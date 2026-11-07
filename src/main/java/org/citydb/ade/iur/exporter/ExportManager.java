@@ -175,9 +175,9 @@ public class ExportManager implements ADEExportManager {
     public void exportGenericApplicationProperties(String adeHookTable, AbstractFeature parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BRIDGE)) && parent instanceof AbstractBridge)
             getExporter(BridgePropertiesExporter.class).doExport((AbstractBridge) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING)) && parent instanceof AbstractBuilding)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING)) && parent instanceof AbstractBuilding)
             getExporter(BuildingPropertiesExporter.class).doExport((AbstractBuilding) parent, parentId, parentType, projectionFilter);
-        else if (parent instanceof CityObjectGroup) {
+        if (parent instanceof CityObjectGroup) {
             if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP)))
                 getExporter(org.citydb.ade.iur.exporter.urg.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
             else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1)))
@@ -187,33 +187,33 @@ public class ExportManager implements ADEExportManager {
             else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_3)))
                 getExporter(org.citydb.ade.iur.exporter.urt.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
         }
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.LAND_USE)) && parent instanceof LandUse)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.LAND_USE)) && parent instanceof LandUse)
             getExporter(LandUsePropertiesExporter.class).doExport((LandUse) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.ROOM)) && parent instanceof Room)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.ROOM)) && parent instanceof Room)
             getExporter(RoomPropertiesExporter.class).doExport((Room) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.OPENING)) && parent instanceof org.citygml4j.model.citygml.building.AbstractOpening)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.OPENING)) && parent instanceof org.citygml4j.model.citygml.building.AbstractOpening)
             getExporter(OpeningPropertiesExporter.class).doExport((org.citygml4j.model.citygml.building.AbstractOpening) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.THEMATIC_SURFACE)) && parent instanceof org.citygml4j.model.citygml.building.AbstractBoundarySurface)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.THEMATIC_SURFACE)) && parent instanceof org.citygml4j.model.citygml.building.AbstractBoundarySurface)
             getExporter(BoundarySurfacePropertiesExporter.class).doExport((org.citygml4j.model.citygml.building.AbstractBoundarySurface) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING_INSTALLATION)) && (parent instanceof BuildingInstallation || parent instanceof IntBuildingInstallation))
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING_INSTALLATION)) && (parent instanceof BuildingInstallation || parent instanceof IntBuildingInstallation))
             getExporter(BuildingInstallationPropertiesExporter.class).doExport((AbstractCityObject) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING_FURNITURE)) && parent instanceof BuildingFurniture)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING_FURNITURE)) && parent instanceof BuildingFurniture)
             getExporter(BuildingFurniturePropertiesExporter.class).doExport((BuildingFurniture) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITY_FURNITURE)) && parent instanceof CityFurniture)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITY_FURNITURE)) && parent instanceof CityFurniture)
             getExporter(CityFurniturePropertiesExporter.class).doExport((CityFurniture) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_COMPONENT)) && parent instanceof AbstractReliefComponent)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_COMPONENT)) && parent instanceof AbstractReliefComponent)
             getExporter(ReliefComponentPropertiesExporter.class).doExport((AbstractReliefComponent) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_FEATURE)) && parent instanceof ReliefFeature)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_FEATURE)) && parent instanceof ReliefFeature)
             getExporter(ReliefFeaturePropertiesExporter.class).doExport((ReliefFeature) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX)) && parent instanceof TransportationComplex)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX)) && parent instanceof TransportationComplex)
             getExporter(TransportationComplexPropertiesExporter.class).doExport((TransportationComplex) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRAFFIC_AREA)) && parent instanceof TrafficArea)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRAFFIC_AREA)) && parent instanceof TrafficArea)
             getExporter(TrafficAreaPropertiesExporter.class).doExport((TrafficArea) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TUNNEL)) && parent instanceof AbstractTunnel)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TUNNEL)) && parent instanceof AbstractTunnel)
             getExporter(TunnelPropertiesExporter.class).doExport((AbstractTunnel) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECT)) && parent instanceof AbstractVegetationObject)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECT)) && parent instanceof AbstractVegetationObject)
             getExporter(VegetationObjectPropertiesExporter.class).doExport((AbstractVegetationObject) parent, parentId, parentType, projectionFilter);
-        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.WATERBODY)) && parent instanceof WaterBody)
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.WATERBODY)) && parent instanceof WaterBody)
             getExporter(WaterBodyPropertiesExporter.class).doExport((WaterBody) parent, parentId, parentType, projectionFilter);
     }
 

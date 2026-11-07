@@ -170,9 +170,9 @@ public class ImportManager implements ADEImportManager {
     public void importGenericApplicationProperties(ADEPropertyCollection properties, AbstractFeature parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         if (parent instanceof AbstractBridge)
             getImporter(BridgePropertiesImporter.class).doImport(properties, (AbstractBridge) parent, parentId, parentType);
-        else if (parent instanceof AbstractBuilding)
+        if (parent instanceof AbstractBuilding)
             getImporter(BuildingPropertiesImporter.class).doImport(properties, (AbstractBuilding) parent, parentId, parentType);
-        else if (parent instanceof CityObjectGroup) {
+        if (parent instanceof CityObjectGroup) {
             if (properties.containsOneOf(org.citygml4j.ade.iur.model.urf.FiscalYearOfPublicationProperty.class,
                     org.citygml4j.ade.iur.model.urf.LanguageProperty.class)) {
                 getImporter(org.citydb.ade.iur.importer.urf.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
@@ -190,33 +190,33 @@ public class ImportManager implements ADEImportManager {
             if (properties.contains(DataTypeProperty.class))
                 getImporter(org.citydb.ade.iur.importer.urt.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
         }
-        else if (parent instanceof LandUse)
+        if (parent instanceof LandUse)
             getImporter(LandUsePropertiesImporter.class).doImport(properties, (LandUse) parent, parentId, parentType);
-        else if (parent instanceof Room)
+        if (parent instanceof Room)
             getImporter(RoomPropertiesImporter.class).doImport(properties, (Room) parent, parentId, parentType);
-        else if (parent instanceof org.citygml4j.model.citygml.building.AbstractOpening)
+        if (parent instanceof org.citygml4j.model.citygml.building.AbstractOpening)
             getImporter(OpeningPropertiesImporter.class).doImport(properties, (org.citygml4j.model.citygml.building.AbstractOpening) parent, parentId, parentType);
-        else if (parent instanceof org.citygml4j.model.citygml.building.AbstractBoundarySurface)
+        if (parent instanceof org.citygml4j.model.citygml.building.AbstractBoundarySurface)
             getImporter(BoundarySurfacePropertiesImporter.class).doImport(properties, (org.citygml4j.model.citygml.building.AbstractBoundarySurface) parent, parentId, parentType);
-        else if (parent instanceof BuildingInstallation || parent instanceof IntBuildingInstallation)
+        if (parent instanceof BuildingInstallation || parent instanceof IntBuildingInstallation)
             getImporter(BuildingInstallationPropertiesImporter.class).doImport(properties, (AbstractCityObject) parent, parentId, parentType);
-        else if (parent instanceof BuildingFurniture)
+        if (parent instanceof BuildingFurniture)
             getImporter(BuildingFurniturePropertiesImporter.class).doImport(properties, (BuildingFurniture) parent, parentId, parentType);
-        else if (parent instanceof CityFurniture)
+        if (parent instanceof CityFurniture)
             getImporter(CityFurniturePropertiesImporter.class).doImport(properties, (CityFurniture) parent, parentId, parentType);
-        else if (parent instanceof AbstractReliefComponent)
+        if (parent instanceof AbstractReliefComponent)
             getImporter(ReliefComponentPropertiesImporter.class).doImport(properties, (AbstractReliefComponent) parent, parentId, parentType);
-        else if (parent instanceof ReliefFeature)
+        if (parent instanceof ReliefFeature)
             getImporter(ReliefFeaturePropertiesImporter.class).doImport(properties, (ReliefFeature) parent, parentId, parentType);
-        else if (parent instanceof TransportationComplex)
+        if (parent instanceof TransportationComplex)
             getImporter(TransportationComplexPropertiesImporter.class).doImport(properties, (TransportationComplex) parent, parentId, parentType);
-        else if (parent instanceof TrafficArea)
+        if (parent instanceof TrafficArea)
             getImporter(TrafficAreaPropertiesImporter.class).doImport(properties, (TrafficArea) parent, parentId, parentType);
-        else if (parent instanceof AbstractTunnel)
+        if (parent instanceof AbstractTunnel)
             getImporter(TunnelPropertiesImporter.class).doImport(properties, (AbstractTunnel) parent, parentId, parentType);
-        else if (parent instanceof AbstractVegetationObject)
+        if (parent instanceof AbstractVegetationObject)
             getImporter(VegetationObjectPropertiesImporter.class).doImport(properties, (AbstractVegetationObject) parent, parentId, parentType);
-        else if (parent instanceof WaterBody)
+        if (parent instanceof WaterBody)
             getImporter(WaterBodyPropertiesImporter.class).doImport(properties, (WaterBody) parent, parentId, parentType);
     }
 

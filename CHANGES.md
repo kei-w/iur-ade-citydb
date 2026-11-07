@@ -20,10 +20,15 @@ Change Log
   schema mapping because `offset` is a reserved word in PostgreSQL.
 * Repeated ADE properties (disaster risks, key-value pairs) are exported in import order (`ORDER BY id`).
 
+#### Changes (all uro attributes, 2026-11-07)
+* Import/export of every `uro` generic application property of every CityGML feature type defined by the i-UR 3.1 XSD,
+  including GML geometries of DM attributes and the ifc coordinate reference system properties.
+* The ADE Manager output is patched where it cannot represent the schema (multi-valued dates, the
+  `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
+* Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
 #### Known limitations
-* `bldgFacilityIdAttribute`, `bldgFacilityTypeAttribute`, `bldgFacilityAttribute`, `bldgDmAttribute`,
-  `ifcBuildingAttribute`, `indoorBuildingAttribute` and the `uro` attributes of other feature types are stored
-  in the schema but not imported/exported.
+* ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
+  supported; `urf`, `urg` and `urt` remain at 1.4.
 
 ### 3.0.0 - 2026-11-07
 
