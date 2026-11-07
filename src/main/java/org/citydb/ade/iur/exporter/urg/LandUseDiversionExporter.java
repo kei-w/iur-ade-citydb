@@ -32,106 +32,94 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
-import org.citygml4j.ade.iur.model.urg.*;
-import org.citygml4j.model.gml.basicTypes.Measure;
+import org.citygml4j.ade.iur.model.urg.AreaOfAnnualDiversions;
+import org.citygml4j.ade.iur.model.urg.AreaOfAnnualDiversionsProperty;
+import org.citygml4j.ade.iur.model.urg.LandUseDiversion;
+import org.citygml4j.ade.iur.model.urg.NumberOfAnnualDiversions;
+import org.citygml4j.ade.iur.model.urg.NumberOfAnnualDiversionsProperty;
 
 import java.sql.*;
-import java.time.Year;
-import java.util.HashSet;
-import java.util.Set;
 
 public class LandUseDiversionExporter implements StatisticalGridModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final StatisticalGridExporter statisticalGridExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psNumberOfAnnualDiversion;
+    private final PreparedStatement psAreaOfAnnualDiversion;
+    private final NumberOfAnnualDiversionsExporter numberOfAnnualDiversionsExporter;
+    private final AreaOfAnnualDiversionsExporter areaOfAnnualDiversionsExporter;
+    private final AttributeValueSplitter valueSplitter;
 
     public LandUseDiversionExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LANDUSEDIVERSION);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         statisticalGridExporter = manager.getExporter(StatisticalGridExporter.class);
+        numberOfAnnualDiversionsExporter = manager.getExporter(NumberOfAnnualDiversionsExporter.class);
+        areaOfAnnualDiversionsExporter = manager.getExporter(AreaOfAnnualDiversionsExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table statisticalGrid = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)));
-
-        Select select = statisticalGridExporter.addProjection(new Select(), statisticalGrid, projectionFilter, "sg")
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(statisticalGrid, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("numberOfAnnualDiversion", module)) {
-            Table number = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.NUMBEROFANNUALDIVERSIO)));
-            select.addProjection(number.getColumn("id", "nid"), number.getColumn("count"), number.getColumn("year", "nyear"))
-                    .addJoin(JoinFactory.left(number, "landusediver_numberofannu_id", ComparisonName.EQUAL_TO, table.getColumn("id")));
-        }
-        if (projectionFilter.containsProperty("areaOfAnnualDiversion", module)) {
-            Table area = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.AREAOFANNUALDIVERSIONS)));
-            select.addProjection(area.getColumn("id", "aid"), area.getColumn("year", "ayear"))
-                    .addProjection(area.getColumns("area", "area_uom"))
-                    .addJoin(JoinFactory.left(area, "landusediver_areaofannual_id", ComparisonName.EQUAL_TO, table.getColumn("id")));
-        }
+        addProjection(select, table, "");
+        statisticalGridExporter.addProjection(select, statisticalGrid, "sg_");
         ps = connection.prepareStatement(select.toString());
+
+        Table numberOfAnnualDiversions = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDUSEDI_TO_NUMBEROFA)));
+        Select numberOfAnnualDiversionSelect = new Select().addProjection(numberOfAnnualDiversions.getColumn("numberofannualdiversio_id"))
+                .addSelection(ComparisonFactory.equalTo(numberOfAnnualDiversions.getColumn("landusediversion_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(numberOfAnnualDiversions.getColumn("numberofannualdiversio_id")));
+        psNumberOfAnnualDiversion = connection.prepareStatement(numberOfAnnualDiversionSelect.toString());
+        Table areaOfAnnualDiversions = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDUSEDI_TO_AREAOFANN)));
+        Select areaOfAnnualDiversionSelect = new Select().addProjection(areaOfAnnualDiversions.getColumn("areaofannualdiversions_id"))
+                .addSelection(ComparisonFactory.equalTo(areaOfAnnualDiversions.getColumn("landusediversion_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(areaOfAnnualDiversions.getColumn("areaofannualdiversions_id")));
+        psAreaOfAnnualDiversion = connection.prepareStatement(areaOfAnnualDiversionSelect.toString());
     }
 
     public void doExport(LandUseDiversion landUseDiversion, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-            Set<Long> numberOfAnnualDiversions = new HashSet<>();
-            Set<Long> areaOfAnnualDiversions = new HashSet<>();
+            if (rs.next()) {
+                statisticalGridExporter.doExport(landUseDiversion, objectId, "sg_", rs);
+                doExport(landUseDiversion, objectId, "", rs);
+            }
+        }
+    }
 
-            while (rs.next()) {
-                if (!isInitialized) {
-                    statisticalGridExporter.doExport(landUseDiversion, projectionFilter, "sg", rs);
-                    isInitialized = true;
-                }
+    public Select addProjection(Select select, Table table, String prefix) {
+        return select;
+    }
 
-                if (projectionFilter.containsProperty("numberOfAnnuallDiversion", module)) {
-                    long numberId = rs.getLong("nid");
-                    if (!rs.wasNull() && numberOfAnnualDiversions.add(numberId)) {
-                        NumberOfAnnualDiversions number = new NumberOfAnnualDiversions();
+    public void doExport(LandUseDiversion landUseDiversion, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        psNumberOfAnnualDiversion.setLong(1, objectId);
+        try (ResultSet numberOfAnnualDiversionRs = psNumberOfAnnualDiversion.executeQuery()) {
+            while (numberOfAnnualDiversionRs.next()) {
+                NumberOfAnnualDiversions numberOfAnnualDiversion = new NumberOfAnnualDiversions();
+                numberOfAnnualDiversionsExporter.doExport(numberOfAnnualDiversion, numberOfAnnualDiversionRs.getLong("numberofannualdiversio_id"));
+                landUseDiversion.getNumberOfAnnualDiversion().add(new NumberOfAnnualDiversionsProperty(numberOfAnnualDiversion));
+            }
+        }
 
-                        int count = rs.getInt("count");
-                        if (!rs.wasNull())
-                            number.setCount(count);
-
-                        Date year = rs.getDate("nyear");
-                        if (!rs.wasNull())
-                            number.setYear(Year.of(year.toLocalDate().getYear()));
-
-                        landUseDiversion.getNumberOfAnnualDiversions().add(new NumberOfAnnualDiversionsProperty(number));
-                    }
-                }
-
-                if (projectionFilter.containsProperty("areaOfAnnualDiversion", module)) {
-                    long areaId = rs.getLong("aid");
-                    if (!rs.wasNull() && areaOfAnnualDiversions.add(areaId)) {
-                        AreaOfAnnualDiversions area = new AreaOfAnnualDiversions();
-
-                        double areaValue = rs.getDouble("area");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(areaValue);
-                            measure.setUom(rs.getString("area_uom"));
-                            area.setArea(measure);
-                        }
-
-                        Date year = rs.getDate("ayear");
-                        if (!rs.wasNull())
-                            area.setYear(Year.of(year.toLocalDate().getYear()));
-
-                        landUseDiversion.getAreaOfAnnualDiversions().add(new AreaOfAnnualDiversionsProperty(area));
-                    }
-                }
+        psAreaOfAnnualDiversion.setLong(1, objectId);
+        try (ResultSet areaOfAnnualDiversionRs = psAreaOfAnnualDiversion.executeQuery()) {
+            while (areaOfAnnualDiversionRs.next()) {
+                AreaOfAnnualDiversions areaOfAnnualDiversion = new AreaOfAnnualDiversions();
+                areaOfAnnualDiversionsExporter.doExport(areaOfAnnualDiversion, areaOfAnnualDiversionRs.getLong("areaofannualdiversions_id"));
+                landUseDiversion.getAreaOfAnnualDiversion().add(new AreaOfAnnualDiversionsProperty(areaOfAnnualDiversion));
             }
         }
     }
@@ -139,5 +127,7 @@ public class LandUseDiversionExporter implements StatisticalGridModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psNumberOfAnnualDiversion.close();
+        psAreaOfAnnualDiversion.close();
     }
 }

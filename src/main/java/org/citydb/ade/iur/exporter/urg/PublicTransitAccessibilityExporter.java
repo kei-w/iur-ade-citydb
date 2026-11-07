@@ -33,37 +33,32 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
 import org.citygml4j.ade.iur.model.urg.PublicTransitAccessibility;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class PublicTransitAccessibilityExporter implements StatisticalGridModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final StatisticalGridExporter statisticalGridExporter;
+    private final PreparedStatement ps;
 
     public PublicTransitAccessibilityExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSITACCESSIBI);
         statisticalGridExporter = manager.getExporter(StatisticalGridExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = statisticalGridExporter.addProjection(new Select(), table, projectionFilter, "sg")
+        Table statisticalGrid = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)));
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(statisticalGrid, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("availability", module))
-            select.addProjection(table.getColumn("availability"));
+        addProjection(select, table, "");
+        statisticalGridExporter.addProjection(select, statisticalGrid, "sg_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -72,15 +67,22 @@ public class PublicTransitAccessibilityExporter implements StatisticalGridModule
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                statisticalGridExporter.doExport(publicTransitAccessibility, projectionFilter, "sg", rs);
-
-                if (projectionFilter.containsProperty("availability", module)) {
-                    boolean availability = rs.getBoolean("availability");
-                    if (!rs.wasNull())
-                        publicTransitAccessibility.setAvailability(availability);
-                }
+                statisticalGridExporter.doExport(publicTransitAccessibility, objectId, "sg_", rs);
+                doExport(publicTransitAccessibility, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("availability", prefix + "availability"));
+
+        return select;
+    }
+
+    public void doExport(PublicTransitAccessibility publicTransitAccessibility, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        boolean availability = rs.getBoolean(prefix + "availability");
+        if (!rs.wasNull())
+            publicTransitAccessibility.setAvailability(availability);
     }
 
     @Override

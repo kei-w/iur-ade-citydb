@@ -30,88 +30,60 @@ package org.citydb.ade.iur.exporter.urt;
 
 import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
-import org.citydb.ade.iur.schema.ObjectMapper;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.PublicTransitModule;
 import org.citygml4j.ade.iur.model.urt.*;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class CityObjectGroupPropertiesExporter implements PublicTransitModuleExporter {
-    private final CityGMLExportHelper helper;
-    private final ObjectMapper objectMapper;
     private final PreparedStatement ps;
     private final String module;
 
-    private final FareRuleExporter fareRuleExporter;
-    private final FeedInfoExporter feedInfoExporter;
-    private final FrequencyExporter frequencyExporter;
-    private final StopTimeExporter stopTimeExporter;
-    private final TransferExporter transferExporter;
-    private final TranslationExporter translationExporter;
+    private final PublicTransitDataTypeExporter publicTransitDataTypeExporter;
+    private final PreparedStatement psDataType;
 
     public CityObjectGroupPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        this.helper = helper;
-        this.objectMapper = manager.getObjectMapper();
-
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSITDATATYPE);
-        module = PublicTransitModule.v1_4.getNamespaceURI();
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECTGROUP_3);
+        module = PublicTransitModule.v3_0.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("id", "objectclass_id"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("cityobjectgroup_datatype_id"), new PlaceHolder<>()));
-
+        Select select = new Select().addProjection(table.getColumn("id"))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
-        fareRuleExporter = manager.getExporter(FareRuleExporter.class);
-        feedInfoExporter = manager.getExporter(FeedInfoExporter.class);
-        frequencyExporter = manager.getExporter(FrequencyExporter.class);
-        stopTimeExporter = manager.getExporter(StopTimeExporter.class);
-        transferExporter = manager.getExporter(TransferExporter.class);
-        translationExporter = manager.getExporter(TranslationExporter.class);
+        Table dataTypes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITYOBJEC_TO_PUBLICTRA)));
+        Select dataTypeSelect = new Select().addProjection(dataTypes.getColumn("publictransitdatatype_id"))
+                .addSelection(ComparisonFactory.equalTo(dataTypes.getColumn("cityobjectgroup_3_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(dataTypes.getColumn("publictransitdatatype_id")));
+        psDataType = connection.prepareStatement(dataTypeSelect.toString());
+        publicTransitDataTypeExporter = manager.getExporter(PublicTransitDataTypeExporter.class);
     }
 
     public void doExport(CityObjectGroup parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
-        if (projectionFilter.containsProperty("dataType", module)) {
-            ps.setLong(1, parentId);
+        ps.setLong(1, parentId);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    long objectId = rs.getLong(1);
-                    int objectClassId = rs.getInt(2);
-                    if (!rs.wasNull()) {
-                        PublicTransitDataType dataType = objectMapper.createType(objectClassId, PublicTransitDataType.class);
-                        if (dataType == null) {
-                            helper.logOrThrowErrorMessage("Failed to instantiate public transit data type (id: " + objectId + ").");
-                            continue;
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                if (projectionFilter.containsProperty("dataType", module)) {
+                    psDataType.setLong(1, parentId);
+                    try (ResultSet dataTypeRs = psDataType.executeQuery()) {
+                        while (dataTypeRs.next()) {
+                            PublicTransitDataType dataType = publicTransitDataTypeExporter.doExport(dataTypeRs.getLong("publictransitdatatype_id"));
+                            if (dataType != null) {
+                                DataTypePropertyElement property = new DataTypePropertyElement(new PublicTransitDataTypeProperty(dataType));
+                                parent.addGenericApplicationPropertyOfCityObjectGroup(property);
+                            }
                         }
-
-                        if (dataType instanceof FareRule)
-                            fareRuleExporter.doExport((FareRule) dataType, objectId);
-                        else if (dataType instanceof FeedInfo)
-                            feedInfoExporter.doExport((FeedInfo) dataType, objectId);
-                        else if (dataType instanceof Frequency)
-                            frequencyExporter.doExport((Frequency) dataType, objectId);
-                        else if (dataType instanceof StopTime)
-                            stopTimeExporter.doExport((StopTime) dataType, objectId);
-                        else if (dataType instanceof Transfer)
-                            transferExporter.doExport((Transfer) dataType, objectId);
-                        else if (dataType instanceof Translation)
-                            translationExporter.doExport((Translation) dataType, objectId);
-
-                        DataTypeProperty property = new DataTypeProperty(new PublicTransitDataTypeProperty(dataType));
-                        parent.addGenericApplicationPropertyOfCityObjectGroup(property);
                     }
                 }
             }
@@ -121,5 +93,6 @@ public class CityObjectGroupPropertiesExporter implements PublicTransitModuleExp
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psDataType.close();
     }
 }

@@ -35,22 +35,17 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.urt.Level;
-import org.citygml4j.ade.iur.model.urt.PointProperty;
 import org.citygml4j.ade.iur.model.urt.PublicTransit;
-import org.citygml4j.ade.iur.model.urt.Shape;
+import org.citygml4j.ade.iur.model.urt.TargetProperty;
 import org.citygml4j.model.citygml.core.AbstractCityObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PublicTransitImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final PointImporter pointImporter;
+    private final PublicTransitToCityObjectImporter publicTransitToCityObjectImporter;
 
     private int batchCounter;
 
@@ -59,11 +54,11 @@ public class PublicTransitImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)) + " " +
-                "(id, objectclass_id, orgid, target_id, index_) " +
-                "values (?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PUBLICTRANSIT)) + " " +
+                "(id, objectclass_id, orgid) " +
+                "values (?, ?, ?)");
 
-        pointImporter = manager.getImporter(PointImporter.class);
+        publicTransitToCityObjectImporter = manager.getImporter(PublicTransitToCityObjectImporter.class);
     }
 
     public void doImport(PublicTransit publicTransit, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
@@ -72,43 +67,21 @@ public class PublicTransitImporter implements PublicTransitModuleImporter {
 
         ps.setString(3, publicTransit.getOrgId());
 
-        long cityObjectId = 0;
-        if (publicTransit.getTarget() != null) {
-            AbstractCityObject cityObject = publicTransit.getTarget().getObject();
-            if (cityObject != null) {
-                cityObjectId = helper.importObject(cityObject);
-                publicTransit.getTarget().unsetObject();
-            } else {
-                String href = publicTransit.getTarget().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.PUBLICTRANSIT),
-                            objectId, href, "target_id");
-                }
-            }
-        }
-
-        if (cityObjectId != 0)
-            ps.setLong(4, cityObjectId);
-        else
-            ps.setNull(4, Types.NULL);
-
-        if (publicTransit instanceof Level)
-            ps.setDouble(5, ((Level) publicTransit).getIndex());
-        else
-            ps.setNull(5, Types.DOUBLE);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
 
-        if (publicTransit instanceof Shape) {
-            Shape shape = (Shape) publicTransit;
-            for (PointProperty property : shape.getPoints()) {
-                if (property.getObject() != null) {
-                    pointImporter.doImport(property.getObject(), objectId);
-                    property.unsetObject();
-                }
+        if (publicTransit.getTarget() != null) {
+            TargetProperty property = publicTransit.getTarget();
+            AbstractCityObject cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                publicTransitToCityObjectImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.PUBLICTRA_TO_CITYOBJEC), objectId, "publictransit_id", href, "cityobject_id");
             }
         }
     }

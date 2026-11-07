@@ -36,20 +36,23 @@ import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Agency;
+import org.citygml4j.ade.iur.model.urt.AgencyProperty;
 import org.citygml4j.ade.iur.model.urt.Attribution;
 import org.citygml4j.ade.iur.model.urt.Route;
+import org.citygml4j.ade.iur.model.urt.RouteProperty;
 import org.citygml4j.ade.iur.model.urt.Trip;
+import org.citygml4j.ade.iur.model.urt.TripProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class AttributionImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
+    private final AttributionToAgencyImporter attributionToAgencyImporter;
+    private final AttributionToRouteImporter attributionToRouteImporter;
+    private final AttributionToTripImporter attributionToTripImporter;
 
     private int batchCounter;
 
@@ -58,22 +61,25 @@ public class AttributionImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ATTRIBUTION)) + " " +
-                "(id, email, isauthority, isoperator, isproducer, organizationname, phonenumber, url, " +
-                "agency_id, route_id, trip_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.ATTRIBUTION)) + " " +
+                "(id, organizationname, isproducer, isoperator, isauthority, url, email, phonenumber) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
+        attributionToAgencyImporter = manager.getImporter(AttributionToAgencyImporter.class);
+        attributionToRouteImporter = manager.getImporter(AttributionToRouteImporter.class);
+        attributionToTripImporter = manager.getImporter(AttributionToTripImporter.class);
     }
 
     public void doImport(Attribution attribution, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(attribution, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        ps.setString(2, attribution.getEmail());
+        ps.setString(2, attribution.getOrganizationName());
 
-        if (attribution.getIsAuthority() != null)
-            ps.setInt(3, attribution.getIsAuthority() ? 1 : 0);
+        if (attribution.getIsProducer() != null)
+            ps.setInt(3, attribution.getIsProducer() ? 1 : 0);
         else
             ps.setNull(3, Types.INTEGER);
 
@@ -82,81 +88,60 @@ public class AttributionImporter implements PublicTransitModuleImporter {
         else
             ps.setNull(4, Types.INTEGER);
 
-        if (attribution.getIsProducer() != null)
-            ps.setInt(5, attribution.getIsProducer() ? 1 : 0);
+        if (attribution.getIsAuthority() != null)
+            ps.setInt(5, attribution.getIsAuthority() ? 1 : 0);
         else
             ps.setNull(5, Types.INTEGER);
 
-        ps.setString(6, attribution.getOrganizationName());
-        ps.setString(7, attribution.getPhoneNumber());
-        ps.setString(8, attribution.getUrl());
+        ps.setString(6, attribution.getUrl());
 
-        long agencyId = 0;
-        if (attribution.getAgency() != null) {
-            Agency agency = attribution.getAgency().getObject();
-            if (agency != null) {
-                agencyId = helper.importObject(agency);
-                attribution.getAgency().unsetObject();
-            } else {
-                String href = attribution.getAgency().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.ATTRIBUTION),
-                            objectId, href, "agency_id");
-                }
-            }
-        }
+        ps.setString(7, attribution.getEmail());
 
-        if (agencyId != 0)
-            ps.setLong(9, agencyId);
-        else
-            ps.setNull(9, Types.NULL);
-
-        long routeId = 0;
-        if (attribution.getRoute() != null) {
-            Route route = attribution.getRoute().getObject();
-            if (route != null) {
-                routeId = helper.importObject(route);
-                attribution.getRoute().unsetObject();
-            } else {
-                String href = attribution.getRoute().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.ATTRIBUTION),
-                            objectId, href, "route_id");
-                }
-            }
-        }
-
-        if (routeId != 0)
-            ps.setLong(10, routeId);
-        else
-            ps.setNull(10, Types.NULL);
-
-        long tripId = 0;
-        if (attribution.getTrip() != null) {
-            Trip trip = attribution.getTrip().getObject();
-            if (trip != null) {
-                tripId = helper.importObject(trip);
-                attribution.getTrip().unsetObject();
-            } else {
-                String href = attribution.getTrip().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "trip_id");
-                }
-            }
-        }
-
-        if (tripId != 0)
-            ps.setLong(11, tripId);
-        else
-            ps.setNull(11, Types.NULL);
+        ps.setString(8, attribution.getPhoneNumber());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        if (attribution.getAgency() != null) {
+            AgencyProperty property = attribution.getAgency();
+            Agency cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                attributionToAgencyImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.ATTRIBUTI_TO_AGENCY), objectId, "attribution_id", href, "agency_id");
+            }
+        }
+        if (attribution.getRoute() != null) {
+            RouteProperty property = attribution.getRoute();
+            Route cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                attributionToRouteImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.ATTRIBUTI_TO_ROUTE), objectId, "attribution_id", href, "route_id");
+            }
+        }
+        if (attribution.getTrip() != null) {
+            TripProperty property = attribution.getTrip();
+            Trip cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                attributionToTripImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.ATTRIBUTI_TO_TRIP), objectId, "attribution_id", href, "trip_id");
+            }
+        }
     }
 
     @Override

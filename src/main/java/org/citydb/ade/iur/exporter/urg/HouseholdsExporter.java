@@ -33,59 +33,40 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
-import org.citydb.sqlbuilder.select.join.Join;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citydb.sqlbuilder.select.operator.logical.LogicalOperationName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urg.Households;
 import org.citygml4j.ade.iur.model.urg.NumberOfHouseholds;
 import org.citygml4j.ade.iur.model.urg.NumberOfHouseholdsProperty;
-import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class HouseholdsExporter implements StatisticalGridModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final StatisticalGridExporter statisticalGridExporter;
+    private final PreparedStatement ps;
+    private final NumberOfHouseholdsExporter numberOfHouseholdsExporter;
+    private final AttributeValueSplitter valueSplitter;
 
     public HouseholdsExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.HOUSEHOLDS);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         statisticalGridExporter = manager.getExporter(StatisticalGridExporter.class);
+        numberOfHouseholdsExporter = manager.getExporter(NumberOfHouseholdsExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table statisticalGrid = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)));
-
-        Select select = statisticalGridExporter.addProjection(new Select(), statisticalGrid, projectionFilter, "sg")
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(statisticalGrid, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("numberOfOrdinaryHousehold", module))
-            select.addProjection(table.getColumn("numberofordinaryhousehold"));
-        if (projectionFilter.containsProperty("numberOfMainHousehold", module))
-            select.addProjection(table.getColumn("numberofmainhousehold"));
-        if (projectionFilter.containsProperty("numberOfHouseholdsByOwnership", module)
-                || projectionFilter.containsProperty("numberOfHouseholdsByStructure", module)) {
-            Table households = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.NUMBEROFHOUSEHOLDS)));
-            select.addProjection(households.getColumns("households_numberofhouseh_id", "households_numberofhous_id_1",
-                    "class", "class_codespace", "number_"));
-            Join join = JoinFactory.left(households, "households_numberofhouseh_id", ComparisonName.EQUAL_TO, table.getColumn("id"));
-            join.addCondition(ComparisonFactory.equalTo(households.getColumn("households_numberofhous_id_1"), table.getColumn("id")));
-            join.setConditionOperationName(LogicalOperationName.OR);
-            select.addJoin(join);
-        }
+        addProjection(select, table, "");
+        statisticalGridExporter.addProjection(select, statisticalGrid, "sg_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -93,57 +74,34 @@ public class HouseholdsExporter implements StatisticalGridModuleExporter {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    statisticalGridExporter.doExport(households, projectionFilter, "sg", rs);
-
-                    if (projectionFilter.containsProperty("numberOfOrdinaryHousehold", module)) {
-                        int numberOfOrdinaryHousehold = rs.getInt("numberofordinaryhousehold");
-                        if (!rs.wasNull())
-                            households.setNumberOfOrdinaryHouseholds(numberOfOrdinaryHousehold);
-                    }
-
-                    if (projectionFilter.containsProperty("numberOfMainHousehold", module)) {
-                        int numberOfMainHousehold = rs.getInt("numberofmainhousehold");
-                        if (!rs.wasNull())
-                            households.setNumberOfMainHouseholds(numberOfMainHousehold);
-                    }
-
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("numberOfHouseholdsByOwnership", module)) {
-                    long numberId = rs.getLong("households_numberofhouseh_id");
-                    if (numberId != 0)
-                        households.getNumberOfHouseholdsByOwnership().add(getNumberOfHouseholds(rs));
-                }
-
-                if (projectionFilter.containsProperty("numberOfHouseholdsByStructure", module)) {
-                    long numberId = rs.getLong("households_numberofhous_id_1");
-                    if (numberId != 0)
-                        households.getNumberOfHouseholdsByStructure().add(getNumberOfHouseholds(rs));
-                }
+            if (rs.next()) {
+                statisticalGridExporter.doExport(households, objectId, "sg_", rs);
+                doExport(households, objectId, "", rs);
             }
         }
     }
 
-    private NumberOfHouseholdsProperty getNumberOfHouseholds(ResultSet rs) throws SQLException {
-        NumberOfHouseholds numberOfHouseholds = new NumberOfHouseholds();
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("numberofordinaryhousehold", prefix + "numberofordinaryhousehold"),
+                table.getColumn("numberofmainhousehold", prefix + "numberofmainhousehold"));
 
-        String classifier = rs.getString("class");
-        if (!rs.wasNull()) {
-            Code code = new Code(classifier);
-            code.setCodeSpace(rs.getString("class_codespace"));
-            numberOfHouseholds.setClassifier(code);
-        }
+        return select;
+    }
 
-        int number = rs.getInt("number_");
+    public void doExport(Households households, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        int numberOfOrdinaryHousehold = rs.getInt(prefix + "numberofordinaryhousehold");
         if (!rs.wasNull())
-            numberOfHouseholds.setNumber(number);
+            households.setNumberOfOrdinaryHousehold(numberOfOrdinaryHousehold);
 
-        return new NumberOfHouseholdsProperty(numberOfHouseholds);
+        for (NumberOfHouseholds numberOfHouseholdsByOwnership : numberOfHouseholdsExporter.doExport(objectId, "households_numberofhouseh_id"))
+            households.getNumberOfHouseholdsByOwnership().add(new NumberOfHouseholdsProperty(numberOfHouseholdsByOwnership));
+
+        for (NumberOfHouseholds numberOfHouseholdsByStructure : numberOfHouseholdsExporter.doExport(objectId, "households_numberofhouseh__2"))
+            households.getNumberOfHouseholdsByStructure().add(new NumberOfHouseholdsProperty(numberOfHouseholdsByStructure));
+
+        int numberOfMainHousehold = rs.getInt(prefix + "numberofmainhousehold");
+        if (!rs.wasNull())
+            households.setNumberOfMainHousehold(numberOfMainHousehold);
     }
 
     @Override

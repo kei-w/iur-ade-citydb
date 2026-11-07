@@ -33,7 +33,6 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -41,52 +40,26 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urt.Agency;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class AgencyExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
 
     public AgencyExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.AGENCY);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumns("name", "url", "timezone", "timezone_codespace"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
-        if (projectionFilter.containsProperty("language", module))
-            select.addProjection(table.getColumns("language", "language_codespace"));
-        if (projectionFilter.containsProperty("phone", module))
-            select.addProjection(table.getColumn("phone"));
-        if (projectionFilter.containsProperty("fareUrl", module))
-            select.addProjection(table.getColumn("fareurl"));
-        if (projectionFilter.containsProperty("email", module))
-            select.addProjection(table.getColumn("email"));
-        if (projectionFilter.containsProperty("officialName", module))
-            select.addProjection(table.getColumn("officialname"));
-        if (projectionFilter.containsProperty("zipNumber", module))
-            select.addProjection(table.getColumn("zipnumber"));
-        if (projectionFilter.containsProperty("address", module))
-            select.addProjection(table.getColumn("address"));
-        if (projectionFilter.containsProperty("presidentPosition", module))
-            select.addProjection(table.getColumn("presidentposition"));
-        if (projectionFilter.containsProperty("presidentName", module))
-            select.addProjection(table.getColumn("presidentname"));
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -95,52 +68,65 @@ public class AgencyExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(agency, projectionFilter, "pt", rs);
-
-                agency.setAgencyName(rs.getString("name"));
-                agency.setUrl(rs.getString("url"));
-
-                String timezone = rs.getString("timezone");
-                if (!rs.wasNull()) {
-                    Code code = new Code(timezone);
-                    code.setCodeSpace(rs.getString("timezone_codespace"));
-                    agency.setTimeZone(code);
-                }
-
-                if (projectionFilter.containsProperty("language", module)) {
-                    String language = rs.getString("language");
-                    if (!rs.wasNull()) {
-                        Code code = new Code(language);
-                        code.setCodeSpace(rs.getString("language_codespace"));
-                        agency.setLanguage(code);
-                    }
-                }
-
-                if (projectionFilter.containsProperty("phone", module))
-                    agency.setPhone(rs.getString("phone"));
-
-                if (projectionFilter.containsProperty("fareUrl", module))
-                    agency.setFareUrl(rs.getString("fareurl"));
-
-                if (projectionFilter.containsProperty("email", module))
-                    agency.setEmail(rs.getString("email"));
-
-                if (projectionFilter.containsProperty("officialName", module))
-                    agency.setOfficialName(rs.getString("officialname"));
-
-                if (projectionFilter.containsProperty("zipNumber", module))
-                    agency.setZipNumber(rs.getString("zipnumber"));
-
-                if (projectionFilter.containsProperty("address", module))
-                    agency.setAddress(rs.getString("address"));
-
-                if (projectionFilter.containsProperty("presidentPosition", module))
-                    agency.setPresidentPosition(rs.getString("presidentposition"));
-
-                if (projectionFilter.containsProperty("presidentName", module))
-                    agency.setPresidentName(rs.getString("presidentname"));
+                publicTransitExporter.doExport(agency, objectId, "pt_", rs);
+                doExport(agency, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("name", prefix + "name"),
+                table.getColumn("url", prefix + "url"),
+                table.getColumn("timezone", prefix + "timezone"),
+                table.getColumn("timezone_codespace", prefix + "timezone_codespace"),
+                table.getColumn("language", prefix + "language"),
+                table.getColumn("language_codespace", prefix + "language_codespace"),
+                table.getColumn("phone", prefix + "phone"),
+                table.getColumn("fareurl", prefix + "fareurl"),
+                table.getColumn("email", prefix + "email"),
+                table.getColumn("officialname", prefix + "officialname"),
+                table.getColumn("zipnumber", prefix + "zipnumber"),
+                table.getColumn("address", prefix + "address"),
+                table.getColumn("presidentposition", prefix + "presidentposition"),
+                table.getColumn("presidentname", prefix + "presidentname"));
+
+        return select;
+    }
+
+    public void doExport(Agency agency, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        agency.setAgencyName(rs.getString(prefix + "name"));
+
+        agency.setUrl(rs.getString(prefix + "url"));
+
+        String timeZone = rs.getString(prefix + "timezone");
+        if (!rs.wasNull()) {
+            Code code = new Code(timeZone);
+            code.setCodeSpace(rs.getString(prefix + "timezone_codespace"));
+            agency.setTimeZone(code);
+        }
+
+        String language = rs.getString(prefix + "language");
+        if (!rs.wasNull()) {
+            Code code = new Code(language);
+            code.setCodeSpace(rs.getString(prefix + "language_codespace"));
+            agency.setLanguage(code);
+        }
+
+        agency.setPhone(rs.getString(prefix + "phone"));
+
+        agency.setFareUrl(rs.getString(prefix + "fareurl"));
+
+        agency.setEmail(rs.getString(prefix + "email"));
+
+        agency.setOfficialName(rs.getString(prefix + "officialname"));
+
+        agency.setZipNumber(rs.getString(prefix + "zipnumber"));
+
+        agency.setAddress(rs.getString(prefix + "address"));
+
+        agency.setPresidentPosition(rs.getString(prefix + "presidentposition"));
+
+        agency.setPresidentName(rs.getString(prefix + "presidentname"));
     }
 
     @Override

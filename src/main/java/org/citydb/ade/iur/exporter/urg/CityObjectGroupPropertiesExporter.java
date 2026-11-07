@@ -39,13 +39,13 @@ import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
-import org.citygml4j.ade.iur.model.urg.FiscalYearOfPublicationProperty;
-import org.citygml4j.ade.iur.model.urg.LanguageProperty;
+import org.citygml4j.ade.iur.model.urg.*;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.*;
 import java.time.Year;
+
+import java.sql.*;
 
 public class CityObjectGroupPropertiesExporter implements StatisticalGridModuleExporter {
     private final PreparedStatement ps;
@@ -53,7 +53,7 @@ public class CityObjectGroupPropertiesExporter implements StatisticalGridModuleE
 
     public CityObjectGroupPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECTGROUP);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
+        module = StatisticalGridModule.v3_0.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("fiscalyearofpublication", "language", "language_codespace"))
@@ -66,22 +66,15 @@ public class CityObjectGroupPropertiesExporter implements StatisticalGridModuleE
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                if (projectionFilter.containsProperty("fiscalYearOfPublication", module)) {
-                    Date fiscalYearOfPublication = rs.getDate("fiscalyearofpublication");
-                    if (!rs.wasNull()) {
-                        FiscalYearOfPublicationProperty property = new FiscalYearOfPublicationProperty(Year.of(fiscalYearOfPublication.toLocalDate().getYear()));
-                        parent.addGenericApplicationPropertyOfCityObjectGroup(property);
-                    }
-                }
+                Date fiscalYearOfPublication = rs.getDate("fiscalyearofpublication");
+                if (!rs.wasNull() && projectionFilter.containsProperty("fiscalYearOfPublication", module))
+                    parent.addGenericApplicationPropertyOfCityObjectGroup(new FiscalYearOfPublicationProperty(Year.of(fiscalYearOfPublication.toLocalDate().getYear())));
 
-                if (projectionFilter.containsProperty("language", module)) {
-                    String language = rs.getString("language");
-                    if (!rs.wasNull()) {
-                        Code code = new Code(language);
-                        code.setCodeSpace(rs.getString("language_codespace"));
-                        LanguageProperty property = new LanguageProperty(code);
-                        parent.addGenericApplicationPropertyOfCityObjectGroup(property);
-                    }
+                String language = rs.getString("language");
+                if (!rs.wasNull() && projectionFilter.containsProperty("language", module)) {
+                    Code code = new Code(language);
+                    code.setCodeSpace(rs.getString("language_codespace"));
+                    parent.addGenericApplicationPropertyOfCityObjectGroup(new LanguageProperty(code));
                 }
             }
         }

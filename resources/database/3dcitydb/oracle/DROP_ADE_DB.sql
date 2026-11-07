@@ -3,27 +3,6 @@
 -- *********************************** Drop foreign keys ********************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- -------------------------------------------------------------------- 
--- ur_agency 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_agency
-    DROP CONSTRAINT ur_agency_fk;
-
--- -------------------------------------------------------------------- 
--- ur_attribution 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_fk;
-
-ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_agency_fk;
-
-ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_route_fk;
-
-ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_trip_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_boundarysurface 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_boundarysurface
@@ -244,21 +223,6 @@ ALTER TABLE ur_cable
 
 ALTER TABLE ur_cable
     DROP CONSTRAINT ur_cable_fk;
-
--- -------------------------------------------------------------------- 
--- ur_calendar 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_calendar
-    DROP CONSTRAINT ur_calendar_fk;
-
--- -------------------------------------------------------------------- 
--- ur_calendardate 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_calendardate
-    DROP CONSTRAINT ur_calendardate_fk;
-
-ALTER TABLE ur_calendardate
-    DROP CONSTRAINT ur_calendardat_calendar_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_cargohandlingfacility 
@@ -594,33 +558,6 @@ ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facilityat_objectcla_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_fareattribute 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_fareattribute
-    DROP CONSTRAINT ur_fareattribute_fk;
-
-ALTER TABLE ur_fareattribute
-    DROP CONSTRAINT ur_fareattribute_agency_fk;
-
--- -------------------------------------------------------------------- 
--- ur_farerule 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_farerule
-    DROP CONSTRAINT ur_farerule_fk;
-
-ALTER TABLE ur_farerule
-    DROP CONSTRAINT ur_farerule_fare_fk;
-
-ALTER TABLE ur_farerule
-    DROP CONSTRAINT ur_farerule_route_fk;
-
--- -------------------------------------------------------------------- 
--- ur_feedinfo 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_feedinfo
-    DROP CONSTRAINT ur_feedinfo_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_fishingportattribute 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_fishingportattribute
@@ -651,25 +588,10 @@ ALTER TABLE ur_floodingriskattribute
     DROP CONSTRAINT ur_floodingriskattribut_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_frequency 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_frequency
-    DROP CONSTRAINT ur_frequency_fk;
-
-ALTER TABLE ur_frequency
-    DROP CONSTRAINT ur_frequency_trip_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_harborfacility 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_harborfacility
     DROP CONSTRAINT ur_harborfacility_fk;
-
--- -------------------------------------------------------------------- 
--- ur_households 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_households
-    DROP CONSTRAINT ur_households_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcattribute 
@@ -957,45 +879,6 @@ ALTER TABLE ur_land_use_to_facilitya
     DROP CONSTRAINT ur_land_use__land_use_id_fk_2;
 
 -- -------------------------------------------------------------------- 
--- ur_landprice 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landprice
-    DROP CONSTRAINT ur_landprice_fk;
-
--- -------------------------------------------------------------------- 
--- ur_landprice_to_landprice 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landprice_to_landprice
-    DROP CONSTRAINT ur_landprice_landpricepe_fk_2;
-
-ALTER TABLE ur_landprice_to_landprice
-    DROP CONSTRAINT ur_landprice_landprice_i_fk_2;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_areaofann 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusedi_to_areaofann
-    DROP CONSTRAINT ur_landusedi_areaofannua_fk_2;
-
-ALTER TABLE ur_landusedi_to_areaofann
-    DROP CONSTRAINT ur_landusedi_landusedive_fk_4;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_numberofa 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusedi_to_numberofa
-    DROP CONSTRAINT ur_landusedi_numberofann_fk_2;
-
-ALTER TABLE ur_landusedi_to_numberofa
-    DROP CONSTRAINT ur_landusedi_landusedive_fk_2;
-
--- -------------------------------------------------------------------- 
--- ur_landusediversion 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusediversion
-    DROP CONSTRAINT ur_landusediversion_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_largecustomerfacilitya 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_largecustomerfacilitya
@@ -1020,27 +903,6 @@ ALTER TABLE ur_navigationassistancefa
     DROP CONSTRAINT ur_navigationassistance_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_numberofhouseholds 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_numberofhouseholds
-    DROP CONSTRAINT ur_number_househ_number_fk;
-
-ALTER TABLE ur_numberofhouseholds
-    DROP CONSTRAINT ur_number_house_numbe_fk_1;
-
--- -------------------------------------------------------------------- 
--- ur_office 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_office
-    DROP CONSTRAINT ur_office_fk;
-
--- -------------------------------------------------------------------- 
--- ur_officesandemployees 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_officesandemployees
-    DROP CONSTRAINT ur_officesandemployees_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_opening 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_opening
@@ -1059,18 +921,6 @@ ALTER TABLE ur_otherconstruction
     DROP CONSTRAINT ur_otherconstruction_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_pathway 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_pathway
-    DROP CONSTRAINT ur_pathway_fk;
-
-ALTER TABLE ur_pathway
-    DROP CONSTRAINT ur_pathway_from_fk;
-
-ALTER TABLE ur_pathway
-    DROP CONSTRAINT ur_pathway_to_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_pipe 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_pipe
@@ -1078,21 +928,6 @@ ALTER TABLE ur_pipe
 
 ALTER TABLE ur_pipe
     DROP CONSTRAINT ur_pipe_fk;
-
--- -------------------------------------------------------------------- 
--- ur_populatio_to_populatio 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_populatio_to_populatio
-    DROP CONSTRAINT ur_populatio_populationb_fk_2;
-
-ALTER TABLE ur_populatio_to_populatio
-    DROP CONSTRAINT ur_populatio_population__fk_2;
-
--- -------------------------------------------------------------------- 
--- ur_population 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_population
-    DROP CONSTRAINT ur_population_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_portattribute 
@@ -1162,33 +997,6 @@ ALTER TABLE ur_portwelfarefacility
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_publicland
     DROP CONSTRAINT ur_publicland_fk;
-
--- -------------------------------------------------------------------- 
--- ur_publictra_to_point 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictra_to_point
-    DROP CONSTRAINT ur_publictra_point_id_fk_2;
-
-ALTER TABLE ur_publictra_to_point
-    DROP CONSTRAINT ur_publictra_publictrans_fk_2;
-
--- -------------------------------------------------------------------- 
--- ur_publictransit 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictransit
-    DROP CONSTRAINT ur_publictran_objectcla_fk;
-
-ALTER TABLE ur_publictransit
-    DROP CONSTRAINT ur_publictransit_fk;
-
-ALTER TABLE ur_publictransit
-    DROP CONSTRAINT ur_publictransit_target_fk;
-
--- -------------------------------------------------------------------- 
--- ur_publictransitdatatype 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictransitdatatype
-    DROP CONSTRAINT ur_publictra_objectcl_fk_1;
 
 -- -------------------------------------------------------------------- 
 -- ur_railwaytr_to_controlpo 
@@ -1263,21 +1071,6 @@ ALTER TABLE ur_room
     DROP CONSTRAINT ur_room_indoorroomattri_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_route 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_route
-    DROP CONSTRAINT ur_route_fk;
-
-ALTER TABLE ur_route
-    DROP CONSTRAINT ur_route_parentroute_fk;
-
-ALTER TABLE ur_route
-    DROP CONSTRAINT ur_route_description_fk;
-
-ALTER TABLE ur_route
-    DROP CONSTRAINT ur_route_agency_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_shipservicefacility 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_shipservicefacility
@@ -1294,54 +1087,6 @@ ALTER TABLE ur_squareurbanplanattribu
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_stationsquareattribute
     DROP CONSTRAINT ur_stationsquareattribu_fk;
-
--- -------------------------------------------------------------------- 
--- ur_statistic_to_keyvaluep 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_statistic_to_keyvaluep
-    DROP CONSTRAINT ur_statistic_keyvaluepai_fk_2;
-
-ALTER TABLE ur_statistic_to_keyvaluep
-    DROP CONSTRAINT ur_statistic_statistical_fk_2;
-
--- -------------------------------------------------------------------- 
--- ur_statisticalgrid 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_statisticalgrid
-    DROP CONSTRAINT ur_statisticalgrid_fk;
-
-ALTER TABLE ur_statisticalgrid
-    DROP CONSTRAINT ur_statistica_objectcla_fk;
-
-ALTER TABLE ur_statisticalgrid
-    DROP CONSTRAINT ur_statisti_lod_1multis_fk;
-
-ALTER TABLE ur_statisticalgrid
-    DROP CONSTRAINT ur_statisti_lod_2multis_fk;
-
--- -------------------------------------------------------------------- 
--- ur_stop 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_stop
-    DROP CONSTRAINT ur_stop_fk;
-
-ALTER TABLE ur_stop
-    DROP CONSTRAINT ur_stop_parentstation_fk;
-
-ALTER TABLE ur_stop
-    DROP CONSTRAINT ur_stop_level_fk;
-
--- -------------------------------------------------------------------- 
--- ur_stoptime 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_stoptime
-    DROP CONSTRAINT ur_stoptime_fk;
-
-ALTER TABLE ur_stoptime
-    DROP CONSTRAINT ur_stoptime_trip_fk;
-
-ALTER TABLE ur_stoptime
-    DROP CONSTRAINT ur_stoptime_stop_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_terminalattribute 
@@ -1386,33 +1131,6 @@ ALTER TABLE ur_trafficvolumeattribute
     DROP CONSTRAINT ur_trafficvolumeattribu_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_transfer 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_transfer
-    DROP CONSTRAINT ur_transfer_fk;
-
-ALTER TABLE ur_transfer
-    DROP CONSTRAINT ur_transfer_from_fk;
-
-ALTER TABLE ur_transfer
-    DROP CONSTRAINT ur_transfer_to_fk;
-
--- -------------------------------------------------------------------- 
--- ur_translation 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_translation
-    DROP CONSTRAINT ur_translation_fk;
-
-ALTER TABLE ur_translation
-    DROP CONSTRAINT ur_translation_recordid_fk;
-
--- -------------------------------------------------------------------- 
--- ur_translationjp 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_translationjp
-    DROP CONSTRAINT ur_translationjp_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_transport_to_facilitya 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_transport_to_facilitya
@@ -1453,27 +1171,6 @@ ALTER TABLE ur_transportation_complex
 
 ALTER TABLE ur_transportation_complex
     DROP CONSTRAINT ur_transp_compl_roads_fk_1;
-
--- -------------------------------------------------------------------- 
--- ur_trip 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_route_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_calendar_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_calendardate_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_office_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_shape_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_tunnel 
@@ -2459,24 +2156,462 @@ ALTER TABLE ur_zone_to_boundary
 ALTER TABLE ur_zone_to_boundary
     DROP CONSTRAINT ur_zone_to_b_zone_id_fk_2;
 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
--- *********************************** Drop tables *************************************** 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+-- -------------------------------------------------------------------- 
+-- ur_genericgr_to_keyvaluep 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_genericgr_to_keyvaluep
+    DROP CONSTRAINT ur_genericgr_genericgrid_fk_2;
+
+ALTER TABLE ur_genericgr_to_keyvaluep
+    DROP CONSTRAINT ur_genericgr_keyvaluepai_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgridcell 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_genericgridcell
+    DROP CONSTRAINT ur_genericgridcell_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_households 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_households
+    DROP CONSTRAINT ur_households_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landprice
+    DROP CONSTRAINT ur_landprice_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice_to_landprice 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landprice_to_landprice
+    DROP CONSTRAINT ur_landprice_landprice_i_fk_2;
+
+ALTER TABLE ur_landprice_to_landprice
+    DROP CONSTRAINT ur_landprice_landpricepe_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_landslidedisaster 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landslidedisaster
+    DROP CONSTRAINT ur_landslidedisaster_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_areaofann 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusedi_to_areaofann
+    DROP CONSTRAINT ur_landusedi_areaofannua_fk_2;
+
+ALTER TABLE ur_landusedi_to_areaofann
+    DROP CONSTRAINT ur_landusedi_landusedive_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_numberofa 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusedi_to_numberofa
+    DROP CONSTRAINT ur_landusedi_landusedive_fk_4;
+
+ALTER TABLE ur_landusedi_to_numberofa
+    DROP CONSTRAINT ur_landusedi_numberofann_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusediversion 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusediversion
+    DROP CONSTRAINT ur_landusediversion_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofhouseholds 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_numberofhouseholds
+    DROP CONSTRAINT ur_numberofh_households__fk_3;
+
+ALTER TABLE ur_numberofhouseholds
+    DROP CONSTRAINT ur_numberofh_households__fk_4;
+
+-- -------------------------------------------------------------------- 
+-- ur_officesandemployees 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_officesandemployees
+    DROP CONSTRAINT ur_officesandemployees_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_populatio_to_populatio 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_populatio_to_populatio
+    DROP CONSTRAINT ur_populatio_population__fk_2;
+
+ALTER TABLE ur_populatio_to_populatio
+    DROP CONSTRAINT ur_populatio_populationb_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_population 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_population
+    DROP CONSTRAINT ur_population_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitaccessibi 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransitaccessibi
+    DROP CONSTRAINT ur_publictransitaccessibi_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_statisticalgrid 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_statisticalgrid
+    DROP CONSTRAINT ur_statisticalg_objectclass__2;
+
+ALTER TABLE ur_statisticalgrid
+    DROP CONSTRAINT ur_statisticalgrid_fk_2;
+
+ALTER TABLE ur_statisticalgrid
+    DROP CONSTRAINT ur_statistic_lod_1multis_fk_2;
+
+ALTER TABLE ur_statisticalgrid
+    DROP CONSTRAINT ur_statistic_lod_2multis_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_statusofsiteseeing 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_statusofsiteseeing
+    DROP CONSTRAINT ur_statusofsiteseeing_fk_2;
+
 -- -------------------------------------------------------------------- 
 -- ur_agency 
 -- -------------------------------------------------------------------- 
-DROP TABLE ur_agency;
+ALTER TABLE ur_agency
+    DROP CONSTRAINT ur_agency_fk_2;
 
 -- -------------------------------------------------------------------- 
--- ur_areaofannualdiversions 
+-- ur_attributi_to_agency 
 -- -------------------------------------------------------------------- 
-DROP TABLE ur_areaofannualdiversions;
+ALTER TABLE ur_attributi_to_agency
+    DROP CONSTRAINT ur_attributi_agency_id_fk_2;
+
+ALTER TABLE ur_attributi_to_agency
+    DROP CONSTRAINT ur_attributi_attribution_fk_4;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_attributi_to_route
+    DROP CONSTRAINT ur_attributi_attribution_fk_5;
+
+ALTER TABLE ur_attributi_to_route
+    DROP CONSTRAINT ur_attributi_route_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_attributi_to_trip
+    DROP CONSTRAINT ur_attributi_attribution_fk_6;
+
+ALTER TABLE ur_attributi_to_trip
+    DROP CONSTRAINT ur_attributi_trip_id_fk_2;
 
 -- -------------------------------------------------------------------- 
 -- ur_attribution 
 -- -------------------------------------------------------------------- 
-DROP TABLE ur_attribution;
+ALTER TABLE ur_attribution
+    DROP CONSTRAINT ur_attribution_fk_2;
 
+-- -------------------------------------------------------------------- 
+-- ur_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendar
+    DROP CONSTRAINT ur_calendar_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendard_to_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendard_to_calendar
+    DROP CONSTRAINT ur_calendard_calendar_id_fk_2;
+
+ALTER TABLE ur_calendard_to_calendar
+    DROP CONSTRAINT ur_calendard_calendardat_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendardate 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendardate
+    DROP CONSTRAINT ur_calendardate_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattri_to_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_fareattri_to_agency
+    DROP CONSTRAINT ur_fareattri_agency_id_fk_2;
+
+ALTER TABLE ur_fareattri_to_agency
+    DROP CONSTRAINT ur_fareattri_fareattribu_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_fareattribute
+    DROP CONSTRAINT ur_fareattribute_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_fareattri 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_farerule_to_fareattri
+    DROP CONSTRAINT ur_farerule__fareattribu_fk_2;
+
+ALTER TABLE ur_farerule_to_fareattri
+    DROP CONSTRAINT ur_farerule__farerule_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_farerule_to_route
+    DROP CONSTRAINT ur_farerule__farerule_id_fk_4;
+
+ALTER TABLE ur_farerule_to_route
+    DROP CONSTRAINT ur_farerule__route_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_frequency_to_trip
+    DROP CONSTRAINT ur_frequency_frequency_i_fk_2;
+
+ALTER TABLE ur_frequency_to_trip
+    DROP CONSTRAINT ur_frequency_trip_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_level 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_level
+    DROP CONSTRAINT ur_level_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_office 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_office
+    DROP CONSTRAINT ur_office_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway
+    DROP CONSTRAINT ur_pathway_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway_to_stop
+    DROP CONSTRAINT ur_pathway_t_pathway_id_fk_3;
+
+ALTER TABLE ur_pathway_to_stop
+    DROP CONSTRAINT ur_pathway_t_stop_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway_to_stop_2
+    DROP CONSTRAINT ur_pathway_t_pathway_id_fk_4;
+
+ALTER TABLE ur_pathway_to_stop_2
+    DROP CONSTRAINT ur_pathway_t_stop_id_fk_4;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictra_to_cityobjec 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictra_to_cityobjec
+    DROP CONSTRAINT ur_publictra_cityobject__fk_2;
+
+ALTER TABLE ur_publictra_to_cityobjec
+    DROP CONSTRAINT ur_publictra_publictrans_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransit 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransit
+    DROP CONSTRAINT ur_publictransi_objectclass__3;
+
+ALTER TABLE ur_publictransit
+    DROP CONSTRAINT ur_publictransit_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitdatatype 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransitdatatype
+    DROP CONSTRAINT ur_publictransi_objectclass__4;
+
+-- -------------------------------------------------------------------- 
+-- ur_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route
+    DROP CONSTRAINT ur_route_fk_2;
+
+ALTER TABLE ur_route
+    DROP CONSTRAINT ur_route_description_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route_to_agency
+    DROP CONSTRAINT ur_route_to__agency_id_fk_2;
+
+ALTER TABLE ur_route_to_agency
+    DROP CONSTRAINT ur_route_to__route_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route_to_route
+    DROP CONSTRAINT ur_route_to__route_id_fk_4;
+
+ALTER TABLE ur_route_to_route
+    DROP CONSTRAINT ur_route_to__route_id_2_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_shape
+    DROP CONSTRAINT ur_shape_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape_to_point 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_shape_to_point
+    DROP CONSTRAINT ur_shape_to__point_id_fk_2;
+
+ALTER TABLE ur_shape_to_point
+    DROP CONSTRAINT ur_shape_to__shape_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop
+    DROP CONSTRAINT ur_stop_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_level 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop_to_level
+    DROP CONSTRAINT ur_stop_to_l_level__id_fk_2;
+
+ALTER TABLE ur_stop_to_level
+    DROP CONSTRAINT ur_stop_to_l_stop_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop_to_stop
+    DROP CONSTRAINT ur_stop_to_s_stop_id_fk_2;
+
+ALTER TABLE ur_stop_to_stop
+    DROP CONSTRAINT ur_stop_to_s_stop_id_2_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stoptime_to_stop
+    DROP CONSTRAINT ur_stoptime__stop_id_fk_2;
+
+ALTER TABLE ur_stoptime_to_stop
+    DROP CONSTRAINT ur_stoptime__stoptime_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stoptime_to_trip
+    DROP CONSTRAINT ur_stoptime__stoptime_id_fk_4;
+
+ALTER TABLE ur_stoptime_to_trip
+    DROP CONSTRAINT ur_stoptime__trip_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_transfer_to_stop
+    DROP CONSTRAINT ur_transfer__stop_id_fk_3;
+
+ALTER TABLE ur_transfer_to_stop
+    DROP CONSTRAINT ur_transfer__transfer_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_transfer_to_stop_2
+    DROP CONSTRAINT ur_transfer__stop_id_fk_4;
+
+ALTER TABLE ur_transfer_to_stop_2
+    DROP CONSTRAINT ur_transfer__transfer_id_fk_4;
+
+-- -------------------------------------------------------------------- 
+-- ur_translati_to_publictra 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_translati_to_publictra
+    DROP CONSTRAINT ur_translati_publictrans_fk_2;
+
+ALTER TABLE ur_translati_to_publictra
+    DROP CONSTRAINT ur_translati_translation_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_translationjp 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_translationjp
+    DROP CONSTRAINT ur_translationjp_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip
+    DROP CONSTRAINT ur_trip_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_calendar
+    DROP CONSTRAINT ur_trip_to_c_calendar_id_fk_2;
+
+ALTER TABLE ur_trip_to_calendar
+    DROP CONSTRAINT ur_trip_to_c_trip_id_fk_3;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendard 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_calendard
+    DROP CONSTRAINT ur_trip_to_c_calendardat_fk_2;
+
+ALTER TABLE ur_trip_to_calendard
+    DROP CONSTRAINT ur_trip_to_c_trip_id_fk_4;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_office 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_office
+    DROP CONSTRAINT ur_trip_to_o_office_id_fk_2;
+
+ALTER TABLE ur_trip_to_office
+    DROP CONSTRAINT ur_trip_to_o_trip_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_route
+    DROP CONSTRAINT ur_trip_to_r_route_id_fk_2;
+
+ALTER TABLE ur_trip_to_route
+    DROP CONSTRAINT ur_trip_to_r_trip_id_fk_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_shape 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_shape
+    DROP CONSTRAINT ur_trip_to_s_shape_id_fk_2;
+
+ALTER TABLE ur_trip_to_shape
+    DROP CONSTRAINT ur_trip_to_s_trip_id_fk_2;
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+-- *********************************** Drop tables *************************************** 
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- -------------------------------------------------------------------- 
 -- ur_boundarysurface 
 -- -------------------------------------------------------------------- 
@@ -2586,16 +2721,6 @@ DROP TABLE ur_buildingriverfloodingr;
 -- ur_cable 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_cable;
-
--- -------------------------------------------------------------------- 
--- ur_calendar 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_calendar;
-
--- -------------------------------------------------------------------- 
--- ur_calendardate 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_calendardate;
 
 -- -------------------------------------------------------------------- 
 -- ur_cargohandlingfacility 
@@ -2778,11 +2903,6 @@ DROP TABLE ur_cyberportmarinaandpbs;
 DROP TABLE ur_damattribute;
 
 -- -------------------------------------------------------------------- 
--- ur_description 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_description;
-
--- -------------------------------------------------------------------- 
 -- ur_disasterriskattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_disasterriskattribute;
@@ -2833,21 +2953,6 @@ DROP TABLE ur_facilityidattribute;
 DROP TABLE ur_facilitytypeattribute;
 
 -- -------------------------------------------------------------------- 
--- ur_fareattribute 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_fareattribute;
-
--- -------------------------------------------------------------------- 
--- ur_farerule 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_farerule;
-
--- -------------------------------------------------------------------- 
--- ur_feedinfo 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_feedinfo;
-
--- -------------------------------------------------------------------- 
 -- ur_fishingportattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_fishingportattribute;
@@ -2868,11 +2973,6 @@ DROP TABLE ur_fishingportfacility;
 DROP TABLE ur_floodingriskattribute;
 
 -- -------------------------------------------------------------------- 
--- ur_frequency 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_frequency;
-
--- -------------------------------------------------------------------- 
 -- ur_harborfacility 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_harborfacility;
@@ -2881,11 +2981,6 @@ DROP TABLE ur_harborfacility;
 -- ur_height 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_height;
-
--- -------------------------------------------------------------------- 
--- ur_households 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_households;
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcattribute 
@@ -3073,11 +3168,6 @@ DROP TABLE ur_indoortacatiletileattr;
 DROP TABLE ur_indooruserdefinedattri;
 
 -- -------------------------------------------------------------------- 
--- ur_keyvaluepair 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_keyvaluepair;
-
--- -------------------------------------------------------------------- 
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_keyvaluepairattribute;
@@ -3098,21 +3188,6 @@ DROP TABLE ur_land_use_to_dmattribu;
 DROP TABLE ur_land_use_to_facilitya;
 
 -- -------------------------------------------------------------------- 
--- ur_landprice 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landprice;
-
--- -------------------------------------------------------------------- 
--- ur_landprice_to_landprice 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landprice_to_landprice;
-
--- -------------------------------------------------------------------- 
--- ur_landpriceperlanduse 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landpriceperlanduse;
-
--- -------------------------------------------------------------------- 
 -- ur_landuseattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_landuseattribute;
@@ -3121,21 +3196,6 @@ DROP TABLE ur_landuseattribute;
 -- ur_landusedataqualityattr 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_landusedataqualityattr;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_areaofann 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landusedi_to_areaofann;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_numberofa 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landusedi_to_numberofa;
-
--- -------------------------------------------------------------------- 
--- ur_landusediversion 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_landusediversion;
 
 -- -------------------------------------------------------------------- 
 -- ur_largecustomerfacilitya 
@@ -3163,29 +3223,9 @@ DROP TABLE ur_mooringfacility;
 DROP TABLE ur_navigationassistancefa;
 
 -- -------------------------------------------------------------------- 
--- ur_numberofannualdiversio 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_numberofannualdiversio;
-
--- -------------------------------------------------------------------- 
--- ur_numberofhouseholds 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_numberofhouseholds;
-
--- -------------------------------------------------------------------- 
 -- ur_occupancy 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_occupancy;
-
--- -------------------------------------------------------------------- 
--- ur_office 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_office;
-
--- -------------------------------------------------------------------- 
--- ur_officesandemployees 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_officesandemployees;
 
 -- -------------------------------------------------------------------- 
 -- ur_offsetdepth 
@@ -3203,34 +3243,9 @@ DROP TABLE ur_opening;
 DROP TABLE ur_otherconstruction;
 
 -- -------------------------------------------------------------------- 
--- ur_pathway 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_pathway;
-
--- -------------------------------------------------------------------- 
 -- ur_pipe 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_pipe;
-
--- -------------------------------------------------------------------- 
--- ur_point 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_point;
-
--- -------------------------------------------------------------------- 
--- ur_populatio_to_populatio 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_populatio_to_populatio;
-
--- -------------------------------------------------------------------- 
--- ur_population 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_population;
-
--- -------------------------------------------------------------------- 
--- ur_populationbyageandsex 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_populationbyageandsex;
 
 -- -------------------------------------------------------------------- 
 -- ur_portattribute 
@@ -3286,21 +3301,6 @@ DROP TABLE ur_portwelfarefacility;
 -- ur_publicland 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_publicland;
-
--- -------------------------------------------------------------------- 
--- ur_publictra_to_point 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_publictra_to_point;
-
--- -------------------------------------------------------------------- 
--- ur_publictransit 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_publictransit;
-
--- -------------------------------------------------------------------- 
--- ur_publictransitdatatype 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_publictransitdatatype;
 
 -- -------------------------------------------------------------------- 
 -- ur_railwayrouteattribute 
@@ -3363,11 +3363,6 @@ DROP TABLE ur_room;
 DROP TABLE ur_roomattribute;
 
 -- -------------------------------------------------------------------- 
--- ur_route 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_route;
-
--- -------------------------------------------------------------------- 
 -- ur_shipservicefacility 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_shipservicefacility;
@@ -3386,26 +3381,6 @@ DROP TABLE ur_squareurbanplanattribu;
 -- ur_stationsquareattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_stationsquareattribute;
-
--- -------------------------------------------------------------------- 
--- ur_statistic_to_keyvaluep 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_statistic_to_keyvaluep;
-
--- -------------------------------------------------------------------- 
--- ur_statisticalgrid 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_statisticalgrid;
-
--- -------------------------------------------------------------------- 
--- ur_stop 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_stop;
-
--- -------------------------------------------------------------------- 
--- ur_stoptime 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_stoptime;
 
 -- -------------------------------------------------------------------- 
 -- ur_terminalattribute 
@@ -3443,24 +3418,9 @@ DROP TABLE ur_trafficareaattribute;
 DROP TABLE ur_trafficvolumeattribute;
 
 -- -------------------------------------------------------------------- 
--- ur_transfer 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_transfer;
-
--- -------------------------------------------------------------------- 
 -- ur_transitioncurvetype 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_transitioncurvetype;
-
--- -------------------------------------------------------------------- 
--- ur_translation 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_translation;
-
--- -------------------------------------------------------------------- 
--- ur_translationjp 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_translationjp;
 
 -- -------------------------------------------------------------------- 
 -- ur_transport_to_facilitya 
@@ -3476,11 +3436,6 @@ DROP TABLE ur_transportation_complex;
 -- ur_transportationdataqual 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_transportationdataqual;
-
--- -------------------------------------------------------------------- 
--- ur_trip 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_trip;
 
 -- -------------------------------------------------------------------- 
 -- ur_tunnel 
@@ -4272,25 +4227,367 @@ DROP TABLE ur_zone;
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_zone_to_boundary;
 
+-- -------------------------------------------------------------------- 
+-- ur_areaofannualdiversions 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_areaofannualdiversions;
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgr_to_keyvaluep 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_genericgr_to_keyvaluep;
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgridcell 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_genericgridcell;
+
+-- -------------------------------------------------------------------- 
+-- ur_households 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_households;
+
+-- -------------------------------------------------------------------- 
+-- ur_keyvaluepair 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_keyvaluepair;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landprice;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice_to_landprice 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landprice_to_landprice;
+
+-- -------------------------------------------------------------------- 
+-- ur_landpriceperlanduse 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landpriceperlanduse;
+
+-- -------------------------------------------------------------------- 
+-- ur_landslidedisaster 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landslidedisaster;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_areaofann 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landusedi_to_areaofann;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_numberofa 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landusedi_to_numberofa;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusediversion 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_landusediversion;
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofannualdiversio 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_numberofannualdiversio;
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofhouseholds 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_numberofhouseholds;
+
+-- -------------------------------------------------------------------- 
+-- ur_officesandemployees 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_officesandemployees;
+
+-- -------------------------------------------------------------------- 
+-- ur_populatio_to_populatio 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_populatio_to_populatio;
+
+-- -------------------------------------------------------------------- 
+-- ur_population 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_population;
+
+-- -------------------------------------------------------------------- 
+-- ur_populationbyageandsex 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_populationbyageandsex;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitaccessibi 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_publictransitaccessibi;
+
+-- -------------------------------------------------------------------- 
+-- ur_statisticalgrid 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_statisticalgrid;
+
+-- -------------------------------------------------------------------- 
+-- ur_statusofsiteseeing 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_statusofsiteseeing;
+
+-- -------------------------------------------------------------------- 
+-- ur_agency 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_agency;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_agency 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_attributi_to_agency;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_route 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_attributi_to_route;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_trip 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_attributi_to_trip;
+
+-- -------------------------------------------------------------------- 
+-- ur_attribution 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_attribution;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendar 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_calendar;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendard_to_calendar 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_calendard_to_calendar;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendardate 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_calendardate;
+
+-- -------------------------------------------------------------------- 
+-- ur_description 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_description;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattri_to_agency 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_fareattri_to_agency;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattribute 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_fareattribute;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_farerule;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_fareattri 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_farerule_to_fareattri;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_route 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_farerule_to_route;
+
+-- -------------------------------------------------------------------- 
+-- ur_feedinfo 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_feedinfo;
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_frequency;
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency_to_trip 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_frequency_to_trip;
+
+-- -------------------------------------------------------------------- 
+-- ur_level 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_level;
+
+-- -------------------------------------------------------------------- 
+-- ur_office 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_office;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_pathway;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_pathway_to_stop;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop_2 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_pathway_to_stop_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_point 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_point;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictra_to_cityobjec 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_publictra_to_cityobjec;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransit 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_publictransit;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitdatatype 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_publictransitdatatype;
+
+-- -------------------------------------------------------------------- 
+-- ur_route 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_route;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_agency 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_route_to_agency;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_route 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_route_to_route;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_shape;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape_to_point 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_shape_to_point;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stop;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_level 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stop_to_level;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_stop 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stop_to_stop;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stoptime;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_stop 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stoptime_to_stop;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_trip 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_stoptime_to_trip;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_transfer;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_transfer_to_stop;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop_2 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_transfer_to_stop_2;
+
+-- -------------------------------------------------------------------- 
+-- ur_translati_to_publictra 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_translati_to_publictra;
+
+-- -------------------------------------------------------------------- 
+-- ur_translation 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_translation;
+
+-- -------------------------------------------------------------------- 
+-- ur_translationjp 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_translationjp;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendar 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip_to_calendar;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendard 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip_to_calendard;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_office 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip_to_office;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_route 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip_to_route;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_shape 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_trip_to_shape;
+
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- *********************************** Drop Sequences ************************************* 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 
-DROP SEQUENCE ur_areaofannualdivers_seq;
-
-DROP SEQUENCE ur_point_seq;
-
 DROP SEQUENCE ur_trackattribute_seq;
-
-DROP SEQUENCE ur_numberofhouseholds_seq;
 
 DROP SEQUENCE ur_ifcunit_seq;
 
 DROP SEQUENCE ur_squareurbanplanatt_seq;
 
 DROP SEQUENCE ur_ifcattribute_seq;
-
-DROP SEQUENCE ur_description_seq;
 
 DROP SEQUENCE ur_dmattribute_seq;
 
@@ -4316,8 +4613,6 @@ DROP SEQUENCE ur_facilityattribute_seq;
 
 DROP SEQUENCE ur_bridgestructureatt_seq;
 
-DROP SEQUENCE ur_landpriceperlandus_seq;
-
 DROP SEQUENCE ur_keyvaluepairattrib_seq;
 
 DROP SEQUENCE ur_occupancy_seq;
@@ -4342,8 +4637,6 @@ DROP SEQUENCE ur_disasterriskattrib_seq;
 
 DROP SEQUENCE ur_railwayrouteattrib_seq;
 
-DROP SEQUENCE ur_numberofannualdive_seq;
-
 DROP SEQUENCE ur_transitioncurvetyp_seq;
 
 DROP SEQUENCE ur_crs_seq;
@@ -4366,15 +4659,11 @@ DROP SEQUENCE ur_bridgefunctionalat_seq;
 
 DROP SEQUENCE ur_thematicshape_seq;
 
-DROP SEQUENCE ur_keyvaluepair_seq;
-
 DROP SEQUENCE ur_cityfurnitureattri_seq;
 
 DROP SEQUENCE ur_landusedataquality_seq;
 
 DROP SEQUENCE ur_controlpoint_seq;
-
-DROP SEQUENCE ur_publictransitdatat_seq;
 
 DROP SEQUENCE ur_ifcaxis2placement3_seq;
 
@@ -4397,8 +4686,6 @@ DROP SEQUENCE ur_roadattribute_seq;
 DROP SEQUENCE ur_circularcurvetype_seq;
 
 DROP SEQUENCE ur_userdefinedvalue_seq;
-
-DROP SEQUENCE ur_populationbyageand_seq;
 
 DROP SEQUENCE ur_slopetype_seq;
 
@@ -4460,4 +4747,34 @@ DROP SEQUENCE ur_vehicleterminalatt_seq;
 DROP SEQUENCE ur_waterworksattribut_seq;
 
 DROP SEQUENCE ur_weatherobservation_seq;
+
+DROP SEQUENCE ur_areaofannualdivers_seq;
+
+DROP SEQUENCE ur_keyvaluepair_seq;
+
+DROP SEQUENCE ur_landpriceperlandus_seq;
+
+DROP SEQUENCE ur_numberofannualdive_seq;
+
+DROP SEQUENCE ur_numberofhouseholds_seq;
+
+DROP SEQUENCE ur_populationbyageand_seq;
+
+DROP SEQUENCE ur_description_seq;
+
+DROP SEQUENCE ur_farerule_seq;
+
+DROP SEQUENCE ur_feedinfo_seq;
+
+DROP SEQUENCE ur_frequency_seq;
+
+DROP SEQUENCE ur_point_seq;
+
+DROP SEQUENCE ur_publictransitdatat_seq;
+
+DROP SEQUENCE ur_stoptime_seq;
+
+DROP SEQUENCE ur_transfer_seq;
+
+DROP SEQUENCE ur_translation_seq;
 

@@ -30,19 +30,18 @@ package org.citydb.ade.iur.importer.urg;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.OfficesAndEmployees;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class OfficesAndEmployeesImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final StatisticalGridImporter statisticalGridImporter;
 
@@ -50,28 +49,35 @@ public class OfficesAndEmployeesImporter implements StatisticalGridModuleImporte
 
     public OfficesAndEmployeesImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.OFFICESANDEMPLOYEES)) + " " +
-                "(id, numberofemployees, numberofoffices) " +
-                "values (?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.OFFICESANDEMPLOYEES)) + " " +
+                "(id, numberofoffices, numberofemployees, salesamount) " +
+                "values (?, ?, ?, ?)");
 
         statisticalGridImporter = manager.getImporter(StatisticalGridImporter.class);
     }
 
     public void doImport(OfficesAndEmployees officesAndEmployees, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         statisticalGridImporter.doImport(officesAndEmployees, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (officesAndEmployees.getNumberOfEmployees() != null)
-            ps.setInt(2, officesAndEmployees.getNumberOfEmployees());
+        if (officesAndEmployees.getNumberOfOffices() != null)
+            ps.setInt(2, officesAndEmployees.getNumberOfOffices());
         else
             ps.setNull(2, Types.INTEGER);
 
-        if (officesAndEmployees.getNumberOfOffices() != null)
-            ps.setInt(3, officesAndEmployees.getNumberOfOffices());
+        if (officesAndEmployees.getNumberOfEmployees() != null)
+            ps.setInt(3, officesAndEmployees.getNumberOfEmployees());
         else
             ps.setNull(3, Types.INTEGER);
+
+        if (officesAndEmployees.getSalesAmount() != null)
+            ps.setInt(4, officesAndEmployees.getSalesAmount());
+        else
+            ps.setNull(4, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

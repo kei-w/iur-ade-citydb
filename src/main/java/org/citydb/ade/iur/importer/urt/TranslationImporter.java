@@ -34,18 +34,16 @@ import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.PublicTransit;
+import org.citygml4j.ade.iur.model.urt.PublicTransitProperty;
 import org.citygml4j.ade.iur.model.urt.Translation;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class TranslationImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final PublicTransitDataTypeImporter dataTypeImporter;
+    private final TranslationToPublicTransitImporter translationToPublicTransitImporter;
 
     private int batchCounter;
 
@@ -54,65 +52,58 @@ public class TranslationImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSLATION)) + " " +
-                "(id, fieldname, fieldvalue, language, language_codespace, recordsubid, tablename, tablename_codespace " +
-                "translation, recordid_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.TRANSLATION)) + " " +
+                "(id, tablename, tablename_codespace, fieldname, language, language_codespace, translation," +
+                "fieldvalue, recordsubid) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        dataTypeImporter = manager.getImporter(PublicTransitDataTypeImporter.class);
+        translationToPublicTransitImporter = manager.getImporter(TranslationToPublicTransitImporter.class);
     }
 
-    public void doImport(Translation translation, long cityObjectGroupId) throws CityGMLImportException, SQLException {
-        long objectId = dataTypeImporter.doImport(translation, cityObjectGroupId);
+    public void doImport(Translation translation, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
 
-        ps.setString(2, translation.getFieldName());
-        ps.setString(3, translation.getFieldValue());
+        if (translation.getTableName() != null && translation.getTableName().isSetValue()) {
+            ps.setString(2, translation.getTableName().getValue());
+            ps.setString(3, translation.getTableName().getCodeSpace());
+        } else {
+            ps.setNull(2, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
+        }
+
+        ps.setString(4, translation.getFieldName());
 
         if (translation.getLanguage() != null && translation.getLanguage().isSetValue()) {
-            ps.setString(4, translation.getLanguage().getValue());
-            ps.setString(5, translation.getLanguage().getCodeSpace());
+            ps.setString(5, translation.getLanguage().getValue());
+            ps.setString(6, translation.getLanguage().getCodeSpace());
         } else {
-            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
         }
 
-        ps.setString(6, translation.getRecordSubId());
+        ps.setString(7, translation.getTranslation());
 
-        if (translation.getTableName() != null && translation.getTableName().isSetValue()) {
-            ps.setString(7, translation.getTableName().getValue());
-            ps.setString(8, translation.getTableName().getCodeSpace());
-        } else {
-            ps.setNull(7, Types.VARCHAR);
-            ps.setNull(8, Types.VARCHAR);
-        }
+        ps.setString(8, translation.getFieldValue());
 
-        ps.setString(9, translation.getTranslation());
-
-        long recordId = 0;
-        if (translation.getRecordId() != null) {
-            PublicTransit publicTransit = translation.getRecordId().getObject();
-            if (publicTransit != null) {
-                recordId = helper.importObject(publicTransit);
-                translation.getRecordId().unsetObject();
-            } else {
-                String href = translation.getRecordId().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRANSLATION),
-                            objectId, href, "recordid_id");
-                }
-            }
-        }
-
-        if (recordId != 0)
-            ps.setLong(10, recordId);
-        else
-            ps.setNull(10, Types.NULL);
+        ps.setString(9, translation.getRecordSubId());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.TRANSLATION));
+
+        if (translation.getRecordId() != null) {
+            PublicTransitProperty property = translation.getRecordId();
+            PublicTransit cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                translationToPublicTransitImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRANSLATI_TO_PUBLICTRA), objectId, "translation_id", href, "publictransit_id");
+            }
+        }
     }
 
     @Override

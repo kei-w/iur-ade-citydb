@@ -30,111 +30,75 @@ package org.citydb.ade.iur.importer.urg;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citydb.core.operation.importer.util.AttributeValueJoiner;
-import org.citygml4j.ade.iur.model.urg.GenericGridCell;
-import org.citygml4j.ade.iur.model.urg.KeyValuePairProperty;
-import org.citygml4j.ade.iur.model.urg.PublicTransitAccessibility;
 import org.citygml4j.ade.iur.model.urg.StatisticalGrid;
 import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty;
-import org.w3c.dom.Element;
 
-import javax.xml.transform.TransformerException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class StatisticalGridImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
-    private final ImportManager manager;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final KeyValuePairImporter keyValuePairImporter;
-    private final AttributeValueJoiner valueJoiner;
 
     private int batchCounter;
 
     public StatisticalGridImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
-        this.manager = manager;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)) + " " +
-                "(id, objectclass_id, areaclassificationtype, areaclassification_codespace, city, city_codespace, " +
-                "class, class_codespace, lod_1multisurface_id, lod_2multisurface_id, prefecture, prefecture_codespace, " +
-                "surveyyear, urbanplantype, urbanplantype_codespace, value, availability) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-        keyValuePairImporter = manager.getImporter(KeyValuePairImporter.class);
-        valueJoiner = helper.getAttributeValueJoiner();
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.STATISTICALGRID)) + " " +
+                "(id, objectclass_id, class, class_codespace, urbanplantype, urbanplantype_codespace," +
+                "areaclassificationtype, areaclassification_codespace, prefecture, prefecture_codespace, city," +
+                "city_codespace, surveyyear, referencedate, lod_1multisurface_id, lod_2multisurface_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
     public void doImport(StatisticalGrid statisticalGrid, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
         ps.setInt(2, objectType.getObjectClassId());
 
-        if (statisticalGrid.getAreaClassificationType() != null && statisticalGrid.getAreaClassificationType().isSetValue()) {
-            ps.setString(3, statisticalGrid.getAreaClassificationType().getValue());
-            ps.setString(4, statisticalGrid.getAreaClassificationType().getCodeSpace());
+        if (statisticalGrid.getClassifier() != null && statisticalGrid.getClassifier().isSetValue()) {
+            ps.setString(3, statisticalGrid.getClassifier().getValue());
+            ps.setString(4, statisticalGrid.getClassifier().getCodeSpace());
         } else {
             ps.setNull(3, Types.VARCHAR);
             ps.setNull(4, Types.VARCHAR);
         }
 
-        if (statisticalGrid.getCity() != null && statisticalGrid.getCity().isSetValue()) {
-            ps.setString(5, statisticalGrid.getCity().getValue());
-            ps.setString(6, statisticalGrid.getCity().getCodeSpace());
+        if (statisticalGrid.getUrbanPlanType() != null && statisticalGrid.getUrbanPlanType().isSetValue()) {
+            ps.setString(5, statisticalGrid.getUrbanPlanType().getValue());
+            ps.setString(6, statisticalGrid.getUrbanPlanType().getCodeSpace());
         } else {
             ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
         }
 
-        if (statisticalGrid.getClassifier() != null && statisticalGrid.getClassifier().isSetValue()) {
-            ps.setString(7, statisticalGrid.getClassifier().getValue());
-            ps.setString(8, statisticalGrid.getClassifier().getCodeSpace());
+        if (statisticalGrid.getAreaClassificationType() != null && statisticalGrid.getAreaClassificationType().isSetValue()) {
+            ps.setString(7, statisticalGrid.getAreaClassificationType().getValue());
+            ps.setString(8, statisticalGrid.getAreaClassificationType().getCodeSpace());
         } else {
             ps.setNull(7, Types.VARCHAR);
             ps.setNull(8, Types.VARCHAR);
         }
 
-        for (int i = 0; i < 2; i++) {
-            MultiSurfaceProperty property = null;
-            long surfaceGeometryId = 0;
-
-            switch (i) {
-                case 0:
-                    property = statisticalGrid.getLod1MultiSurface();
-                    break;
-                case 1:
-                    property = statisticalGrid.getLod2MultiSurface();
-                    break;
-            }
-
-            if (property != null) {
-                if (property.isSetMultiSurface()) {
-                    surfaceGeometryId = helper.importSurfaceGeometry(property.getMultiSurface(), objectId);
-                    property.unsetMultiSurface();
-                } else {
-                    String href = property.getHref();
-                    if (href != null && !href.isEmpty())
-                        helper.propagateSurfaceGeometryXlink(href, manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID), objectId, "lod_" + (i + 1) + "multisurface_id");
-                }
-            }
-
-            if (surfaceGeometryId != 0)
-                ps.setLong(9 + i, surfaceGeometryId);
-            else
-                ps.setNull(9 + i, Types.NULL);
+        if (statisticalGrid.getPrefecture() != null && statisticalGrid.getPrefecture().isSetValue()) {
+            ps.setString(9, statisticalGrid.getPrefecture().getValue());
+            ps.setString(10, statisticalGrid.getPrefecture().getCodeSpace());
+        } else {
+            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(10, Types.VARCHAR);
         }
 
-        if (statisticalGrid.getPrefecture() != null && statisticalGrid.getPrefecture().isSetValue()) {
-            ps.setString(11, statisticalGrid.getPrefecture().getValue());
-            ps.setString(12, statisticalGrid.getPrefecture().getCodeSpace());
+        if (statisticalGrid.getCity() != null && statisticalGrid.getCity().isSetValue()) {
+            ps.setString(11, statisticalGrid.getCity().getValue());
+            ps.setString(12, statisticalGrid.getCity().getCodeSpace());
         } else {
             ps.setNull(11, Types.VARCHAR);
             ps.setNull(12, Types.VARCHAR);
@@ -145,48 +109,50 @@ public class StatisticalGridImporter implements StatisticalGridModuleImporter {
         else
             ps.setNull(13, Types.DATE);
 
-        if (statisticalGrid.getUrbanPlanType() != null && statisticalGrid.getUrbanPlanType().isSetValue()) {
-            ps.setString(14, statisticalGrid.getUrbanPlanType().getValue());
-            ps.setString(15, statisticalGrid.getUrbanPlanType().getCodeSpace());
-        } else {
-            ps.setNull(14, Types.VARCHAR);
-            ps.setNull(15, Types.VARCHAR);
-        }
+        if (statisticalGrid.getReferenceDate() != null)
+            ps.setDate(14, Date.valueOf(statisticalGrid.getReferenceDate()));
+        else
+            ps.setNull(14, Types.DATE);
 
-        List<String> values = new ArrayList<>();
-        try {
-            for (Iterator<Element> iter = statisticalGrid.getValues().iterator(); iter.hasNext(); ) {
-                Element element = iter.next();
-                if (element.hasChildNodes())
-                    values.add(manager.marshal(element.getFirstChild()));
-
-                iter.remove();
+        long lodMinus1MultiSurfaceId = 0;
+        if (statisticalGrid.getLodMinus1MultiSurface() != null) {
+            MultiSurfaceProperty property = statisticalGrid.getLodMinus1MultiSurface();
+            if (property.isSetMultiSurface()) {
+                lodMinus1MultiSurfaceId = helper.importSurfaceGeometry(property.getMultiSurface(), objectId);
+                property.unsetMultiSurface();
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateSurfaceGeometryXlink(href, schemaMapper.getTableName(ADETable.STATISTICALGRID), objectId, "lod_1multisurface_id");
             }
-        } catch (TransformerException e) {
-            throw new CityGMLImportException("Failed to parse generic xs:anyType value.", e);
         }
 
-        if (!values.isEmpty())
-            ps.setString(16, valueJoiner.join(values));
+        if (lodMinus1MultiSurfaceId != 0)
+            ps.setLong(15, lodMinus1MultiSurfaceId);
         else
-            ps.setNull(16, Types.VARCHAR);
+            ps.setNull(15, Types.NULL);
 
-        if (statisticalGrid instanceof PublicTransitAccessibility && ((PublicTransitAccessibility) statisticalGrid).getAvailability() != null)
-            ps.setInt(17, ((PublicTransitAccessibility) statisticalGrid).getAvailability() ? 1 : 0);
+        long lodMinus2MultiSurfaceId = 0;
+        if (statisticalGrid.getLodMinus2MultiSurface() != null) {
+            MultiSurfaceProperty property = statisticalGrid.getLodMinus2MultiSurface();
+            if (property.isSetMultiSurface()) {
+                lodMinus2MultiSurfaceId = helper.importSurfaceGeometry(property.getMultiSurface(), objectId);
+                property.unsetMultiSurface();
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateSurfaceGeometryXlink(href, schemaMapper.getTableName(ADETable.STATISTICALGRID), objectId, "lod_2multisurface_id");
+            }
+        }
+
+        if (lodMinus2MultiSurfaceId != 0)
+            ps.setLong(16, lodMinus2MultiSurfaceId);
         else
-            ps.setNull(17, Types.INTEGER);
+            ps.setNull(16, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
-
-        if (statisticalGrid instanceof GenericGridCell) {
-            GenericGridCell genericGridCell = (GenericGridCell) statisticalGrid;
-            for (KeyValuePairProperty property : genericGridCell.getGenericValues()) {
-                if (property.isSetObject())
-                    keyValuePairImporter.doImport(property.getObject(), objectId);
-            }
-        }
     }
 
     @Override
