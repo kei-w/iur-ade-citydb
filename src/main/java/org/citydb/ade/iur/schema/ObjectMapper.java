@@ -39,6 +39,7 @@ import org.citygml4j.ade.iur.model.module.UrbanFunctionModule;
 import org.citygml4j.ade.iur.model.urf.*;
 import org.citygml4j.ade.iur.model.urg.LandUseDiversion;
 import org.citygml4j.ade.iur.model.urg.*;
+import org.citygml4j.ade.iur.model.uro.*;
 import org.citygml4j.ade.iur.model.urt.*;
 import org.citygml4j.model.gml.base.AbstractGML;
 import org.citygml4j.model.module.citygml.CityGMLVersion;
@@ -190,6 +191,36 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "FareRule":
                     typeClassIds.put(FareRule.class, typeClassId);
+                    break;
+                case "BuildingIDAttribute":
+                    typeClassIds.put(BuildingIDAttribute.class, typeClassId);
+                    break;
+                case "BuildingDetailAttribute":
+                    typeClassIds.put(BuildingDetailAttribute.class, typeClassId);
+                    break;
+                case "LargeCustomerFacilityAttribute":
+                    typeClassIds.put(LargeCustomerFacilityAttribute.class, typeClassId);
+                    break;
+                case "BuildingRiverFloodingRiskAttribute":
+                    typeClassIds.put(BuildingRiverFloodingRiskAttribute.class, typeClassId);
+                    break;
+                case "BuildingTsunamiRiskAttribute":
+                    typeClassIds.put(BuildingTsunamiRiskAttribute.class, typeClassId);
+                    break;
+                case "BuildingInlandFloodingRiskAttribute":
+                    typeClassIds.put(BuildingInlandFloodingRiskAttribute.class, typeClassId);
+                    break;
+                case "BuildingHighTideRiskAttribute":
+                    typeClassIds.put(BuildingHighTideRiskAttribute.class, typeClassId);
+                    break;
+                case "BuildingLandSlideRiskAttribute":
+                    typeClassIds.put(BuildingLandSlideRiskAttribute.class, typeClassId);
+                    break;
+                case "KeyValuePairAttribute":
+                    typeClassIds.put(KeyValuePairAttribute.class, typeClassId);
+                    break;
+                case "BuildingDataQualityAttribute":
+                    typeClassIds.put(BuildingDataQualityAttribute.class, typeClassId);
                     break;
             }
         }

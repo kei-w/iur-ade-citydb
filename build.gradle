@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.citydb.ade'
-version '2.1.0'
+version '3.0.0'
 description 'i-Urban Revitalization ADE extension for the 3DCityDB'
 
 java {
@@ -25,13 +25,14 @@ repositories {
         url 'https://3dcitydb.org/maven'
     }
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation 'org.citydb:impexp-client-gui:5.5.0'
-    implementation 'org.citygml4j.ade:iur-ade-citygml4j:1.5.0'
+    implementation 'org.citygml4j.ade:iur-ade-citygml4j:2.0.0'
 
-    citygml4j('org.citygml4j.ade:iur-ade-citygml4j:1.5.0') {
+    citygml4j('org.citygml4j.ade:iur-ade-citygml4j:2.0.0') {
         transitive = false
     }
 }

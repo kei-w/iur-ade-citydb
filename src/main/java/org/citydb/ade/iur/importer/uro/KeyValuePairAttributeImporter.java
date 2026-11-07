@@ -34,30 +34,30 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.uro.KeyValuePair;
+import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
 
 import java.sql.*;
 
-public class KeyValuePairImporter implements UrbanObjectModuleImporter {
+public class KeyValuePairAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
 
     private int batchCounter;
 
-    public KeyValuePairImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public KeyValuePairAttributeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.KEYVALUEPAIR_1)) + " " +
-                "(id, building_extendedattribut_id, key, key_codespace, codevalue, codevalue_codespace, datevalue, " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE)) + " " +
+                "(id, building_keyvaluepairattr_id, key, key_codespace, codevalue, codevalue_codespace, datevalue, " +
                 "doublevalue, intvalue, measuredvalue, measuredvalue_uom, stringvalue, urivalue) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(KeyValuePair keyValuePair, long parentId) throws CityGMLImportException, SQLException {
-        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.KEYVALUEPAIR_SEQ_1));
+    public long doImport(KeyValuePairAttribute keyValuePair, long parentId) throws CityGMLImportException, SQLException {
+        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.KEYVALUEPAIRATTRIB_SEQ));
         ps.setLong(1, objectId);
 
         ps.setLong(2, parentId);
@@ -106,7 +106,7 @@ public class KeyValuePairImporter implements UrbanObjectModuleImporter {
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.KEYVALUEPAIR_1));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE));
 
         return objectId;
     }

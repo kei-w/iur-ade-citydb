@@ -1,13 +1,9 @@
--- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2024-09-14 20:02:27 
+-- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2026-11-07 11:28:53 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- *********************************** Create Sequences *********************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 
-CREATE SEQUENCE ur_buildingdetails_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
-
 CREATE SEQUENCE ur_areaofannualdivers_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
-
-CREATE SEQUENCE ur_keyvaluepair_seq_1 INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_point_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -15,7 +11,9 @@ CREATE SEQUENCE ur_numberofhouseholds_seq INCREMENT BY 1 START WITH 1 MINVALUE 1
 
 CREATE SEQUENCE ur_keyvaluepair_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
-CREATE SEQUENCE ur_largecustomerfacil_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+CREATE SEQUENCE ur_trafficareaattribu_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_cityfurnitureattri_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_description_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -23,11 +21,21 @@ CREATE SEQUENCE ur_publictransitdatat_seq INCREMENT BY 1 START WITH 1 MINVALUE 1
 
 CREATE SEQUENCE ur_numberofannualdive_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
-CREATE SEQUENCE ur_trafficvolume_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+CREATE SEQUENCE ur_waterbodyattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_landuseattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_roadattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_landpriceperlandus_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
+CREATE SEQUENCE ur_keyvaluepairattrib_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_buildingattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
 CREATE SEQUENCE ur_legalgrounds_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_vegetationattribut_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_populationbyageand_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -97,48 +105,177 @@ CREATE TABLE ur_attribution
 CREATE TABLE ur_building
 (
     id NUMBER(38) NOT NULL,
-    buildingdetails_id NUMBER(38),
-    largecustomerfacilities_id NUMBER(38),
+    buildingdataqualityattrib_id NUMBER(38),
+    buildingdetailattribute_id NUMBER(38),
+    buildingidattribute_id NUMBER(38),
+    largecustomerfacilityattr_id NUMBER(38),
     PRIMARY KEY (id)
 );
 
 -- -------------------------------------------------------------------- 
--- ur_buildingdetails 
+-- ur_buildingattribute 
 -- -------------------------------------------------------------------- 
-CREATE TABLE ur_buildingdetails
+CREATE TABLE ur_buildingattribute
+(
+    id NUMBER(38) NOT NULL,
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdataqualityatt 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingdataqualityatt
+(
+    id NUMBER(38) NOT NULL,
+    appearancesrcdesc VARCHAR2(1000),
+    appearancesrcdesc_codespace VARCHAR2(1000),
+    geometrysrcdesc VARCHAR2(1000),
+    geometrysrcdesc_codespace VARCHAR2(1000),
+    lod1heighttype VARCHAR2(1000),
+    lod1heighttype_codespace VARCHAR2(1000),
+    lodtype VARCHAR2(1000),
+    srcscale VARCHAR2(1000),
+    srcscale_codespace VARCHAR2(1000),
+    thematicsrcdesc VARCHAR2(1000),
+    thematicsrcdesc_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdetailattribut 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingdetailattribut
 (
     id NUMBER(38) NOT NULL,
     areaclassification_codespace VARCHAR2(1000),
     areaclassificationtype VARCHAR2(1000),
+    basementfirstusage VARCHAR2(1000),
+    basementfirstusage_codespace VARCHAR2(1000),
+    basementsecondusag_codespace VARCHAR2(1000),
+    basementsecondusage VARCHAR2(1000),
+    basementusage VARCHAR2(1000),
+    basementusage_codespace VARCHAR2(1000),
+    buildingcoveragerate NUMBER,
     buildingfootprintarea NUMBER,
     buildingfootprintarea_uom VARCHAR2(1000),
+    buildingheight NUMBER,
+    buildingheight_uom VARCHAR2(1000),
     buildingroofedgearea NUMBER,
     buildingroofedgearea_uom VARCHAR2(1000),
+    buildingstructureo_codespace VARCHAR2(1000),
+    buildingstructureorgtype VARCHAR2(1000),
     buildingstructuret_codespace VARCHAR2(1000),
     buildingstructuretype VARCHAR2(1000),
-    city VARCHAR2(1000),
-    city_codespace VARCHAR2(1000),
+    detailedusage VARCHAR2(1000),
+    detailedusage2 VARCHAR2(1000),
+    detailedusage2_codespace VARCHAR2(1000),
+    detailedusage3 VARCHAR2(1000),
+    detailedusage3_codespace VARCHAR2(1000),
+    detailedusage_codespace VARCHAR2(1000),
     developmentarea NUMBER,
     developmentarea_uom VARCHAR2(1000),
     districtsandzonest_codespace VARCHAR2(1000),
     districtsandzonestype VARCHAR2(1000),
+    eaveheight NUMBER,
+    eaveheight_uom VARCHAR2(1000),
     fireproofstructure_codespace VARCHAR2(1000),
     fireproofstructuretype VARCHAR2(1000),
+    floorarearate NUMBER,
+    groundfloorusage VARCHAR2(1000),
+    groundfloorusage_codespace VARCHAR2(1000),
     implementingbody VARCHAR2(1000),
-    landuseplantype VARCHAR2(1000),
-    landuseplantype_codespace VARCHAR2(1000),
+    landusetype VARCHAR2(1000),
+    landusetype_codespace VARCHAR2(1000),
+    majorusage VARCHAR2(1000),
+    majorusage2 VARCHAR2(1000),
+    majorusage2_codespace VARCHAR2(1000),
+    majorusage_codespace VARCHAR2(1000),
     note VARCHAR2(1000),
-    prefecture VARCHAR2(1000),
-    prefecture_codespace VARCHAR2(1000),
+    orgusage VARCHAR2(1000),
+    orgusage2 VARCHAR2(1000),
+    orgusage2_codespace VARCHAR2(1000),
+    orgusage_codespace VARCHAR2(1000),
     reference VARCHAR2(1000),
+    secondfloorusage VARCHAR2(1000),
+    secondfloorusage_codespace VARCHAR2(1000),
     serialnumberofbuildingcertif VARCHAR2(1000),
     sitearea NUMBER,
     sitearea_uom VARCHAR2(1000),
+    specifiedbuildingcoveragerat NUMBER,
+    specifiedfloorarearate NUMBER,
+    standardfloorarearate NUMBER,
     surveyyear DATE,
+    thirdfloorusage VARCHAR2(1000),
+    thirdfloorusage_codespace VARCHAR2(1000),
     totalfloorarea NUMBER,
     totalfloorarea_uom VARCHAR2(1000),
     urbanplantype VARCHAR2(1000),
     urbanplantype_codespace VARCHAR2(1000),
+    vacancy VARCHAR2(1000),
+    vacancy_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdisasterriskat 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingdisasterriskat
+(
+    id NUMBER(38) NOT NULL,
+    areatype VARCHAR2(1000),
+    areatype_codespace VARCHAR2(1000),
+    building_buildingdisaster_id NUMBER(38),
+    description VARCHAR2(1000),
+    description_codespace VARCHAR2(1000),
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingfloodingriskat 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingfloodingriskat
+(
+    id NUMBER(38) NOT NULL,
+    depth NUMBER,
+    depth_uom VARCHAR2(1000),
+    objectclass_id INTEGER,
+    rank VARCHAR2(1000),
+    rank_codespace VARCHAR2(1000),
+    rankorg VARCHAR2(1000),
+    rankorg_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingidattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingidattribute
+(
+    id NUMBER(38) NOT NULL,
+    branchid INTEGER,
+    buildingid VARCHAR2(1000),
+    city VARCHAR2(1000),
+    city_codespace VARCHAR2(1000),
+    partid INTEGER,
+    prefecture VARCHAR2(1000),
+    prefecture_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingriverfloodingr 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_buildingriverfloodingr
+(
+    id NUMBER(38) NOT NULL,
+    admintype VARCHAR2(1000),
+    admintype_codespace VARCHAR2(1000),
+    duration NUMBER,
+    duration_uom VARCHAR2(1000),
+    scale VARCHAR2(1000),
+    scale_codespace VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -183,6 +320,66 @@ CREATE TABLE ur_censusblock
     daytimepopulationdensity NUMBER,
     numberofmainhouseholds INTEGER,
     numberofordinaryhouseholds INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_city_furniture 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_city_furniture
+(
+    id NUMBER(38) NOT NULL,
+    cityfurnituredataqualitya_id NUMBER(38),
+    cityfurnituredetailattrib_id NUMBER(38),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnitureattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityfurnitureattribute
+(
+    id NUMBER(38) NOT NULL,
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnituredataquali 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityfurnituredataquali
+(
+    id NUMBER(38) NOT NULL,
+    appearancesrcdesc VARCHAR2(1000),
+    appearancesrcdesc_codespace VARCHAR2(1000),
+    geometrysrcdesc VARCHAR2(1000),
+    geometrysrcdesc_codespace VARCHAR2(1000),
+    lodtype VARCHAR2(1000),
+    srcscale VARCHAR2(1000),
+    srcscale_codespace VARCHAR2(1000),
+    thematicsrcdesc VARCHAR2(1000),
+    thematicsrcdesc_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnituredetailatt 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityfurnituredetailatt
+(
+    id NUMBER(38) NOT NULL,
+    description VARCHAR2(1000),
+    facilitytype VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityobject
+(
+    id NUMBER(38) NOT NULL,
+    vegetationdataqualityattr_id NUMBER(38),
     PRIMARY KEY (id)
 );
 
@@ -388,12 +585,12 @@ CREATE TABLE ur_keyvaluepair
 );
 
 -- -------------------------------------------------------------------- 
--- ur_keyvaluepair_1 
+-- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
-CREATE TABLE ur_keyvaluepair_1
+CREATE TABLE ur_keyvaluepairattribute
 (
     id NUMBER(38) NOT NULL,
-    building_extendedattribut_id NUMBER(38),
+    building_keyvaluepairattr_id NUMBER(38),
     codevalue VARCHAR2(1000),
     codevalue_codespace VARCHAR2(1000),
     datevalue TIMESTAMP,
@@ -414,30 +611,7 @@ CREATE TABLE ur_keyvaluepair_1
 CREATE TABLE ur_land_use
 (
     id NUMBER(38) NOT NULL,
-    areaclassification_codespace VARCHAR2(1000),
-    areaclassificationtype VARCHAR2(1000),
-    areainha NUMBER,
-    areainha_uom VARCHAR2(1000),
-    areainsquaremeter NUMBER,
-    areainsquaremeter_uom VARCHAR2(1000),
-    city VARCHAR2(1000),
-    city_codespace VARCHAR2(1000),
-    districtsandzonest_codespace VARCHAR2(1000),
-    districtsandzonestype VARCHAR2(1000),
-    landuseplantype VARCHAR2(1000),
-    landuseplantype_codespace VARCHAR2(1000),
-    nominalarea NUMBER,
-    nominalarea_uom VARCHAR2(1000),
-    note VARCHAR2(1000),
-    owner VARCHAR2(1000),
-    ownertype VARCHAR2(1000),
-    ownertype_codespace VARCHAR2(1000),
-    prefecture VARCHAR2(1000),
-    prefecture_codespace VARCHAR2(1000),
-    reference VARCHAR2(1000),
-    surveyyear DATE,
-    urbanplantype VARCHAR2(1000),
-    urbanplantype_codespace VARCHAR2(1000),
+    landusedetailattribute_id NUMBER(38),
     PRIMARY KEY (id)
 );
 
@@ -466,6 +640,44 @@ CREATE TABLE ur_landpriceperlanduse
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_landuseattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landuseattribute
+(
+    id NUMBER(38) NOT NULL,
+    areaclassification_codespace VARCHAR2(1000),
+    areaclassificationtype VARCHAR2(1000),
+    areainha NUMBER,
+    areainha_uom VARCHAR2(1000),
+    areainsquaremeter NUMBER,
+    areainsquaremeter_uom VARCHAR2(1000),
+    buildingcoveragerate NUMBER,
+    city VARCHAR2(1000),
+    city_codespace VARCHAR2(1000),
+    districtsandzonest_codespace VARCHAR2(1000),
+    districtsandzonestype VARCHAR2(1000),
+    floorarearate NUMBER,
+    nominalarea NUMBER,
+    nominalarea_uom VARCHAR2(1000),
+    note VARCHAR2(1000),
+    orglanduse VARCHAR2(1000),
+    orglanduse_codespace VARCHAR2(1000),
+    owner VARCHAR2(1000),
+    ownertype VARCHAR2(1000),
+    ownertype_codespace VARCHAR2(1000),
+    prefecture VARCHAR2(1000),
+    prefecture_codespace VARCHAR2(1000),
+    reference VARCHAR2(1000),
+    specifiedbuildingcoveragerat NUMBER,
+    specifiedfloorarearate NUMBER,
+    standardfloorarearate NUMBER,
+    surveyyear DATE,
+    urbanplantype VARCHAR2(1000),
+    urbanplantype_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_landusediversion 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_landusediversion
@@ -475,30 +687,26 @@ CREATE TABLE ur_landusediversion
 );
 
 -- -------------------------------------------------------------------- 
--- ur_largecustomerfacilitie 
+-- ur_largecustomerfacilitya 
 -- -------------------------------------------------------------------- 
-CREATE TABLE ur_largecustomerfacilitie
+CREATE TABLE ur_largecustomerfacilitya
 (
     id NUMBER(38) NOT NULL,
     areaclassification_codespace VARCHAR2(1000),
     areaclassificationtype VARCHAR2(1000),
     availability NUMBER,
     capacity INTEGER,
-    city VARCHAR2(1000),
-    city_codespace VARCHAR2(1000),
     class VARCHAR2(1000),
     class_codespace VARCHAR2(1000),
     districtsandzonest_codespace VARCHAR2(1000),
     districtsandzonestype VARCHAR2(1000),
     inauguraldate TIMESTAMP,
     keytenants VARCHAR2(1000),
-    landuseplantype VARCHAR2(1000),
-    landuseplantype_codespace VARCHAR2(1000),
+    landusetype VARCHAR2(1000),
+    landusetype_codespace VARCHAR2(1000),
     name VARCHAR2(1000),
     note VARCHAR2(1000),
     owner VARCHAR2(1000),
-    prefecture VARCHAR2(1000),
-    prefecture_codespace VARCHAR2(1000),
     reference VARCHAR2(1000),
     surveyyear DATE,
     totalfloorarea NUMBER,
@@ -721,6 +929,50 @@ CREATE TABLE ur_recreations
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_roadattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_roadattribute
+(
+    id NUMBER(38) NOT NULL,
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_roaddataqualityattribu 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_roaddataqualityattribu
+(
+    id NUMBER(38) NOT NULL,
+    appearancesrcdesc VARCHAR2(1000),
+    appearancesrcdesc_codespace VARCHAR2(1000),
+    geometrysrcdesc VARCHAR2(1000),
+    geometrysrcdesc_codespace VARCHAR2(1000),
+    lodtype VARCHAR2(1000),
+    srcscale VARCHAR2(1000),
+    srcscale_codespace VARCHAR2(1000),
+    thematicsrcdesc VARCHAR2(1000),
+    thematicsrcdesc_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_roadstructureattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_roadstructureattribute
+(
+    id NUMBER(38) NOT NULL,
+    numberoflanes INTEGER,
+    sectiontype VARCHAR2(1000),
+    sectiontype_codespace VARCHAR2(1000),
+    width NUMBER,
+    width_uom VARCHAR2(1000),
+    widthtype VARCHAR2(1000),
+    widthtype_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_route 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_route
@@ -828,26 +1080,40 @@ CREATE TABLE ur_stoptime
 );
 
 -- -------------------------------------------------------------------- 
--- ur_trafficvolume 
+-- ur_traffic_area 
 -- -------------------------------------------------------------------- 
-CREATE TABLE ur_trafficvolume
+CREATE TABLE ur_traffic_area
 (
     id NUMBER(38) NOT NULL,
-    areaclassification_codespace VARCHAR2(1000),
-    areaclassificationtype VARCHAR2(1000),
+    trafficareastructureattri_id NUMBER(38),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trafficareaattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trafficareaattribute
+(
+    id NUMBER(38) NOT NULL,
+    numberoflanes INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trafficvolumeattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trafficvolumeattribute
+(
+    id NUMBER(38) NOT NULL,
+    averageinboundtravelspeedinc NUMBER,
+    averageoutboundtravelspeedin NUMBER,
     averagetravelspeedincongesti NUMBER,
-    city VARCHAR2(1000),
-    city_codespace VARCHAR2(1000),
     congestionrate NUMBER,
     largevehiclerate NUMBER,
-    note VARCHAR2(1000),
     observationpointname VARCHAR2(1000),
-    prefecture VARCHAR2(1000),
-    prefecture_codespace VARCHAR2(1000),
     reference VARCHAR2(1000),
+    sectionid VARCHAR2(1000),
     surveyyear DATE,
-    urbanplantype VARCHAR2(1000),
-    urbanplantype_codespace VARCHAR2(1000),
     weekday12hourtrafficvolume INTEGER,
     weekday24hourtrafficvolume INTEGER,
     PRIMARY KEY (id)
@@ -903,11 +1169,9 @@ CREATE TABLE ur_translationjp
 CREATE TABLE ur_transportation_complex
 (
     id NUMBER(38) NOT NULL,
-    trafficvolume_id NUMBER(38),
-    width NUMBER,
-    width_uom VARCHAR2(1000),
-    widthtype VARCHAR2(1000),
-    widthtype_codespace VARCHAR2(1000),
+    roaddataqualityattribute_id NUMBER(38),
+    roadstructureattribute_id NUMBER(38),
+    trafficvolumeattribute_id NUMBER(38),
     PRIMARY KEY (id)
 );
 
@@ -1003,6 +1267,66 @@ CREATE TABLE ur_urbanization
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_vegetationattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_vegetationattribute
+(
+    id NUMBER(38) NOT NULL,
+    appearancesrcdesc VARCHAR2(1000),
+    appearancesrcdesc_codespace VARCHAR2(1000),
+    geometrysrcdesc VARCHAR2(1000),
+    geometrysrcdesc_codespace VARCHAR2(1000),
+    srcscale VARCHAR2(1000),
+    srcscale_codespace VARCHAR2(1000),
+    thematicsrcdesc VARCHAR2(1000),
+    thematicsrcdesc_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbody 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_waterbody
+(
+    id NUMBER(38) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbodyattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_waterbodyattribute
+(
+    id NUMBER(38) NOT NULL,
+    depth NUMBER,
+    depth_uom VARCHAR2(1000),
+    description VARCHAR2(1000),
+    description_codespace VARCHAR2(1000),
+    objectclass_id INTEGER,
+    rank VARCHAR2(1000),
+    rank_codespace VARCHAR2(1000),
+    rankorg VARCHAR2(1000),
+    rankorg_codespace VARCHAR2(1000),
+    waterbody_floodingriskatt_id NUMBER(38),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbodyriverflooding 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_waterbodyriverflooding
+(
+    id NUMBER(38) NOT NULL,
+    admintype VARCHAR2(1000),
+    admintype_codespace VARCHAR2(1000),
+    duration NUMBER,
+    duration_uom VARCHAR2(1000),
+    scale VARCHAR2(1000),
+    scale_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_zone 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_zone
@@ -1053,13 +1377,72 @@ ON DELETE SET NULL;
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_fk FOREIGN KEY (id)
 REFERENCES building (id);
 
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdet_fk FOREIGN KEY (buildingdetails_id)
-REFERENCES ur_buildingdetails (id)
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingida_fk FOREIGN KEY (buildingidattribute_id)
+REFERENCES ur_buildingidattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_largecustom_fk FOREIGN KEY (largecustomerfacilities_id)
-REFERENCES ur_largecustomerfacilitie (id)
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdet_fk FOREIGN KEY (buildingdetailattribute_id)
+REFERENCES ur_buildingdetailattribut (id)
 ON DELETE SET NULL;
+
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_largecustom_fk FOREIGN KEY (largecustomerfacilityattr_id)
+REFERENCES ur_largecustomerfacilitya (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdat_fk FOREIGN KEY (buildingdataqualityattrib_id)
+REFERENCES ur_buildingdataqualityatt (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingattribute ADD CONSTRAINT ur_buildingat_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdataqualityatt 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingdataqualityatt ADD CONSTRAINT ur_buildingdataqualitya_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdetailattribut 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingdetailattribut ADD CONSTRAINT ur_buildingdetailattrib_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdisasterriskat 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingdisasterriskat ADD CONSTRAINT ur_buildingdi_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_buildingdisasterriskat ADD CONSTRAINT ur_buildingdisasterrisk_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id);
+
+ALTER TABLE ur_buildingdisasterriskat ADD CONSTRAINT ur_buildi_buildi_buildi_fk FOREIGN KEY (building_buildingdisaster_id)
+REFERENCES ur_building (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingfloodingriskat 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingfloodingriskat ADD CONSTRAINT ur_buildingfl_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_buildingfloodingriskat ADD CONSTRAINT ur_buildingfloodingrisk_fk FOREIGN KEY (id)
+REFERENCES ur_buildingdisasterriskat (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingidattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingidattribute ADD CONSTRAINT ur_buildingidattribute_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingriverfloodingr 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_buildingriverfloodingr ADD CONSTRAINT ur_buildingriverfloodin_fk FOREIGN KEY (id)
+REFERENCES ur_buildingfloodingriskat (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_calendar 
@@ -1082,6 +1465,48 @@ ON DELETE SET NULL;
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_censusblock ADD CONSTRAINT ur_censusblock_fk FOREIGN KEY (id)
 REFERENCES ur_urbanfunction (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_city_furniture 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furniture_fk FOREIGN KEY (id)
+REFERENCES city_furniture (id);
+
+ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_cityfur_fk FOREIGN KEY (cityfurnituredetailattrib_id)
+REFERENCES ur_cityfurnituredetailatt (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnit_cityfu_fk_1 FOREIGN KEY (cityfurnituredataqualitya_id)
+REFERENCES ur_cityfurnituredataquali (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnitureattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityfurnitureattribute ADD CONSTRAINT ur_cityfurnit_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnituredataquali 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityfurnituredataquali ADD CONSTRAINT ur_cityfurnituredataqua_fk FOREIGN KEY (id)
+REFERENCES ur_cityfurnitureattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnituredetailatt 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityfurnituredetailatt ADD CONSTRAINT ur_cityfurnituredetaila_fk FOREIGN KEY (id)
+REFERENCES ur_cityfurnitureattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_fk FOREIGN KEY (id)
+REFERENCES cityobject (id);
+
+ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_vegetatio_fk FOREIGN KEY (vegetationdataqualityattr_id)
+REFERENCES ur_vegetationattribute (id)
+ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 
@@ -1172,9 +1597,9 @@ ALTER TABLE ur_keyvaluepair ADD CONSTRAINT ur_keyval_statis_generi_fk FOREIGN KE
 REFERENCES ur_statisticalgrid (id);
 
 -- -------------------------------------------------------------------- 
--- ur_keyvaluepair_1 
+-- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_keyvaluepair_1 ADD CONSTRAINT ur_keyval_buildi_extend_fk FOREIGN KEY (building_extendedattribut_id)
+ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_buildi_keyval_fk FOREIGN KEY (building_keyvaluepairattr_id)
 REFERENCES ur_building (id);
 
 -- -------------------------------------------------------------------- 
@@ -1182,6 +1607,10 @@ REFERENCES ur_building (id);
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_fk FOREIGN KEY (id)
 REFERENCES land_use (id);
+
+ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_landusedeta_fk FOREIGN KEY (landusedetailattribute_id)
+REFERENCES ur_landuseattribute (id)
+ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
 -- ur_landprice 
@@ -1200,6 +1629,12 @@ REFERENCES ur_landprice (id);
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_landusediversion ADD CONSTRAINT ur_landusediversion_fk FOREIGN KEY (id)
 REFERENCES ur_statisticalgrid (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_largecustomerfacilitya 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_largecustomerfacilitya ADD CONSTRAINT ur_largecustomerfacilit_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_numberofannualdiversio 
@@ -1310,6 +1745,24 @@ ALTER TABLE ur_recreations ADD CONSTRAINT ur_recreations_fk FOREIGN KEY (id)
 REFERENCES ur_urbanfunction (id);
 
 -- -------------------------------------------------------------------- 
+-- ur_roadattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_roadattribute ADD CONSTRAINT ur_roadattrib_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_roaddataqualityattribu 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_roaddataqualityattribu ADD CONSTRAINT ur_roaddataqualityattri_fk FOREIGN KEY (id)
+REFERENCES ur_roadattribute (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_roadstructureattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_roadstructureattribute ADD CONSTRAINT ur_roadstructureattribu_fk FOREIGN KEY (id)
+REFERENCES ur_roadattribute (id);
+
+-- -------------------------------------------------------------------- 
 -- ur_route 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_route ADD CONSTRAINT ur_route_fk FOREIGN KEY (id)
@@ -1330,11 +1783,11 @@ ON DELETE SET NULL;
 -- -------------------------------------------------------------------- 
 -- ur_statisticalgrid 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statistica_objectcla_fk FOREIGN KEY (objectclass_id)
-REFERENCES objectclass (id);
-
 ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisticalgrid_fk FOREIGN KEY (id)
 REFERENCES cityobject (id);
+
+ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statistica_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
 
 ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisti_lod_1multis_fk FOREIGN KEY (lod_1multisurface_id)
 REFERENCES surface_geometry (id);
@@ -1369,6 +1822,22 @@ ON DELETE SET NULL;
 ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_trip_fk FOREIGN KEY (trip_id)
 REFERENCES ur_trip (id)
 ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
+-- ur_traffic_area 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_traffic_area ADD CONSTRAINT ur_traffic_area_fk FOREIGN KEY (id)
+REFERENCES traffic_area (id);
+
+ALTER TABLE ur_traffic_area ADD CONSTRAINT ur_traffic_area_traffic_fk FOREIGN KEY (trafficareastructureattri_id)
+REFERENCES ur_trafficareaattribute (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
+-- ur_trafficvolumeattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trafficvolumeattribute ADD CONSTRAINT ur_trafficvolumeattribu_fk FOREIGN KEY (id)
+REFERENCES ur_roadattribute (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_transfer 
@@ -1406,8 +1875,16 @@ REFERENCES ur_publictransit (id);
 ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transportati_complex_fk FOREIGN KEY (id)
 REFERENCES transportation_complex (id);
 
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_traffi_fk FOREIGN KEY (trafficvolume_id)
-REFERENCES ur_trafficvolume (id)
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_traffi_fk FOREIGN KEY (trafficvolumeattribute_id)
+REFERENCES ur_trafficvolumeattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_roadst_fk FOREIGN KEY (roadstructureattribute_id)
+REFERENCES ur_roadstructureattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_roadda_fk FOREIGN KEY (roaddataqualityattribute_id)
+REFERENCES ur_roaddataqualityattribu (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -1476,6 +1953,27 @@ ALTER TABLE ur_urbanization ADD CONSTRAINT ur_urbanization_fk FOREIGN KEY (id)
 REFERENCES ur_urbanfunction (id);
 
 -- -------------------------------------------------------------------- 
+-- ur_waterbody 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_fk FOREIGN KEY (id)
+REFERENCES waterbody (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbodyattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_waterbodyattribute ADD CONSTRAINT ur_waterbodya_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_waterbodyattribute ADD CONSTRAINT ur_waterb_waterb_floodi_fk FOREIGN KEY (waterbody_floodingriskatt_id)
+REFERENCES ur_waterbody (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbodyriverflooding 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_waterbodyriverflooding ADD CONSTRAINT ur_waterbodyriverfloodi_fk FOREIGN KEY (id)
+REFERENCES ur_waterbodyattribute (id);
+
+-- -------------------------------------------------------------------- 
 -- ur_zone 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_zone ADD CONSTRAINT ur_zone_objectclass_fk FOREIGN KEY (objectclass_id)
@@ -1519,14 +2017,52 @@ CREATE INDEX ur_attribution_trip_fkx ON ur_attribution (trip_id);
 -- -------------------------------------------------------------------- 
 -- ur_building 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_building_buildingde_fkx ON ur_building (buildingdetails_id);
+CREATE INDEX ur_building_buildingda_fkx ON ur_building (buildingdataqualityattrib_id);
 
-CREATE INDEX ur_building_largecusto_fkx ON ur_building (largecustomerfacilities_id);
+CREATE INDEX ur_building_buildingde_fkx ON ur_building (buildingdetailattribute_id);
+
+CREATE INDEX ur_building_buildingid_fkx ON ur_building (buildingidattribute_id);
+
+CREATE INDEX ur_building_largecusto_fkx ON ur_building (largecustomerfacilityattr_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingattribute 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_buildinga_objectcla_fkx ON ur_buildingattribute (objectclass_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingdisasterriskat 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_buildi_buildi_build_fkx ON ur_buildingdisasterriskat (building_buildingdisaster_id);
+
+CREATE INDEX ur_buildingd_objectcla_fkx ON ur_buildingdisasterriskat (objectclass_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_buildingfloodingriskat 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_buildingf_objectcla_fkx ON ur_buildingfloodingriskat (objectclass_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_calendardate 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_calendarda_calendar_fkx ON ur_calendardate (calendar_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_city_furniture 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_city_furnit_cityf_fkx_1 ON ur_city_furniture (cityfurnituredataqualitya_id);
+
+CREATE INDEX ur_city_furnitu_cityfu_fkx ON ur_city_furniture (cityfurnituredetailattrib_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityfurnitureattribute 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_cityfurni_objectcla_fkx ON ur_cityfurnitureattribute (objectclass_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_cityobjec_vegetatio_fkx ON ur_cityobject (vegetationdataqualityattr_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_fareattribute 
@@ -1551,9 +2087,14 @@ CREATE INDEX ur_frequency_trip_fkx ON ur_frequency (trip_id);
 CREATE INDEX ur_keyval_statis_gener_fkx ON ur_keyvaluepair (statisticalg_genericvalue_id);
 
 -- -------------------------------------------------------------------- 
--- ur_keyvaluepair_1 
+-- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_keyval_buildi_exten_fkx ON ur_keyvaluepair_1 (building_extendedattribut_id);
+CREATE INDEX ur_keyval_buildi_keyva_fkx ON ur_keyvaluepairattribute (building_keyvaluepairattr_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_land_use 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_land_use_landusedet_fkx ON ur_land_use (landusedetailattribute_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_landpriceperlanduse 
@@ -1617,6 +2158,11 @@ CREATE INDEX ur_public_cityob_datat_fkx ON ur_publictransitdatatype (cityobjectg
 CREATE INDEX ur_publictr_objectcl_fkx_1 ON ur_publictransitdatatype (objectclass_id);
 
 -- -------------------------------------------------------------------- 
+-- ur_roadattribute 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_roadattri_objectcla_fkx ON ur_roadattribute (objectclass_id);
+
+-- -------------------------------------------------------------------- 
 -- ur_route 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_route_agency_fkx ON ur_route (agency_id);
@@ -1661,6 +2207,11 @@ CREATE INDEX ur_stoptime_stop_fkx ON ur_stoptime (stop_id);
 CREATE INDEX ur_stoptime_trip_fkx ON ur_stoptime (trip_id);
 
 -- -------------------------------------------------------------------- 
+-- ur_traffic_area 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_traffic_area_traffi_fkx ON ur_traffic_area (trafficareastructureattri_id);
+
+-- -------------------------------------------------------------------- 
 -- ur_transfer 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_transfer_from_fkx ON ur_transfer (from_id);
@@ -1675,7 +2226,11 @@ CREATE INDEX ur_translatio_recordid_fkx ON ur_translation (recordid_id);
 -- -------------------------------------------------------------------- 
 -- ur_transportation_complex 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_transp_comple_traff_fkx ON ur_transportation_complex (trafficvolume_id);
+CREATE INDEX ur_transp_comple_roadd_fkx ON ur_transportation_complex (roaddataqualityattribute_id);
+
+CREATE INDEX ur_transp_comple_roads_fkx ON ur_transportation_complex (roadstructureattribute_id);
+
+CREATE INDEX ur_transp_comple_traff_fkx ON ur_transportation_complex (trafficvolumeattribute_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_trip 
@@ -1751,6 +2306,13 @@ CREATE INDEX ur_urbanfu_lod_2multip_spx ON ur_urbanfunction (lod_2multipoint) IN
 CREATE INDEX ur_urbanfu_lod_2multis_fkx ON ur_urbanfunction (lod_2multisurface_id);
 
 CREATE INDEX ur_urbanfunc_objectcla_fkx ON ur_urbanfunction (objectclass_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_waterbodyattribute 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_waterbody_objectcla_fkx ON ur_waterbodyattribute (objectclass_id);
+
+CREATE INDEX ur_waterb_waterb_flood_fkx ON ur_waterbodyattribute (waterbody_floodingriskatt_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_zone 

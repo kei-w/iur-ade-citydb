@@ -76,42 +76,135 @@ public class ADETableMapper {
             }});
             put(schemaMapper.getTableName(ADETable.BUILDING).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
-                add("BUILDINGDETAILS_ID");
-                add("LARGECUSTOMERFACILITIES_ID");
+                add("BUILDINGDATAQUALITYATTRIB_ID");
+                add("BUILDINGDETAILATTRIBUTE_ID");
+                add("BUILDINGIDATTRIBUTE_ID");
+                add("LARGECUSTOMERFACILITYATTR_ID");
             }});
-            put(schemaMapper.getTableName(ADETable.BUILDINGDETAILS).toUpperCase(), new LinkedHashSet<String>() {{
+            put(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGDATAQUALITYATT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("APPEARANCESRCDESC");
+                add("APPEARANCESRCDESC_CODESPACE");
+                add("GEOMETRYSRCDESC");
+                add("GEOMETRYSRCDESC_CODESPACE");
+                add("LOD1HEIGHTTYPE");
+                add("LOD1HEIGHTTYPE_CODESPACE");
+                add("LODTYPE");
+                add("SRCSCALE");
+                add("SRCSCALE_CODESPACE");
+                add("THEMATICSRCDESC");
+                add("THEMATICSRCDESC_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGDETAILATTRIBUT).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("AREACLASSIFICATION_CODESPACE");
                 add("AREACLASSIFICATIONTYPE");
+                add("BASEMENTFIRSTUSAGE");
+                add("BASEMENTFIRSTUSAGE_CODESPACE");
+                add("BASEMENTSECONDUSAG_CODESPACE");
+                add("BASEMENTSECONDUSAGE");
+                add("BASEMENTUSAGE");
+                add("BASEMENTUSAGE_CODESPACE");
+                add("BUILDINGCOVERAGERATE");
                 add("BUILDINGFOOTPRINTAREA");
                 add("BUILDINGFOOTPRINTAREA_UOM");
+                add("BUILDINGHEIGHT");
+                add("BUILDINGHEIGHT_UOM");
                 add("BUILDINGROOFEDGEAREA");
                 add("BUILDINGROOFEDGEAREA_UOM");
+                add("BUILDINGSTRUCTUREO_CODESPACE");
+                add("BUILDINGSTRUCTUREORGTYPE");
                 add("BUILDINGSTRUCTURET_CODESPACE");
                 add("BUILDINGSTRUCTURETYPE");
-                add("CITY");
-                add("CITY_CODESPACE");
+                add("DETAILEDUSAGE");
+                add("DETAILEDUSAGE2");
+                add("DETAILEDUSAGE2_CODESPACE");
+                add("DETAILEDUSAGE3");
+                add("DETAILEDUSAGE3_CODESPACE");
+                add("DETAILEDUSAGE_CODESPACE");
                 add("DEVELOPMENTAREA");
                 add("DEVELOPMENTAREA_UOM");
                 add("DISTRICTSANDZONEST_CODESPACE");
                 add("DISTRICTSANDZONESTYPE");
+                add("EAVEHEIGHT");
+                add("EAVEHEIGHT_UOM");
                 add("FIREPROOFSTRUCTURE_CODESPACE");
                 add("FIREPROOFSTRUCTURETYPE");
+                add("FLOORAREARATE");
+                add("GROUNDFLOORUSAGE");
+                add("GROUNDFLOORUSAGE_CODESPACE");
                 add("IMPLEMENTINGBODY");
-                add("LANDUSEPLANTYPE");
-                add("LANDUSEPLANTYPE_CODESPACE");
+                add("LANDUSETYPE");
+                add("LANDUSETYPE_CODESPACE");
+                add("MAJORUSAGE");
+                add("MAJORUSAGE2");
+                add("MAJORUSAGE2_CODESPACE");
+                add("MAJORUSAGE_CODESPACE");
                 add("NOTE");
-                add("PREFECTURE");
-                add("PREFECTURE_CODESPACE");
+                add("ORGUSAGE");
+                add("ORGUSAGE2");
+                add("ORGUSAGE2_CODESPACE");
+                add("ORGUSAGE_CODESPACE");
                 add("REFERENCE");
+                add("SECONDFLOORUSAGE");
+                add("SECONDFLOORUSAGE_CODESPACE");
                 add("SERIALNUMBEROFBUILDINGCERTIF");
                 add("SITEAREA");
                 add("SITEAREA_UOM");
+                add("SPECIFIEDBUILDINGCOVERAGERAT");
+                add("SPECIFIEDFLOORAREARATE");
+                add("STANDARDFLOORAREARATE");
                 add("SURVEYYEAR");
+                add("THIRDFLOORUSAGE");
+                add("THIRDFLOORUSAGE_CODESPACE");
                 add("TOTALFLOORAREA");
                 add("TOTALFLOORAREA_UOM");
                 add("URBANPLANTYPE");
                 add("URBANPLANTYPE_CODESPACE");
+                add("VACANCY");
+                add("VACANCY_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("AREATYPE");
+                add("AREATYPE_CODESPACE");
+                add("BUILDING_BUILDINGDISASTER_ID");
+                add("DESCRIPTION");
+                add("DESCRIPTION_CODESPACE");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGFLOODINGRISKAT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DEPTH");
+                add("DEPTH_UOM");
+                add("OBJECTCLASS_ID");
+                add("RANK");
+                add("RANK_CODESPACE");
+                add("RANKORG");
+                add("RANKORG_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGIDATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("BRANCHID");
+                add("BUILDINGID");
+                add("CITY");
+                add("CITY_CODESPACE");
+                add("PARTID");
+                add("PREFECTURE");
+                add("PREFECTURE_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDINGRIVERFLOODINGR).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ADMINTYPE");
+                add("ADMINTYPE_CODESPACE");
+                add("DURATION");
+                add("DURATION_UOM");
+                add("SCALE");
+                add("SCALE_CODESPACE");
             }});
             put(schemaMapper.getTableName(ADETable.CALENDAR).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -262,9 +355,9 @@ public class ADETableMapper {
                 add("STRINGVALUE");
                 add("URIVALUE");
             }});
-            put(schemaMapper.getTableName(ADETable.KEYVALUEPAIR_1).toUpperCase(), new LinkedHashSet<String>() {{
+            put(schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
-                add("BUILDING_EXTENDEDATTRIBUT_ID");
+                add("BUILDING_KEYVALUEPAIRATTR_ID");
                 add("CODEVALUE");
                 add("CODEVALUE_CODESPACE");
                 add("DATEVALUE");
@@ -276,33 +369,6 @@ public class ADETableMapper {
                 add("MEASUREDVALUE_UOM");
                 add("STRINGVALUE");
                 add("URIVALUE");
-            }});
-            put(schemaMapper.getTableName(ADETable.LAND_USE).toUpperCase(), new LinkedHashSet<String>() {{
-                add("ID");
-                add("AREACLASSIFICATION_CODESPACE");
-                add("AREACLASSIFICATIONTYPE");
-                add("AREAINHA");
-                add("AREAINHA_UOM");
-                add("AREAINSQUAREMETER");
-                add("AREAINSQUAREMETER_UOM");
-                add("CITY");
-                add("CITY_CODESPACE");
-                add("DISTRICTSANDZONEST_CODESPACE");
-                add("DISTRICTSANDZONESTYPE");
-                add("LANDUSEPLANTYPE");
-                add("LANDUSEPLANTYPE_CODESPACE");
-                add("NOMINALAREA");
-                add("NOMINALAREA_UOM");
-                add("NOTE");
-                add("OWNER");
-                add("OWNERTYPE");
-                add("OWNERTYPE_CODESPACE");
-                add("PREFECTURE");
-                add("PREFECTURE_CODESPACE");
-                add("REFERENCE");
-                add("SURVEYYEAR");
-                add("URBANPLANTYPE");
-                add("URBANPLANTYPE_CODESPACE");
             }});
             put(schemaMapper.getTableName(ADETable.LANDPRICE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -319,27 +385,23 @@ public class ADETableMapper {
             put(schemaMapper.getTableName(ADETable.LANDUSEDIVERSION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
             }});
-            put(schemaMapper.getTableName(ADETable.LARGECUSTOMERFACILITIE).toUpperCase(), new LinkedHashSet<String>() {{
+            put(schemaMapper.getTableName(ADETable.LARGECUSTOMERFACILITYA).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("AREACLASSIFICATION_CODESPACE");
                 add("AREACLASSIFICATIONTYPE");
                 add("AVAILABILITY");
                 add("CAPACITY");
-                add("CITY");
-                add("CITY_CODESPACE");
                 add("CLASS");
                 add("CLASS_CODESPACE");
                 add("DISTRICTSANDZONEST_CODESPACE");
                 add("DISTRICTSANDZONESTYPE");
                 add("INAUGURALDATE");
                 add("KEYTENANTS");
-                add("LANDUSEPLANTYPE");
-                add("LANDUSEPLANTYPE_CODESPACE");
+                add("LANDUSETYPE");
+                add("LANDUSETYPE_CODESPACE");
                 add("NAME");
                 add("NOTE");
                 add("OWNER");
-                add("PREFECTURE");
-                add("PREFECTURE_CODESPACE");
                 add("REFERENCE");
                 add("SURVEYYEAR");
                 add("TOTALFLOORAREA");
@@ -553,26 +615,6 @@ public class ADETableMapper {
                 add("TIMEPOINT_CODESPACE");
                 add("TRIP_ID");
             }});
-            put(schemaMapper.getTableName(ADETable.TRAFFICVOLUME).toUpperCase(), new LinkedHashSet<String>() {{
-                add("ID");
-                add("AREACLASSIFICATION_CODESPACE");
-                add("AREACLASSIFICATIONTYPE");
-                add("AVERAGETRAVELSPEEDINCONGESTI");
-                add("CITY");
-                add("CITY_CODESPACE");
-                add("CONGESTIONRATE");
-                add("LARGEVEHICLERATE");
-                add("NOTE");
-                add("OBSERVATIONPOINTNAME");
-                add("PREFECTURE");
-                add("PREFECTURE_CODESPACE");
-                add("REFERENCE");
-                add("SURVEYYEAR");
-                add("URBANPLANTYPE");
-                add("URBANPLANTYPE_CODESPACE");
-                add("WEEKDAY12HOURTRAFFICVOLUME");
-                add("WEEKDAY24HOURTRAFFICVOLUME");
-            }});
             put(schemaMapper.getTableName(ADETable.TRANSFER).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("FROM_ID");
@@ -598,14 +640,6 @@ public class ADETableMapper {
                 add("LANGUAGE");
                 add("LANGUAGE_CODESPACE");
                 add("TRANSLATION");
-            }});
-            put(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX).toUpperCase(), new LinkedHashSet<String>() {{
-                add("ID");
-                add("TRAFFICVOLUME_ID");
-                add("WIDTH");
-                add("WIDTH_UOM");
-                add("WIDTHTYPE");
-                add("WIDTHTYPE_CODESPACE");
             }});
             put(schemaMapper.getTableName(ADETable.TRIP).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

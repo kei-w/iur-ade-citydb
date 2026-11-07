@@ -39,8 +39,6 @@ import org.citygml4j.ade.iur.model.urg.StatisticalGrid;
 import org.citygml4j.ade.iur.model.urt.PublicTransit;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
-import org.citygml4j.model.citygml.landuse.LandUse;
-import org.citygml4j.model.citygml.transportation.TransportationComplex;
 import org.citygml4j.model.gml.base.AbstractGML;
 import org.citygml4j.model.module.citygml.CityGMLVersion;
 
@@ -66,10 +64,6 @@ public class BalloonManager implements ADEBalloonManager {
 
         if (modelObject instanceof AbstractBuilding) {
             balloonHandler = getBalloonHandler(BuildingBalloonHandler.class);
-        } else if (modelObject instanceof LandUse) {
-            balloonHandler = getBalloonHandler(LandUseBalloonHandler.class);
-        } else if (modelObject instanceof TransportationComplex) {
-            balloonHandler = getBalloonHandler(TransportationBalloonHandler.class);
         } else if (modelObject instanceof CityObjectGroup) {
             balloonHandler = getBalloonHandler(CityObjectGroupBalloonHandler.class);
         } else if (modelObject instanceof UrbanFunction) {
@@ -93,10 +87,6 @@ public class BalloonManager implements ADEBalloonManager {
         if (balloonHandler == null) {
             if (type == BuildingBalloonHandler.class) {
                 balloonHandler = new BuildingBalloonHandler(this);
-            } else if (type == LandUseBalloonHandler.class) {
-                balloonHandler = new LandUseBalloonHandler(this);
-            } else if (type == TransportationBalloonHandler.class) {
-                balloonHandler = new TransportationBalloonHandler(this);
             } else if (type == CityObjectGroupBalloonHandler.class) {
                 balloonHandler = new CityObjectGroupBalloonHandler(this);
             } else if (type == UrbanFunctionBalloonHandler.class) {
