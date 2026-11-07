@@ -26,6 +26,7 @@ Change Log
 * The ADE Manager output is patched where it cannot represent the schema (multi-valued dates, the
   `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
 * Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
+
 #### Known limitations
 * ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
   supported; `urf`, `urg` and `urt` remain at 1.4.
