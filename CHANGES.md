@@ -26,10 +26,12 @@ Change Log
   `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
 * Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
 
+#### Changes (ADE feature types, 2026-11-07)
+* The i-UR 2.0 XSD defines no ADE feature types; regenerated with the generator that supports them.
+
 #### Known limitations
 * `uro:ControlPoint/uro:parameter` is not supported: the 2.0 XSD declares it with the type of `uro:ControlPoint` itself.
-* ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
-  supported; `urf`, `urg` and `urt` remain at 1.4.
+* `urf`, `urg` and `urt` remain at 1.4.
 
 ### 2.1.0 - 2024-09-19
 
