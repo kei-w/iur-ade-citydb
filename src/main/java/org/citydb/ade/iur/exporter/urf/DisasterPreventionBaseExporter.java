@@ -32,6 +32,7 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
@@ -45,10 +46,12 @@ import org.citygml4j.ade.iur.model.urf.DisasterPreventionBase;
 import java.sql.*;
 
 public class DisasterPreventionBaseExporter implements UrbanFunctionModuleExporter {
+    private final ExportManager manager;
     private final UrbanFunctionExporter urbanFunctionExporter;
     private final PreparedStatement ps;
 
     public DisasterPreventionBaseExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.DISASTERPREVENTIONBASE);
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
 
@@ -71,6 +74,8 @@ public class DisasterPreventionBaseExporter implements UrbanFunctionModuleExport
                 doExport(disasterPreventionBase, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), disasterPreventionBase, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

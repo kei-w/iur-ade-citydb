@@ -6024,9 +6024,6 @@
                     <inverseJoin table="ur_keyvaluepairattribute" fromColumn="keyvaluepairattribute_id" toColumn="id" toRole="parent"/>
                 </joinTable>
             </complexProperty>
-            <featureProperty target="ur_1_AbstractPointCloudType" relationType="association" maxOccurs="1" path="pointCloud" schema="ur_1">
-                <join table="ur_pointcloud" fromColumn="pointcloud_id" toColumn="id" toRole="parent"/>
-            </featureProperty>
         </propertyInjection>
         <propertyInjection table="ur_cityobjectgroup_2" defaultBase="CityObjectGroupType">
             <join table="ur_cityobjectgroup_2" fromColumn="ID" toColumn="ID" toRole="child"/>
@@ -6046,6 +6043,12 @@
                     </inverseJoin>
                 </joinTable>
             </complexProperty>
+        </propertyInjection>
+        <propertyInjection table="ur_cityobject_2" defaultBase="AbstractCityObjectType">
+            <join table="ur_cityobject_2" fromColumn="ID" toColumn="ID" toRole="child"/>
+            <featureProperty target="ur_1_AbstractPointCloudType" relationType="association" maxOccurs="1" path="pointCloud" schema="ur_1">
+                <join table="ur_pointcloud" fromColumn="pointcloud_id" toColumn="id" toRole="parent"/>
+            </featureProperty>
         </propertyInjection>
     </propertyInjections>
 </schemaMapping>

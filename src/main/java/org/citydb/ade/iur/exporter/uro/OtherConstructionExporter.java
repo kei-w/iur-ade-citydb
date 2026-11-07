@@ -34,6 +34,7 @@ import org.citydb.config.geometry.GeometryObject;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.database.content.GMLConverter;
@@ -213,6 +214,8 @@ public class OtherConstructionExporter implements UrbanObjectModuleExporter {
                 doExport(otherConstruction, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), otherConstruction, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

@@ -606,7 +606,6 @@ CREATE TABLE ur_cityfurnitureattribute
 CREATE TABLE ur_cityobject
 (
     id NUMBER(38) NOT NULL,
-    pointcloud_id NUMBER(38),
     vegdataqualityattribute_id NUMBER(38),
     vegfacilityidattribute_id NUMBER(38),
     vegfacilitytypeattribute_id NUMBER(38),
@@ -4266,6 +4265,16 @@ CREATE TABLE ur_cityobjec_to_publictra
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityobject_2
+(
+    id NUMBER(38) NOT NULL,
+    pointcloud_id NUMBER(38),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_abstractd_to_districtd 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_abstractd_to_districtd
@@ -6443,10 +6452,6 @@ ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobjec_vegfacil_fk_1 FOREIGN KEY 
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_pointclou_fk FOREIGN KEY (pointcloud_id)
-REFERENCES ur_pointcloud (id)
-ON DELETE SET NULL;
-
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 
 -- -------------------------------------------------------------------- 
@@ -8358,6 +8363,17 @@ REFERENCES ur_cityobjectgroup_3 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityobject_2 ADD CONSTRAINT ur_cityobject_2_fk FOREIGN KEY (id)
+REFERENCES cityobject (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_cityobject_2 ADD CONSTRAINT ur_cityobjec_pointcloud__fk FOREIGN KEY (pointcloud_id)
+REFERENCES ur_pointcloud (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
 -- ur_abstractd_to_districtd 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_abstractd_to_districtd ADD CONSTRAINT ur_abstractd_abstractdis_fk_3 FOREIGN KEY (abstractdistrictplan_id)
@@ -9474,8 +9490,6 @@ CREATE INDEX ur_city_furnit_frnfa_fkx_1 ON ur_city_furniture (frnfacilitytypeatt
 -- -------------------------------------------------------------------- 
 -- ur_cityobject 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_cityobjec_pointclou_fkx ON ur_cityobject (pointcloud_id);
-
 CREATE INDEX ur_cityobjec_vegdataqu_fkx ON ur_cityobject (vegdataqualityattribute_id);
 
 CREATE INDEX ur_cityobjec_vegfacili_fkx ON ur_cityobject (vegfacilityidattribute_id);
@@ -10475,6 +10489,11 @@ CREATE INDEX ur_cityobjec_cityobject_fkx_6 ON ur_cityobjec_to_keyvaluep (cityobj
 CREATE INDEX ur_cityobjec_publictran_fkx_2 ON ur_cityobjec_to_publictra (publictransitdatatype_id);
 
 CREATE INDEX ur_cityobjec_cityobject_fkx_8 ON ur_cityobjec_to_publictra (cityobjectgroup_3_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_cityobjec_pointcloud_fkx ON ur_cityobject_2 (pointcloud_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_abstractdistrictplan 

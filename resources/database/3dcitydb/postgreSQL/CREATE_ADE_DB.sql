@@ -1390,7 +1390,6 @@ CREATE TABLE ur_cityfurnitureattribute
 CREATE TABLE ur_cityobject
 (
     id BIGINT NOT NULL,
-    pointcloud_id BIGINT,
     vegdataqualityattribute_id BIGINT,
     vegfacilityidattribute_id BIGINT,
     vegfacilitytypeattribute_id BIGINT,
@@ -5050,6 +5049,16 @@ CREATE TABLE ur_cityobjec_to_publictra
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_cityobject_2
+(
+    id BIGINT NOT NULL,
+    pointcloud_id BIGINT,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_abstractd_to_districtd 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_abstractd_to_districtd
@@ -7227,10 +7236,6 @@ ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobjec_vegfacil_fk_1 FOREIGN KEY 
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_pointclou_fk FOREIGN KEY (pointcloud_id)
-REFERENCES ur_pointcloud (id)
-ON DELETE SET NULL;
-
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 
 -- -------------------------------------------------------------------- 
@@ -9142,6 +9147,17 @@ REFERENCES ur_cityobjectgroup_3 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityobject_2 ADD CONSTRAINT ur_cityobject_2_fk FOREIGN KEY (id)
+REFERENCES cityobject (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_cityobject_2 ADD CONSTRAINT ur_cityobjec_pointcloud__fk FOREIGN KEY (pointcloud_id)
+REFERENCES ur_pointcloud (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
 -- ur_abstractd_to_districtd 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_abstractd_to_districtd ADD CONSTRAINT ur_abstractd_abstractdis_fk FOREIGN KEY (abstractdistrictplan_id)
@@ -10387,12 +10403,6 @@ CREATE INDEX ur_city_furnit_frnfa_fkx_1 ON ur_city_furniture
 -- -------------------------------------------------------------------- 
 -- ur_cityobject 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_cityobjec_pointclou_fkx ON ur_cityobject
-    USING btree
-    (
-      pointcloud_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
 CREATE INDEX ur_cityobjec_vegdataqu_fkx ON ur_cityobject
     USING btree
     (
@@ -12335,6 +12345,15 @@ CREATE INDEX ur_cityobjec_cityobject_fkx_7 ON ur_cityobjec_to_publictra
     USING btree
     (
       cityobjectgroup_3_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_cityobjec_pointcloud_fkx ON ur_cityobject_2
+    USING btree
+    (
+      pointcloud_id ASC NULLS LAST
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 

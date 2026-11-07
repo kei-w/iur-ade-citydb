@@ -79,6 +79,7 @@ public enum ADETable {
     CITYOBJECTGROUP_1(org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class),
     CITYOBJECTGROUP_2(org.citydb.ade.iur.importer.urg.CityObjectGroupPropertiesImporter.class),
     CITYOBJECTGROUP_3(org.citydb.ade.iur.importer.urg.CityObjectGroupPropertiesImporter.class),
+    CITYOBJECT_2(CityObjectPropertiesImporter.class),
     CITYOBJEC_TO_DMATTRIBU(VegetationObjectToDmAttributeImporter.class),
     CITYOBJEC_TO_FACILITYA(VegetationObjectToFacilityAttributeImporter.class),
     CITYOBJEC_TO_KEYVALUEP(VegetationObjectToKeyValuePairAttributeImporter.class),

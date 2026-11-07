@@ -495,6 +495,8 @@ public class ImportManager implements ADEImportManager {
             getImporter(TunnelPropertiesImporter.class).doImport(properties, (AbstractTunnel) parent, parentId, parentType);
         if (parent instanceof AbstractVegetationObject)
             getImporter(VegetationObjectPropertiesImporter.class).doImport(properties, (AbstractVegetationObject) parent, parentId, parentType);
+        if (parent instanceof AbstractCityObject && properties.containsOneOf(org.citygml4j.ade.iur.model.uro.PointCloudPropertyElement.class))
+            getImporter(CityObjectPropertiesImporter.class).doImport(properties, (AbstractCityObject) parent, parentId, parentType);
     }
 
     @Override
@@ -866,6 +868,8 @@ public class ImportManager implements ADEImportManager {
                     importer = new TunnelPropertiesImporter(connection, helper, this);
                 else if (type == VegetationObjectPropertiesImporter.class)
                     importer = new VegetationObjectPropertiesImporter(connection, helper, this);
+                else if (type == CityObjectPropertiesImporter.class)
+                    importer = new CityObjectPropertiesImporter(connection, helper, this);
                 else if (type == DataQualityAttributeImporter.class)
                     importer = new DataQualityAttributeImporter(connection, helper, this);
                 else if (type == PublicSurveyDataQualityAttributeImporter.class)

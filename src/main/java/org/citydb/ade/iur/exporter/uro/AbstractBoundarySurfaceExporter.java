@@ -33,6 +33,7 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.config.geometry.GeometryObject;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.database.content.GMLConverter;
 import org.citydb.core.operation.exporter.database.content.SurfaceGeometryExporter;
@@ -48,12 +49,14 @@ import java.sql.*;
 
 public class AbstractBoundarySurfaceExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
+    private final ExportManager manager;
     private final PreparedStatement ps;
     private final SurfaceGeometryExporter surfaceGeometryExporter;
     private final GMLConverter gmlConverter;
 
     public AbstractBoundarySurfaceExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BOUNDARYSURFACE);
         surfaceGeometryExporter = helper.getSurfaceGeometryExporter();
         gmlConverter = helper.getGMLConverter();
@@ -73,6 +76,8 @@ public class AbstractBoundarySurfaceExporter implements UrbanObjectModuleExporte
                 doExport(abstractBoundarySurface, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), abstractBoundarySurface, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

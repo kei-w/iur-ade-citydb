@@ -38,10 +38,11 @@ Change Log
   properties of one type keeps the foreign key columns (the ADE Manager's delete functions reject two join tables
   between the same tables). Subtype rows are deleted with their base rows (`ON DELETE CASCADE`).
 * Lists of simple values and of measures are stored as joined strings like the lists of dates.
+* Import/export of the hook `uro:pointCloud` of every city object: the `uro:PointCloud` feature is stored as a
+  city object of its own (`ur_pointcloud`) and referenced from the injection table `ur_cityobject_2`
+  (base `AbstractCityObjectType`; the ADE Manager put the reference into the vegetation injection).
 
 #### Known limitations
-* The feature-typed hook `uro:pointCloud` (`core:_GenericApplicationPropertyOfCityObject`) is not supported;
-  `uro:PointCloud` itself is modelled.
 * `gml:pos` values (`uro:Elevation/elevationValue`, `uro:OffsetDepth/pos`) keep their coordinates only; `srsName` and
   `srsDimension` are not stored.
 * `urg` and `urt` remain at 1.4.

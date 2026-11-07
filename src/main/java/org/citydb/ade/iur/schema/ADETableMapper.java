@@ -414,7 +414,6 @@ public class ADETableMapper {
             }});
             put(schemaMapper.getTableName(ADETable.CITYOBJECT).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
-                add("POINTCLOUD_ID");
                 add("VEGDATAQUALITYATTRIBUTE_ID");
                 add("VEGFACILITYIDATTRIBUTE_ID");
                 add("VEGFACILITYTYPEATTRIBUTE_ID");
@@ -441,6 +440,10 @@ public class ADETableMapper {
             }});
             put(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_3).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.CITYOBJECT_2).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("POINTCLOUD_ID");
             }});
             put(schemaMapper.getTableName(ADETable.CITYOBJEC_TO_DMATTRIBU).toUpperCase(), new LinkedHashSet<String>() {{
                 add("DMATTRIBUTE_ID");

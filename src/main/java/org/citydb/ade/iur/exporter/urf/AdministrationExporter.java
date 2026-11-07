@@ -33,6 +33,7 @@ import org.citydb.ade.iur.exporter.uro.DmAttributeExporter;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
@@ -52,6 +53,7 @@ import org.citygml4j.ade.iur.model.uro.DmAttributeProperty;
 import java.sql.*;
 
 public class AdministrationExporter implements UrbanFunctionModuleExporter {
+    private final ExportManager manager;
     private final UrbanFunctionExporter urbanFunctionExporter;
     private final PreparedStatement ps;
     private final PreparedStatement psUrfDmAttribute;
@@ -59,6 +61,7 @@ public class AdministrationExporter implements UrbanFunctionModuleExporter {
     private final AttributeValueSplitter valueSplitter;
 
     public AdministrationExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.ADMINISTRATION);
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
@@ -89,6 +92,8 @@ public class AdministrationExporter implements UrbanFunctionModuleExporter {
                 doExport(administration, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), administration, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

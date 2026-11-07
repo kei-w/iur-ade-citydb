@@ -32,6 +32,7 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
@@ -45,11 +46,13 @@ import org.citygml4j.ade.iur.model.urf.AreaClassification;
 import java.sql.*;
 
 public class AreaClassificationExporter implements UrbanFunctionModuleExporter {
+    private final ExportManager manager;
     private final UrbanFunctionExporter urbanFunctionExporter;
     private final ZoneExporter zoneExporter;
     private final PreparedStatement ps;
 
     public AreaClassificationExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.AREACLASSIFICATION);
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
         zoneExporter = manager.getExporter(ZoneExporter.class);
@@ -77,6 +80,8 @@ public class AreaClassificationExporter implements UrbanFunctionModuleExporter {
                 doExport(areaClassification, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), areaClassification, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

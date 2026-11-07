@@ -32,6 +32,7 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
@@ -54,12 +55,14 @@ import java.time.Year;
 import java.sql.*;
 
 public class LandPriceExporter implements UrbanFunctionModuleExporter {
+    private final ExportManager manager;
     private final UrbanFunctionExporter urbanFunctionExporter;
     private final PreparedStatement ps;
     private final ValueByCodesExporter valueByCodesExporter;
     private final AttributeValueSplitter valueSplitter;
 
     public LandPriceExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LANDPRICE_2);
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
         valueByCodesExporter = manager.getExporter(ValueByCodesExporter.class);
@@ -84,6 +87,8 @@ public class LandPriceExporter implements UrbanFunctionModuleExporter {
                 doExport(landPrice, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), landPrice, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

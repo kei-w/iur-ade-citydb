@@ -35,6 +35,7 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.config.geometry.GeometryObject;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.database.content.GMLConverter;
@@ -65,6 +66,7 @@ import java.time.Year;
 
 public class UrbanFunctionExporter implements UrbanFunctionModuleExporter {
     private final CityGMLExportHelper helper;
+    private final ExportManager manager;
     private final PreparedStatement ps;
     private final PreparedStatement psTarget;
     private final PreparedStatement psKeyValuePairAttribute;
@@ -76,6 +78,7 @@ public class UrbanFunctionExporter implements UrbanFunctionModuleExporter {
 
     public UrbanFunctionExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
@@ -111,6 +114,8 @@ public class UrbanFunctionExporter implements UrbanFunctionModuleExporter {
                 doExport(urbanFunction, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), urbanFunction, objectId, (FeatureType) objectType, projectionFilter);
     }
 
     public Select addProjection(Select select, Table table, String prefix) {

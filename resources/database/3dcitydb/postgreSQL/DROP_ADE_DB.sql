@@ -353,8 +353,14 @@ ALTER TABLE ur_cityobject
 ALTER TABLE ur_cityobject
     DROP CONSTRAINT ur_cityobjec_vegfacil_fk_1;
 
-ALTER TABLE ur_cityobject
-    DROP CONSTRAINT ur_cityobject_pointclou_fk;
+-- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_cityobject_2
+    DROP CONSTRAINT ur_cityobject_2_fk;
+
+ALTER TABLE ur_cityobject_2
+    DROP CONSTRAINT ur_cityobjec_pointcloud__fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 
@@ -2817,6 +2823,11 @@ DROP TABLE ur_cityobjec_to_publictra;
 -- ur_cityobject 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_cityobject;
+
+-- -------------------------------------------------------------------- 
+-- ur_cityobject_2 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_cityobject_2;
 
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 

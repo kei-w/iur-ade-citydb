@@ -485,6 +485,8 @@ public class ExportManager implements ADEExportManager {
             getExporter(TunnelPropertiesExporter.class).doExport((AbstractTunnel) parent, parentId, parentType, projectionFilter);
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECT)) && parent instanceof AbstractVegetationObject)
             getExporter(VegetationObjectPropertiesExporter.class).doExport((AbstractVegetationObject) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECT_2)) && parent instanceof AbstractCityObject)
+            getExporter(CityObjectPropertiesExporter.class).doExport((AbstractCityObject) parent, parentId, parentType, projectionFilter);
     }
 
     @Override
@@ -794,6 +796,8 @@ public class ExportManager implements ADEExportManager {
                     exporter = new TunnelPropertiesExporter(connection, helper, this);
                 else if (type == VegetationObjectPropertiesExporter.class)
                     exporter = new VegetationObjectPropertiesExporter(connection, helper, this);
+                else if (type == CityObjectPropertiesExporter.class)
+                    exporter = new CityObjectPropertiesExporter(connection, helper, this);
                 else if (type == DataQualityAttributeExporter.class)
                     exporter = new DataQualityAttributeExporter(connection, helper, this);
                 else if (type == PublicSurveyDataQualityAttributeExporter.class)
