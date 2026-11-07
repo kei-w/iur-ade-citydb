@@ -49,6 +49,7 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final WaterBodyDetailAttributeImporter waterBodyDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
@@ -69,6 +70,7 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         waterBodyDetailAttributeImporter = manager.getImporter(WaterBodyDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
@@ -148,6 +150,13 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
             for (WtrFacilityAttributePropertyElement property : properties.getAll(WtrFacilityAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrfacilityattr_id");
+            }
+        }
+
+        if (properties.contains(WtrDmAttributePropertyElement.class)) {
+            for (WtrDmAttributePropertyElement property : properties.getAll(WtrDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrdmattribute_id");
             }
         }
 

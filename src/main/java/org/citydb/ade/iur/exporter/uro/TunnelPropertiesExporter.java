@@ -53,6 +53,7 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
     private final TunnelFunctionalAttributeExporter tunnelFunctionalAttributeExporter;
     private final ConstructionRiskAssessmentAttributeExporter constructionRiskAssessmentAttributeExporter;
     private final DisasterRiskAttributeExporter disasterRiskAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
@@ -75,6 +76,7 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
         tunnelFunctionalAttributeExporter = manager.getExporter(TunnelFunctionalAttributeExporter.class);
         constructionRiskAssessmentAttributeExporter = manager.getExporter(ConstructionRiskAssessmentAttributeExporter.class);
         disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
@@ -126,6 +128,13 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
                 if (projectionFilter.containsProperty("tunDisasterRiskAttribute", module)) {
                     for (DisasterRiskAttribute tunDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "tunnel_tundisasterriskatt_id")) {
                         TunDisasterRiskAttributePropertyElement property = new TunDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(tunDisasterRiskAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("tunDmAttribute", module)) {
+                    for (DmAttribute tunDmAttribute : dmAttributeExporter.doExport(parentId, "tunnel_tundmattribute_id")) {
+                        TunDmAttributePropertyElement property = new TunDmAttributePropertyElement(new DmAttributeProperty(tunDmAttribute));
                         parent.addGenericApplicationPropertyOfAbstractTunnel(property);
                     }
                 }

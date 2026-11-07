@@ -55,6 +55,7 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final TrafficObjectUsecaseAttributeExporter trafficObjectUsecaseAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
@@ -79,6 +80,7 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         trafficObjectUsecaseAttributeExporter = manager.getExporter(TrafficObjectUsecaseAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
@@ -116,6 +118,13 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 if (projectionFilter.containsProperty("tranFacilityAttribute", module)) {
                     for (FacilityAttribute tranFacilityAttribute : facilityAttributeExporter.doExport(parentId, "transpor_complex_tranfaci_id")) {
                         TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("tranDmAttribute", module)) {
+                    for (DmAttribute tranDmAttribute : dmAttributeExporter.doExport(parentId, "transpor_complex_trandmat_id")) {
+                        TranDmAttributePropertyElement property = new TranDmAttributePropertyElement(new DmAttributeProperty(tranDmAttribute));
                         parent.addGenericApplicationPropertyOfTransportationComplex(property);
                     }
                 }

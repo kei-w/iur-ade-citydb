@@ -54,6 +54,7 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final RealEstateIDAttributeImporter realEstateIDAttributeImporter;
     private final BuildingUsecaseAttributeImporter buildingUsecaseAttributeImporter;
 
@@ -79,6 +80,7 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         realEstateIDAttributeImporter = manager.getImporter(RealEstateIDAttributeImporter.class);
         buildingUsecaseAttributeImporter = manager.getImporter(BuildingUsecaseAttributeImporter.class);
     }
@@ -220,6 +222,13 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
             for (BldgFacilityAttributePropertyElement property : properties.getAll(BldgFacilityAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgfacilityattr_id");
+            }
+        }
+
+        if (properties.contains(BldgDmAttributePropertyElement.class)) {
+            for (BldgDmAttributePropertyElement property : properties.getAll(BldgDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgdmattribute_id");
             }
         }
     }

@@ -517,6 +517,86 @@ public class ADETableMapper {
                 add("OBJECTCLASS_ID");
                 add("TUNNEL_TUNDISASTERRISKATT_ID");
             }});
+            put(schemaMapper.getTableName(ADETable.DMANNOTATION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("GEOMETRYTYPE");
+                add("GEOMETRYTYPE_CODESPACE");
+                add("ISVERTICAL");
+                add("LABEL");
+                add("LINEWIDTH");
+                add("LOD0ANCHORPOINT_BREP_ID");
+                add("LOD0ANCHORPOINT_OTHER_GEOM");
+                add("ORIENTATION");
+                add("SHAPETYPE");
+                add("SHAPETYPE_CODESPACE");
+                add("SIZE_");
+                add("SPACING");
+            }});
+            put(schemaMapper.getTableName(ADETable.DMATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("BRIDGE_BRIDDMATTRIBUTE_ID");
+                add("BUILDING_BLDGDMATTRIBUTE_ID");
+                add("CITY_FURNITURE_FRNDMATTRI_ID");
+                add("CITYOBJECT_VEGDMATTRIBUTE_ID");
+                add("CONSTRUCTION_CONSDMATTRIB_ID");
+                add("DMCODE");
+                add("DMCODE_CODESPACE");
+                add("DMELEMENT_ID");
+                add("LAND_USE_LUSEDMATTRIBUTE_ID");
+                add("MESHCODE");
+                add("MESHCODE_CODESPACE");
+                add("OBJECTCLASS_ID");
+                add("RELIEF_COMPONENT_DEMDMATT_ID");
+                add("TRANSPOR_COMPLEX_TRANDMAT_ID");
+                add("TUNNEL_TUNDMATTRIBUTE_ID");
+                add("WATERBODY_WTRDMATTRIBUTE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.DMELEMENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ANNOTATIONTYPE");
+                add("ANNOTATIONTYPE_CODESPACE");
+                add("ATTRIBUTETYPE");
+                add("ATTRIBUTETYPE_CODESPACE");
+                add("ATTRIBUTEVALUE");
+                add("ATTRIBUTEVALUETYPE");
+                add("BREAKTYPE");
+                add("BREAKTYPE_CODESPACE");
+                add("CREATIONDATE");
+                add("DATATYPE");
+                add("DATATYPE_CODESPACE");
+                add("DISLOCATIONTYPE");
+                add("DISLOCATIONTYPE_CODESPACE");
+                add("ELEMENTKEY");
+                add("FREESPACE");
+                add("HIERARCHYLEVEL");
+                add("INFOTYPE");
+                add("INFOTYPE_CODESPACE");
+                add("LOCATIONTYPE");
+                add("LOCATIONTYPE_CODESPACE");
+                add("PRECISIONTYPE");
+                add("PRECISIONTYPE_CODESPACE");
+                add("TERMINATIONDATE");
+                add("UPDATEDATE");
+            }});
+            put(schemaMapper.getTableName(ADETable.DMGEOMETRICATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ANGLE");
+                add("ELEVATION");
+                add("ELEVATION_UOM");
+                add("GEOMETRYTYPE");
+                add("GEOMETRYTYPE_CODESPACE");
+                add("IS3D");
+                add("ISEDITED");
+                add("ISINSTALLATION");
+                add("ISSUPPLEMENTARYSYMBOL");
+                add("LOD0GEOMETRY_BREP_ID");
+                add("LOD0GEOMETRY_OTHER_GEOM");
+                add("MAPLEVEL");
+                add("MAPLEVEL_CODESPACE");
+                add("SHAPETYPE");
+                add("SHAPETYPE_CODESPACE");
+                add("VISIBILITY");
+            }});
             put(schemaMapper.getTableName(ADETable.FACILITYATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("BRIDGE_BRIDFACILITYATTRIB_ID");
@@ -1299,6 +1379,9 @@ public class ADETableMapper {
                 add("ID");
                 add("CAPACITY");
                 add("NUMBEROFUSERS");
+            }});
+            put(schemaMapper.getTableName(ADETable.RELIEF_COMPONENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
             }});
             put(schemaMapper.getTableName(ADETable.RELIEF_FEATURE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

@@ -50,6 +50,7 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
     private final TunnelFunctionalAttributeImporter tunnelFunctionalAttributeImporter;
     private final ConstructionRiskAssessmentAttributeImporter constructionRiskAssessmentAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
@@ -74,6 +75,7 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
         tunnelFunctionalAttributeImporter = manager.getImporter(TunnelFunctionalAttributeImporter.class);
         constructionRiskAssessmentAttributeImporter = manager.getImporter(ConstructionRiskAssessmentAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
@@ -190,6 +192,13 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
             for (TunDisasterRiskAttributePropertyElement property : properties.getAll(TunDisasterRiskAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tundisasterriskatt_id");
+            }
+        }
+
+        if (properties.contains(TunDmAttributePropertyElement.class)) {
+            for (TunDmAttributePropertyElement property : properties.getAll(TunDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tundmattribute_id");
             }
         }
 

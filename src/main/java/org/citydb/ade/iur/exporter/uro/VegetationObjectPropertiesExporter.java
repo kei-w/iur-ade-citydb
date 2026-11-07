@@ -51,6 +51,7 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
@@ -66,6 +67,7 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -96,6 +98,13 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
                 if (projectionFilter.containsProperty("vegFacilityAttribute", module)) {
                     for (FacilityAttribute vegFacilityAttribute : facilityAttributeExporter.doExport(parentId, "cityobject_vegfacilityatt_id")) {
                         VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfVegetationObject(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("vegDmAttribute", module)) {
+                    for (DmAttribute vegDmAttribute : dmAttributeExporter.doExport(parentId, "cityobject_vegdmattribute_id")) {
+                        VegDmAttributePropertyElement property = new VegDmAttributePropertyElement(new DmAttributeProperty(vegDmAttribute));
                         parent.addGenericApplicationPropertyOfVegetationObject(property);
                     }
                 }

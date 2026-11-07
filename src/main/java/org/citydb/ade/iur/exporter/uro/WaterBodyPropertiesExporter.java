@@ -52,6 +52,7 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final WaterBodyDetailAttributeExporter waterBodyDetailAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
@@ -70,6 +71,7 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         waterBodyDetailAttributeExporter = manager.getExporter(WaterBodyDetailAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
@@ -110,6 +112,13 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
                 if (projectionFilter.containsProperty("wtrFacilityAttribute", module)) {
                     for (FacilityAttribute wtrFacilityAttribute : facilityAttributeExporter.doExport(parentId, "waterbody_wtrfacilityattr_id")) {
                         WtrFacilityAttributePropertyElement property = new WtrFacilityAttributePropertyElement(new FacilityAttributeProperty(wtrFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfWaterBody(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("wtrDmAttribute", module)) {
+                    for (DmAttribute wtrDmAttribute : dmAttributeExporter.doExport(parentId, "waterbody_wtrdmattribute_id")) {
+                        WtrDmAttributePropertyElement property = new WtrDmAttributePropertyElement(new DmAttributeProperty(wtrDmAttribute));
                         parent.addGenericApplicationPropertyOfWaterBody(property);
                     }
                 }

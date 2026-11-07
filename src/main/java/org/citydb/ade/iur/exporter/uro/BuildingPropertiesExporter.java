@@ -57,6 +57,7 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
     private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
 
@@ -80,6 +81,7 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
         buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
     }
@@ -160,6 +162,13 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                 if (projectionFilter.containsProperty("bldgFacilityAttribute", module)) {
                     for (FacilityAttribute bldgFacilityAttribute : facilityAttributeExporter.doExport(parentId, "building_bldgfacilityattr_id")) {
                         BldgFacilityAttributePropertyElement property = new BldgFacilityAttributePropertyElement(new FacilityAttributeProperty(bldgFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("bldgDmAttribute", module)) {
+                    for (DmAttribute bldgDmAttribute : dmAttributeExporter.doExport(parentId, "building_bldgdmattribute_id")) {
+                        BldgDmAttributePropertyElement property = new BldgDmAttributePropertyElement(new DmAttributeProperty(bldgDmAttribute));
                         parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                     }
                 }

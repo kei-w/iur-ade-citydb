@@ -52,6 +52,7 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
@@ -69,6 +70,7 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -108,6 +110,13 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
                 if (projectionFilter.containsProperty("luseFacilityAttribute", module)) {
                     for (FacilityAttribute luseFacilityAttribute : facilityAttributeExporter.doExport(parentId, "land_use_lusefacilityattr_id")) {
                         LuseFacilityAttributePropertyElement property = new LuseFacilityAttributePropertyElement(new FacilityAttributeProperty(luseFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("luseDmAttribute", module)) {
+                    for (DmAttribute luseDmAttribute : dmAttributeExporter.doExport(parentId, "land_use_lusedmattribute_id")) {
+                        LuseDmAttributePropertyElement property = new LuseDmAttributePropertyElement(new DmAttributeProperty(luseDmAttribute));
                         parent.addGenericApplicationPropertyOfLandUse(property);
                     }
                 }

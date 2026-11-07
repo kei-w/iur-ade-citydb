@@ -318,6 +318,18 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "LandSlideRiskAttribute":
                     typeClassIds.put(LandSlideRiskAttribute.class, typeClassId);
                     break;
+                case "DmAttribute":
+                    typeClassIds.put(DmAttribute.class, typeClassId);
+                    break;
+                case "DmGeometricAttribute":
+                    typeClassIds.put(DmGeometricAttribute.class, typeClassId);
+                    break;
+                case "DmElement":
+                    typeClassIds.put(DmElement.class, typeClassId);
+                    break;
+                case "DmAnnotation":
+                    typeClassIds.put(DmAnnotation.class, typeClassId);
+                    break;
                 case "DataQualityAttribute":
                     typeClassIds.put(DataQualityAttribute.class, typeClassId);
                     break;

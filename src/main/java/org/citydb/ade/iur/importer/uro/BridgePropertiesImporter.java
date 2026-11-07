@@ -53,6 +53,7 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
     private final BridgeFunctionalAttributeImporter bridgeFunctionalAttributeImporter;
     private final ConstructionRiskAssessmentAttributeImporter constructionRiskAssessmentAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
 
@@ -77,6 +78,7 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
         bridgeFunctionalAttributeImporter = manager.getImporter(BridgeFunctionalAttributeImporter.class);
         constructionRiskAssessmentAttributeImporter = manager.getImporter(ConstructionRiskAssessmentAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
     }
@@ -197,6 +199,13 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
             for (BridDisasterRiskAttributePropertyElement property : properties.getAll(BridDisasterRiskAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_briddisasterriskat_id");
+            }
+        }
+
+        if (properties.contains(BridDmAttributePropertyElement.class)) {
+            for (BridDmAttributePropertyElement property : properties.getAll(BridDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_briddmattribute_id");
             }
         }
 

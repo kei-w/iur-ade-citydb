@@ -48,6 +48,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final TrafficObjectUsecaseAttributeImporter trafficObjectUsecaseAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
@@ -74,6 +75,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         trafficObjectUsecaseAttributeImporter = manager.getImporter(TrafficObjectUsecaseAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
@@ -236,6 +238,13 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
             for (TranFacilityAttributePropertyElement property : properties.getAll(TranFacilityAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_tranfaci_id");
+            }
+        }
+
+        if (properties.contains(TranDmAttributePropertyElement.class)) {
+            for (TranDmAttributePropertyElement property : properties.getAll(TranDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_trandmat_id");
             }
         }
 

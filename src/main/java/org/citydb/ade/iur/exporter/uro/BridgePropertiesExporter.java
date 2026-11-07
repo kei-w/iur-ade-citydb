@@ -56,6 +56,7 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
     private final BridgeFunctionalAttributeExporter bridgeFunctionalAttributeExporter;
     private final ConstructionRiskAssessmentAttributeExporter constructionRiskAssessmentAttributeExporter;
     private final DisasterRiskAttributeExporter disasterRiskAttributeExporter;
+    private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
@@ -78,6 +79,7 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
         bridgeFunctionalAttributeExporter = manager.getExporter(BridgeFunctionalAttributeExporter.class);
         constructionRiskAssessmentAttributeExporter = manager.getExporter(ConstructionRiskAssessmentAttributeExporter.class);
         disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
+        dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -151,6 +153,13 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
                 if (projectionFilter.containsProperty("bridDisasterRiskAttribute", module)) {
                     for (DisasterRiskAttribute bridDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "bridge_briddisasterriskat_id")) {
                         BridDisasterRiskAttributePropertyElement property = new BridDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(bridDisasterRiskAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    }
+                }
+
+                if (projectionFilter.containsProperty("bridDmAttribute", module)) {
+                    for (DmAttribute bridDmAttribute : dmAttributeExporter.doExport(parentId, "bridge_briddmattribute_id")) {
+                        BridDmAttributePropertyElement property = new BridDmAttributePropertyElement(new DmAttributeProperty(bridDmAttribute));
                         parent.addGenericApplicationPropertyOfAbstractBridge(property);
                     }
                 }

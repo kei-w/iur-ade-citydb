@@ -62,6 +62,7 @@ import org.citygml4j.model.citygml.transportation.TransportationComplex;
 import org.citygml4j.model.citygml.tunnel.AbstractTunnel;
 import org.citygml4j.model.citygml.vegetation.AbstractVegetationObject;
 import org.citygml4j.model.citygml.waterbody.WaterBody;
+import org.citygml4j.model.citygml.relief.AbstractReliefComponent;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -175,6 +176,8 @@ public class ExportManager implements ADEExportManager {
             getExporter(CityFurniturePropertiesExporter.class).doExport((CityFurniture) parent, parentId, parentType, projectionFilter);
         else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.LAND_USE)) && parent instanceof LandUse)
             getExporter(LandUsePropertiesExporter.class).doExport((LandUse) parent, parentId, parentType, projectionFilter);
+        else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_COMPONENT)) && parent instanceof AbstractReliefComponent)
+            getExporter(ReliefComponentPropertiesExporter.class).doExport((AbstractReliefComponent) parent, parentId, parentType, projectionFilter);
         else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.RELIEF_FEATURE)) && parent instanceof ReliefFeature)
             getExporter(ReliefFeaturePropertiesExporter.class).doExport((ReliefFeature) parent, parentId, parentType, projectionFilter);
         else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX)) && parent instanceof TransportationComplex)
@@ -284,6 +287,8 @@ public class ExportManager implements ADEExportManager {
                     exporter = new CityFurniturePropertiesExporter(connection, helper, this);
                 else if (type == LandUsePropertiesExporter.class)
                     exporter = new LandUsePropertiesExporter(connection, helper, this);
+                else if (type == ReliefComponentPropertiesExporter.class)
+                    exporter = new ReliefComponentPropertiesExporter(connection, helper, this);
                 else if (type == ReliefFeaturePropertiesExporter.class)
                     exporter = new ReliefFeaturePropertiesExporter(connection, helper, this);
                 else if (type == TransportationComplexPropertiesExporter.class)
@@ -324,6 +329,10 @@ public class ExportManager implements ADEExportManager {
                     exporter = new ConstructionRiskAssessmentAttributeExporter(connection, helper, this);
                 else if (type == DisasterRiskAttributeExporter.class)
                     exporter = new DisasterRiskAttributeExporter(connection, helper, this);
+                else if (type == DmAttributeExporter.class)
+                    exporter = new DmAttributeExporter(connection, helper, this);
+                else if (type == DmElementExporter.class)
+                    exporter = new DmElementExporter(connection, helper, this);
                 else if (type == DataQualityAttributeExporter.class)
                     exporter = new DataQualityAttributeExporter(connection, helper, this);
                 else if (type == PublicSurveyDataQualityAttributeExporter.class)

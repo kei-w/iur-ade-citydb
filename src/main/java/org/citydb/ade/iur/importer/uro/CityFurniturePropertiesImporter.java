@@ -48,6 +48,7 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final CityFurnitureDetailAttributeImporter cityFurnitureDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
@@ -67,6 +68,7 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         cityFurnitureDetailAttributeImporter = manager.getImporter(CityFurnitureDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
@@ -139,6 +141,13 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
             for (FrnFacilityAttributePropertyElement property : properties.getAll(FrnFacilityAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frnfacilit_id");
+            }
+        }
+
+        if (properties.contains(FrnDmAttributePropertyElement.class)) {
+            for (FrnDmAttributePropertyElement property : properties.getAll(FrnDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frndmattri_id");
             }
         }
 

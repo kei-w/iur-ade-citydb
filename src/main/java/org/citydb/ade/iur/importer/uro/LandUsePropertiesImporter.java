@@ -49,6 +49,7 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final DmAttributeImporter dmAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
 
@@ -68,6 +69,7 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
     }
@@ -139,6 +141,13 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
             for (LuseFacilityAttributePropertyElement property : properties.getAll(LuseFacilityAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusefacilityattr_id");
+            }
+        }
+
+        if (properties.contains(LuseDmAttributePropertyElement.class)) {
+            for (LuseDmAttributePropertyElement property : properties.getAll(LuseDmAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusedmattribute_id");
             }
         }
 

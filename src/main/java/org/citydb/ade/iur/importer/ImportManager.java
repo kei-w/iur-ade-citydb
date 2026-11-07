@@ -60,6 +60,7 @@ import org.citygml4j.model.citygml.transportation.TransportationComplex;
 import org.citygml4j.model.citygml.tunnel.AbstractTunnel;
 import org.citygml4j.model.citygml.vegetation.AbstractVegetationObject;
 import org.citygml4j.model.citygml.waterbody.WaterBody;
+import org.citygml4j.model.citygml.relief.AbstractReliefComponent;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.OutputKeys;
@@ -170,6 +171,8 @@ public class ImportManager implements ADEImportManager {
             getImporter(CityFurniturePropertiesImporter.class).doImport(properties, (CityFurniture) parent, parentId, parentType);
         else if (parent instanceof LandUse)
             getImporter(LandUsePropertiesImporter.class).doImport(properties, (LandUse) parent, parentId, parentType);
+        else if (parent instanceof AbstractReliefComponent)
+            getImporter(ReliefComponentPropertiesImporter.class).doImport(properties, (AbstractReliefComponent) parent, parentId, parentType);
         else if (parent instanceof ReliefFeature)
             getImporter(ReliefFeaturePropertiesImporter.class).doImport(properties, (ReliefFeature) parent, parentId, parentType);
         else if (parent instanceof TransportationComplex)
@@ -311,6 +314,8 @@ public class ImportManager implements ADEImportManager {
                     importer = new CityFurniturePropertiesImporter(connection, helper, this);
                 else if (type == LandUsePropertiesImporter.class)
                     importer = new LandUsePropertiesImporter(connection, helper, this);
+                else if (type == ReliefComponentPropertiesImporter.class)
+                    importer = new ReliefComponentPropertiesImporter(connection, helper, this);
                 else if (type == ReliefFeaturePropertiesImporter.class)
                     importer = new ReliefFeaturePropertiesImporter(connection, helper, this);
                 else if (type == TransportationComplexPropertiesImporter.class)
@@ -399,6 +404,14 @@ public class ImportManager implements ADEImportManager {
                     importer = new FloodingRiskAttributeImporter(connection, helper, this);
                 else if (type == RiverFloodingRiskAttributeImporter.class)
                     importer = new RiverFloodingRiskAttributeImporter(connection, helper, this);
+                else if (type == DmAttributeImporter.class)
+                    importer = new DmAttributeImporter(connection, helper, this);
+                else if (type == DmGeometricAttributeImporter.class)
+                    importer = new DmGeometricAttributeImporter(connection, helper, this);
+                else if (type == DmElementImporter.class)
+                    importer = new DmElementImporter(connection, helper, this);
+                else if (type == DmAnnotationImporter.class)
+                    importer = new DmAnnotationImporter(connection, helper, this);
                 else if (type == DataQualityAttributeImporter.class)
                     importer = new DataQualityAttributeImporter(connection, helper, this);
                 else if (type == PublicSurveyDataQualityAttributeImporter.class)
