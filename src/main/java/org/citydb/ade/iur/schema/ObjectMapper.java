@@ -194,9 +194,6 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "Manhole":
                     objectClassIds.put(Manhole.class, objectClassId);
                     break;
-                case "Pipe":
-                    objectClassIds.put(Pipe.class, objectClassId);
-                    break;
                 case "OilGasChemicalsPipe":
                     objectClassIds.put(OilGasChemicalsPipe.class, objectClassId);
                     break;
@@ -208,6 +205,9 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "OuterFloorSurface":
                     objectClassIds.put(OuterFloorSurface.class, objectClassId);
+                    break;
+                case "Pipe":
+                    objectClassIds.put(Pipe.class, objectClassId);
                     break;
                 case "PointCloud":
                     objectClassIds.put(PointCloud.class, objectClassId);
