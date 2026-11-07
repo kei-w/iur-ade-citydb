@@ -54,31 +54,39 @@ public class FacilityTypeAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FACILITYTYPEATTRIBUTE)) + " " +
-                "(id, class, class_codespace, function, function_codespace) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, construction_consfacility_id, class, class_codespace, function, function_codespace) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
         valueJoiner = helper.getAttributeValueJoiner();
     }
 
     public long doImport(FacilityTypeAttribute facilityTypeAttribute) throws CityGMLImportException, SQLException {
+        return doImport(facilityTypeAttribute, 0, null);
+    }
+
+    public long doImport(FacilityTypeAttribute facilityTypeAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.FACILITYTYPEATTRIB_SEQ));
         ps.setLong(1, objectId);
+        if ("construction_consfacility_id".equals(parentColumn))
+            ps.setLong(2, parentId);
+        else
+            ps.setNull(2, Types.NULL);
 
         if (facilityTypeAttribute.getClassifier() != null && facilityTypeAttribute.getClassifier().isSetValue()) {
-            ps.setString(2, facilityTypeAttribute.getClassifier().getValue());
-            ps.setString(3, facilityTypeAttribute.getClassifier().getCodeSpace());
+            ps.setString(3, facilityTypeAttribute.getClassifier().getValue());
+            ps.setString(4, facilityTypeAttribute.getClassifier().getCodeSpace());
         } else {
-            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
+            ps.setNull(4, Types.VARCHAR);
         }
 
         if (!facilityTypeAttribute.getFunction().isEmpty()) {
             valueJoiner.join(facilityTypeAttribute.getFunction(), Code::getValue, Code::getCodeSpace);
-            ps.setString(4, valueJoiner.result(0));
-            ps.setString(5, valueJoiner.result(1));
+            ps.setString(5, valueJoiner.result(0));
+            ps.setString(6, valueJoiner.result(1));
         } else {
-            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
         }
 
         ps.addBatch();

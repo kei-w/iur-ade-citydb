@@ -69,13 +69,13 @@ public class DisasterRiskAttributeExporter implements UrbanObjectModuleExporter 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table floodingRiskAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FLOODINGRISKATTRIBUTE)));
         Table riverFloodingRiskAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RIVERFLOODINGRISKATTRI)));
-        for (String parentColumn : Arrays.asList("bridge_briddisasterriskat_id", "building_bldgdisasterrisk_id", "tunnel_tundisasterriskatt_id", "waterbody_floodingriskatt_id")) {
+        for (String parentColumn : Arrays.asList("construction_consdisaster_id", "bridge_briddisasterriskat_id", "building_bldgdisasterrisk_id", "tunnel_tundisasterriskatt_id", "waterbody_floodingriskatt_id")) {
             Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "description", "description_codespace", "areatype", "areatype_codespace"))
                     .addProjection(floodingRiskAttribute.getColumns("rank", "rank_codespace", "rankorg", "rankorg_codespace", "depth", "depth_uom"))
                     .addProjection(riverFloodingRiskAttribute.getColumns("admintype", "admintype_codespace", "scale", "scale_codespace", "duration", "duration_uom"))
                     .addJoin(JoinFactory.left(floodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                     .addJoin(JoinFactory.left(riverFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addSelection(ComparisonFactory.equalTo("bridge_briddisasterriskat_id".equals(parentColumn) || "building_bldgdisasterrisk_id".equals(parentColumn) || "tunnel_tundisasterriskatt_id".equals(parentColumn) ? table.getColumn(parentColumn) : floodingRiskAttribute.getColumn(parentColumn), new PlaceHolder<>()))
+                    .addSelection(ComparisonFactory.equalTo("construction_consdisaster_id".equals(parentColumn) || "bridge_briddisasterriskat_id".equals(parentColumn) || "building_bldgdisasterrisk_id".equals(parentColumn) || "tunnel_tundisasterriskatt_id".equals(parentColumn) ? table.getColumn(parentColumn) : floodingRiskAttribute.getColumn(parentColumn), new PlaceHolder<>()))
                     .addOrderBy(new OrderByToken(table.getColumn("id")));
             psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
         }

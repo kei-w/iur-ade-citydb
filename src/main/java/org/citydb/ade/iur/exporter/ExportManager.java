@@ -68,6 +68,18 @@ import org.citygml4j.model.citygml.building.BuildingInstallation;
 import org.citygml4j.model.citygml.building.IntBuildingInstallation;
 import org.citygml4j.model.citygml.building.Room;
 import org.citygml4j.model.citygml.core.AbstractCityObject;
+import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
+import org.citygml4j.ade.iur.model.uro.AbstractConstruction;
+import org.citygml4j.ade.iur.model.uro.Appurtenance;
+import org.citygml4j.ade.iur.model.uro.Cable;
+import org.citygml4j.ade.iur.model.uro.ConstructionInstallation;
+import org.citygml4j.ade.iur.model.uro.OtherConstruction;
+import org.citygml4j.ade.iur.model.uro.Pipe;
+import org.citygml4j.ade.iur.model.uro.PublicLand;
+import org.citygml4j.ade.iur.model.uro.SewerPipe;
+import org.citygml4j.ade.iur.model.uro.UtilityLink;
+import org.citygml4j.ade.iur.model.uro.UtilityNodeContainer;
+import org.citygml4j.ade.iur.model.uro.Waterway;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -168,6 +180,31 @@ public class ExportManager implements ADEExportManager {
                 getExporter(TranslationJPExporter.class).doExport((TranslationJP) object, objectId, objectType, projectionFilter);
             else if (object instanceof Trip)
                 getExporter(TripExporter.class).doExport((Trip) object, objectId, objectType, projectionFilter);
+        } else if (UrbanObjectModule.v3_1.getModelPackageName().equals(object.getClass().getPackage().getName())) {
+            if (object instanceof SewerPipe)
+                getExporter(SewerPipeExporter.class).doExport((SewerPipe) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Pipe)
+                getExporter(PipeExporter.class).doExport((Pipe) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Cable)
+                getExporter(CableExporter.class).doExport((Cable) object, objectId, objectType, projectionFilter);
+            else if (object instanceof OtherConstruction)
+                getExporter(OtherConstructionExporter.class).doExport((OtherConstruction) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UtilityLink)
+                getExporter(UtilityLinkExporter.class).doExport((UtilityLink) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Appurtenance)
+                getExporter(AppurtenanceExporter.class).doExport((Appurtenance) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UtilityNodeContainer)
+                getExporter(UtilityNodeContainerExporter.class).doExport((UtilityNodeContainer) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Waterway)
+                getExporter(WaterwayExporter.class).doExport((Waterway) object, objectId, objectType, projectionFilter);
+            else if (object instanceof AbstractConstruction)
+                getExporter(AbstractConstructionExporter.class).doExport((AbstractConstruction) object, objectId, objectType, projectionFilter);
+            else if (object instanceof org.citygml4j.ade.iur.model.uro.AbstractBoundarySurface)
+                getExporter(AbstractBoundarySurfaceExporter.class).doExport((org.citygml4j.ade.iur.model.uro.AbstractBoundarySurface) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ConstructionInstallation)
+                getExporter(ConstructionInstallationExporter.class).doExport((ConstructionInstallation) object, objectId, objectType, projectionFilter);
+            else if (object instanceof PublicLand)
+                getExporter(PublicLandExporter.class).doExport((PublicLand) object, objectId, objectType, projectionFilter);
         }
     }
 
@@ -430,6 +467,50 @@ public class ExportManager implements ADEExportManager {
                     exporter = new TunnelFunctionalAttributeExporter(connection, helper, this);
                 else if (type == WaterBodyDetailAttributeExporter.class)
                     exporter = new WaterBodyDetailAttributeExporter(connection, helper, this);
+                else if (type == WaterwayDetailAttributeExporter.class)
+                    exporter = new WaterwayDetailAttributeExporter(connection, helper, this);
+                else if (type == ConstructionEventExporter.class)
+                    exporter = new ConstructionEventExporter(connection, helper, this);
+                else if (type == ElevationExporter.class)
+                    exporter = new ElevationExporter(connection, helper, this);
+                else if (type == HeightExporter.class)
+                    exporter = new HeightExporter(connection, helper, this);
+                else if (type == OccupancyExporter.class)
+                    exporter = new OccupancyExporter(connection, helper, this);
+                else if (type == ConstructionStructureAttributeExporter.class)
+                    exporter = new ConstructionStructureAttributeExporter(connection, helper, this);
+                else if (type == OffsetDepthExporter.class)
+                    exporter = new OffsetDepthExporter(connection, helper, this);
+                else if (type == ThematicShapeExporter.class)
+                    exporter = new ThematicShapeExporter(connection, helper, this);
+                else if (type == LengthAttributeExporter.class)
+                    exporter = new LengthAttributeExporter(connection, helper, this);
+                else if (type == SewerPipeExporter.class)
+                    exporter = new SewerPipeExporter(connection, helper, this);
+                else if (type == PipeExporter.class)
+                    exporter = new PipeExporter(connection, helper, this);
+                else if (type == CableExporter.class)
+                    exporter = new CableExporter(connection, helper, this);
+                else if (type == OtherConstructionExporter.class)
+                    exporter = new OtherConstructionExporter(connection, helper, this);
+                else if (type == UtilityLinkExporter.class)
+                    exporter = new UtilityLinkExporter(connection, helper, this);
+                else if (type == AppurtenanceExporter.class)
+                    exporter = new AppurtenanceExporter(connection, helper, this);
+                else if (type == UtilityNodeContainerExporter.class)
+                    exporter = new UtilityNodeContainerExporter(connection, helper, this);
+                else if (type == WaterwayExporter.class)
+                    exporter = new WaterwayExporter(connection, helper, this);
+                else if (type == AbstractConstructionExporter.class)
+                    exporter = new AbstractConstructionExporter(connection, helper, this);
+                else if (type == AbstractBoundarySurfaceExporter.class)
+                    exporter = new AbstractBoundarySurfaceExporter(connection, helper, this);
+                else if (type == ConstructionInstallationExporter.class)
+                    exporter = new ConstructionInstallationExporter(connection, helper, this);
+                else if (type == UtilityNetworkElementExporter.class)
+                    exporter = new UtilityNetworkElementExporter(connection, helper, this);
+                else if (type == PublicLandExporter.class)
+                    exporter = new PublicLandExporter(connection, helper, this);
             } else if (PublicTransitModuleExporter.class.isAssignableFrom(type)) {
                 // public transit module
                 if (type == AgencyExporter.class)

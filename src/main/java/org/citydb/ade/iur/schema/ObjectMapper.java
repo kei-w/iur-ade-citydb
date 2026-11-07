@@ -167,6 +167,78 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "Attribution":
                     objectClassIds.put(Attribution.class, objectClassId);
                     break;
+                case "Waterway":
+                    objectClassIds.put(Waterway.class, objectClassId);
+                    break;
+                case "AbstractConstruction":
+                    objectClassIds.put(AbstractConstruction.class, objectClassId);
+                    break;
+                case "OtherConstruction":
+                    objectClassIds.put(OtherConstruction.class, objectClassId);
+                    break;
+                case "RoofSurface":
+                    objectClassIds.put(RoofSurface.class, objectClassId);
+                    break;
+                case "WallSurface":
+                    objectClassIds.put(WallSurface.class, objectClassId);
+                    break;
+                case "GroundSurface":
+                    objectClassIds.put(GroundSurface.class, objectClassId);
+                    break;
+                case "OuterCeilingSurface":
+                    objectClassIds.put(OuterCeilingSurface.class, objectClassId);
+                    break;
+                case "OuterFloorSurface":
+                    objectClassIds.put(OuterFloorSurface.class, objectClassId);
+                    break;
+                case "ClosureSurface":
+                    objectClassIds.put(ClosureSurface.class, objectClassId);
+                    break;
+                case "ConstructionInstallation":
+                    objectClassIds.put(ConstructionInstallation.class, objectClassId);
+                    break;
+                case "UndergroundBuilding":
+                    objectClassIds.put(UndergroundBuilding.class, objectClassId);
+                    break;
+                case "Appurtenance":
+                    objectClassIds.put(Appurtenance.class, objectClassId);
+                    break;
+                case "Manhole":
+                    objectClassIds.put(Manhole.class, objectClassId);
+                    break;
+                case "Handhole":
+                    objectClassIds.put(Handhole.class, objectClassId);
+                    break;
+                case "Pipe":
+                    objectClassIds.put(Pipe.class, objectClassId);
+                    break;
+                case "SewerPipe":
+                    objectClassIds.put(SewerPipe.class, objectClassId);
+                    break;
+                case "ThermalPipe":
+                    objectClassIds.put(ThermalPipe.class, objectClassId);
+                    break;
+                case "WaterPipe":
+                    objectClassIds.put(WaterPipe.class, objectClassId);
+                    break;
+                case "OilGasChemicalsPipe":
+                    objectClassIds.put(OilGasChemicalsPipe.class, objectClassId);
+                    break;
+                case "Duct":
+                    objectClassIds.put(Duct.class, objectClassId);
+                    break;
+                case "Cable":
+                    objectClassIds.put(Cable.class, objectClassId);
+                    break;
+                case "ElectricityCable":
+                    objectClassIds.put(ElectricityCable.class, objectClassId);
+                    break;
+                case "TelecommunicationsCable":
+                    objectClassIds.put(TelecommunicationsCable.class, objectClassId);
+                    break;
+                case "PublicLand":
+                    objectClassIds.put(PublicLand.class, objectClassId);
+                    break;
             }
         }
 
@@ -581,6 +653,39 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "WaterBodyDetailAttribute":
                     typeClassIds.put(WaterBodyDetailAttribute.class, typeClassId);
+                    break;
+                case "WaterwayDetailAttribute":
+                    typeClassIds.put(WaterwayDetailAttribute.class, typeClassId);
+                    break;
+                case "ConstructionEvent":
+                    typeClassIds.put(ConstructionEvent.class, typeClassId);
+                    break;
+                case "Elevation":
+                    typeClassIds.put(Elevation.class, typeClassId);
+                    break;
+                case "Height":
+                    typeClassIds.put(Height.class, typeClassId);
+                    break;
+                case "Occupancy":
+                    typeClassIds.put(Occupancy.class, typeClassId);
+                    break;
+                case "ConstructionStructureAttribute":
+                    typeClassIds.put(ConstructionStructureAttribute.class, typeClassId);
+                    break;
+                case "EmbankmentAttribute":
+                    typeClassIds.put(EmbankmentAttribute.class, typeClassId);
+                    break;
+                case "DamAttribute":
+                    typeClassIds.put(DamAttribute.class, typeClassId);
+                    break;
+                case "OffsetDepth":
+                    typeClassIds.put(OffsetDepth.class, typeClassId);
+                    break;
+                case "ThematicShape":
+                    typeClassIds.put(ThematicShape.class, typeClassId);
+                    break;
+                case "LengthAttribute":
+                    typeClassIds.put(LengthAttribute.class, typeClassId);
                     break;
             }
         }

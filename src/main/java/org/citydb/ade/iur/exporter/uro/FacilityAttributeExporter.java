@@ -122,7 +122,7 @@ public class FacilityAttributeExporter implements UrbanObjectModuleExporter {
         Table fishingPortFacility = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FISHINGPORTFACILITY)));
         Table fishingPortCapacity = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FISHINGPORTCAPACITY)));
         Table maintenanceHistoryAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.MAINTENANCEHISTORYATTR)));
-        for (String parentColumn : Arrays.asList("bridge_bridfacilityattrib_id", "building_bldgfacilityattr_id", "city_furniture_frnfacilit_id", "land_use_lusefacilityattr_id", "transpor_complex_tranfaci_id", "tunnel_tunfacilityattribu_id", "cityobject_vegfacilityatt_id", "waterbody_wtrfacilityattr_id")) {
+        for (String parentColumn : Arrays.asList("construction_consfacility_id", "bridge_bridfacilityattrib_id", "building_bldgfacilityattr_id", "city_furniture_frnfacilit_id", "land_use_lusefacilityattr_id", "transpor_complex_tranfaci_id", "tunnel_tunfacilityattribu_id", "cityobject_vegfacilityatt_id", "waterbody_wtrfacilityattr_id")) {
             Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "facilityid"))
                     .addProjection(parkFacilityLongevityPlanAttribute.getColumns("parkcode", "parkcode_codespace", "parkname", "parkname_codespace", "parktype",
                             "parktype_codespace", "facilityname", "facilityname_codespace", "facilitynameoptional",
