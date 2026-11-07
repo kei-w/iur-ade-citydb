@@ -211,7 +211,7 @@ public class ImportManager implements ADEImportManager {
         if (parent instanceof Room)
             getImporter(RoomPropertiesImporter.class).doImport(properties, (Room) parent, parentId, parentType);
         if (parent instanceof TransportationComplex)
-            getImporter(RailwayPropertiesImporter.class).doImport(properties, (AbstractCityObject) parent, parentId, parentType);
+            getImporter(TransportationComplexPropertiesImporter.class).doImport(properties, (TransportationComplex) parent, parentId, parentType);
         if (parent instanceof TrafficArea)
             getImporter(TrafficAreaPropertiesImporter.class).doImport(properties, (TrafficArea) parent, parentId, parentType);
         if (parent instanceof AbstractTunnel)
@@ -349,8 +349,8 @@ public class ImportManager implements ADEImportManager {
                     importer = new OpeningPropertiesImporter(connection, helper, this);
                 else if (type == RoomPropertiesImporter.class)
                     importer = new RoomPropertiesImporter(connection, helper, this);
-                else if (type == RailwayPropertiesImporter.class)
-                    importer = new RailwayPropertiesImporter(connection, helper, this);
+                else if (type == TransportationComplexPropertiesImporter.class)
+                    importer = new TransportationComplexPropertiesImporter(connection, helper, this);
                 else if (type == TrafficAreaPropertiesImporter.class)
                     importer = new TrafficAreaPropertiesImporter(connection, helper, this);
                 else if (type == TunnelPropertiesImporter.class)

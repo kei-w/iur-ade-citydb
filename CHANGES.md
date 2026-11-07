@@ -9,6 +9,18 @@ Change Log
   `ur_realestateidattribute` is a standalone type with its own sequence. `urf`, `urg` and `urt` are unchanged.
 * Updated iur-ade-citygml4j to 3.2.0.
 
+#### Changes (all uro attributes, 2026-11-07)
+* Import/export of every `uro` generic application property of every CityGML feature type defined by the i-UR 3.2 XSD,
+  including GML geometries of DM attributes and the ifc coordinate reference system properties.
+* The ADE Manager output is patched where it cannot represent the schema (multi-valued dates, the
+  `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
+* Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
+
+#### Known limitations
+* The feature-typed hook `uro:pointCloud` (`core:_GenericApplicationPropertyOfCityObject`) is not supported.
+* ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
+  supported; `urf`, `urg` and `urt` remain at 1.4.
+
 ### 3.1.0 - 2026-11-07
 
 #### Breaking changes

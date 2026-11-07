@@ -221,7 +221,7 @@ public enum ADETable {
     TRANSITIONCURVETYPE(TransitionCurveTypeImporter.class),
     TRANSLATION(TranslationImporter.class),
     TRANSLATIONJP(TranslationJPImporter.class),
-    TRANSPORTATION_COMPLEX(RailwayPropertiesImporter.class),
+    TRANSPORTATION_COMPLEX(TransportationComplexPropertiesImporter.class),
     TRIP(TripImporter.class),
     TUNNEL(TunnelPropertiesImporter.class),
     TUNNELFUNCTIONALATTRIB(TunnelFunctionalAttributeImporter.class),

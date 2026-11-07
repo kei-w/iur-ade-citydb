@@ -40,7 +40,6 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
 import org.citygml4j.ade.iur.model.uro.*;
-import org.citygml4j.model.citygml.core.AbstractCityObject;
 import org.citygml4j.model.citygml.transportation.Railway;
 import org.citygml4j.model.citygml.transportation.Road;
 import org.citygml4j.model.citygml.transportation.Square;
@@ -49,7 +48,7 @@ import org.citygml4j.model.citygml.transportation.TransportationComplex;
 
 import java.sql.*;
 
-public class RailwayPropertiesExporter implements UrbanObjectModuleExporter {
+public class TransportationComplexPropertiesExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
     private final String module;
 
@@ -67,7 +66,7 @@ public class RailwayPropertiesExporter implements UrbanObjectModuleExporter {
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
     private final TrafficObjectUsecaseAttributeExporter trafficObjectUsecaseAttributeExporter;
 
-    public RailwayPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+    public TransportationComplexPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.TRANSPORTATION_COMPLEX);
         module = UrbanObjectModule.v3_2.getNamespaceURI();
 
@@ -94,7 +93,7 @@ public class RailwayPropertiesExporter implements UrbanObjectModuleExporter {
         trafficObjectUsecaseAttributeExporter = manager.getExporter(TrafficObjectUsecaseAttributeExporter.class);
     }
 
-    public void doExport(AbstractCityObject parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
+    public void doExport(TransportationComplex parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         ps.setLong(1, parentId);
 
         try (ResultSet rs = ps.executeQuery()) {
@@ -154,60 +153,60 @@ public class RailwayPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 long tranDataQualityAttributeId = rs.getLong("trandataqualityattribute_id");
-                if (tranDataQualityAttributeId != 0 && parent instanceof TransportationComplex && projectionFilter.containsProperty("tranDataQualityAttribute", module)) {
+                if (tranDataQualityAttributeId != 0 && projectionFilter.containsProperty("tranDataQualityAttribute", module)) {
                     DataQualityAttribute tranDataQualityAttribute = new DataQualityAttribute();
                     dataQualityAttributeExporter.doExport(tranDataQualityAttribute, tranDataQualityAttributeId);
 
                     TranDataQualityAttributePropertyElement property = new TranDataQualityAttributePropertyElement(new DataQualityAttributeProperty(tranDataQualityAttribute));
-                    ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                    parent.addGenericApplicationPropertyOfTransportationComplex(property);
                 }
 
-                if (parent instanceof TransportationComplex && projectionFilter.containsProperty("tranDmAttribute", module)) {
+                if (projectionFilter.containsProperty("tranDmAttribute", module)) {
                     for (DmAttribute tranDmAttribute : dmAttributeExporter.doExport(parentId, "transpor_complex_trandmat_id")) {
                         TranDmAttributePropertyElement property = new TranDmAttributePropertyElement(new DmAttributeProperty(tranDmAttribute));
-                        ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
                     }
                 }
 
-                if (parent instanceof TransportationComplex && projectionFilter.containsProperty("tranFacilityAttribute", module)) {
+                if (projectionFilter.containsProperty("tranFacilityAttribute", module)) {
                     for (FacilityAttribute tranFacilityAttribute : facilityAttributeExporter.doExport(parentId, "transpor_complex_tranfaci_id")) {
                         TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
-                        ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
                     }
                 }
 
                 long tranFacilityIdAttributeId = rs.getLong("tranfacilityidattribute_id");
-                if (tranFacilityIdAttributeId != 0 && parent instanceof TransportationComplex && projectionFilter.containsProperty("tranFacilityIdAttribute", module)) {
+                if (tranFacilityIdAttributeId != 0 && projectionFilter.containsProperty("tranFacilityIdAttribute", module)) {
                     FacilityIdAttribute tranFacilityIdAttribute = facilityIdAttributeExporter.doExport(tranFacilityIdAttributeId);
                     if (tranFacilityIdAttribute != null) {
                         TranFacilityIdAttributePropertyElement property = new TranFacilityIdAttributePropertyElement(new FacilityIdAttributeProperty(tranFacilityIdAttribute));
-                        ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
                     }
                 }
 
                 long tranFacilityTypeAttributeId = rs.getLong("tranfacilitytypeattribute_id");
-                if (tranFacilityTypeAttributeId != 0 && parent instanceof TransportationComplex && projectionFilter.containsProperty("tranFacilityTypeAttribute", module)) {
+                if (tranFacilityTypeAttributeId != 0 && projectionFilter.containsProperty("tranFacilityTypeAttribute", module)) {
                     FacilityTypeAttribute tranFacilityTypeAttribute = new FacilityTypeAttribute();
                     facilityTypeAttributeExporter.doExport(tranFacilityTypeAttribute, tranFacilityTypeAttributeId);
 
                     TranFacilityTypeAttributePropertyElement property = new TranFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(tranFacilityTypeAttribute));
-                    ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                    parent.addGenericApplicationPropertyOfTransportationComplex(property);
                 }
 
-                if (parent instanceof TransportationComplex && projectionFilter.containsProperty("tranKeyValuePairAttribute", module)) {
+                if (projectionFilter.containsProperty("tranKeyValuePairAttribute", module)) {
                     for (KeyValuePairAttribute tranKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "transpor_complex_trankeyv_id")) {
                         TranKeyValuePairAttributePropertyElement property = new TranKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(tranKeyValuePairAttribute));
-                        ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
                     }
                 }
 
                 long tranUsecaseAttributeId = rs.getLong("tranusecaseattribute_id");
-                if (tranUsecaseAttributeId != 0 && parent instanceof TransportationComplex && projectionFilter.containsProperty("tranUsecaseAttribute", module)) {
+                if (tranUsecaseAttributeId != 0 && projectionFilter.containsProperty("tranUsecaseAttribute", module)) {
                     TrafficObjectUsecaseAttribute tranUsecaseAttribute = new TrafficObjectUsecaseAttribute();
                     trafficObjectUsecaseAttributeExporter.doExport(tranUsecaseAttribute, tranUsecaseAttributeId);
 
                     TranUsecaseAttributePropertyElement property = new TranUsecaseAttributePropertyElement(new TrafficObjectUsecaseAttributeProperty(tranUsecaseAttribute));
-                    ((TransportationComplex) parent).addGenericApplicationPropertyOfTransportationComplex(property);
+                    parent.addGenericApplicationPropertyOfTransportationComplex(property);
                 }
             }
         }

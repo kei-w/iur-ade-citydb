@@ -4215,7 +4215,7 @@
                 </join>
             </complexProperty>
         </propertyInjection>
-        <propertyInjection table="ur_transportation_complex" defaultBase="RailwayType">
+        <propertyInjection table="ur_transportation_complex" defaultBase="TransportationComplexType">
             <join table="ur_transportation_complex" fromColumn="ID" toColumn="ID" toRole="child"/>
             <complexProperty refType="ur_1_RailwayRouteAttributeType" maxOccurs="1" path="railwayRouteAttribute" schema="ur_1">
                 <join table="ur_railwayrouteattribute" fromColumn="railwayrouteattribute_id" toColumn="id" toRole="parent"/>

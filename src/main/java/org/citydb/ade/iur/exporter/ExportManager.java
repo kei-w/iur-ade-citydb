@@ -208,7 +208,7 @@ public class ExportManager implements ADEExportManager {
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.ROOM)) && parent instanceof Room)
             getExporter(RoomPropertiesExporter.class).doExport((Room) parent, parentId, parentType, projectionFilter);
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX)) && parent instanceof TransportationComplex)
-            getExporter(RailwayPropertiesExporter.class).doExport((AbstractCityObject) parent, parentId, parentType, projectionFilter);
+            getExporter(TransportationComplexPropertiesExporter.class).doExport((TransportationComplex) parent, parentId, parentType, projectionFilter);
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRAFFIC_AREA)) && parent instanceof TrafficArea)
             getExporter(TrafficAreaPropertiesExporter.class).doExport((TrafficArea) parent, parentId, parentType, projectionFilter);
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TUNNEL)) && parent instanceof AbstractTunnel)
@@ -320,8 +320,8 @@ public class ExportManager implements ADEExportManager {
                     exporter = new OpeningPropertiesExporter(connection, helper, this);
                 else if (type == RoomPropertiesExporter.class)
                     exporter = new RoomPropertiesExporter(connection, helper, this);
-                else if (type == RailwayPropertiesExporter.class)
-                    exporter = new RailwayPropertiesExporter(connection, helper, this);
+                else if (type == TransportationComplexPropertiesExporter.class)
+                    exporter = new TransportationComplexPropertiesExporter(connection, helper, this);
                 else if (type == TrafficAreaPropertiesExporter.class)
                     exporter = new TrafficAreaPropertiesExporter(connection, helper, this);
                 else if (type == TunnelPropertiesExporter.class)

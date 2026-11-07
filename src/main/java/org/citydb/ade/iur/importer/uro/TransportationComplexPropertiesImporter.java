@@ -36,11 +36,11 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.uro.*;
-import org.citygml4j.model.citygml.core.AbstractCityObject;
+import org.citygml4j.model.citygml.transportation.TransportationComplex;
 
 import java.sql.*;
 
-public class RailwayPropertiesImporter implements UrbanObjectModuleImporter {
+public class TransportationComplexPropertiesImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
@@ -61,7 +61,7 @@ public class RailwayPropertiesImporter implements UrbanObjectModuleImporter {
 
     private int batchCounter;
 
-    public RailwayPropertiesImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public TransportationComplexPropertiesImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
@@ -88,7 +88,7 @@ public class RailwayPropertiesImporter implements UrbanObjectModuleImporter {
         trafficObjectUsecaseAttributeImporter = manager.getImporter(TrafficObjectUsecaseAttributeImporter.class);
     }
 
-    public void doImport(ADEPropertyCollection properties, AbstractCityObject parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
+    public void doImport(ADEPropertyCollection properties, TransportationComplex parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         ps.setLong(1, parentId);
 
         long railwayRouteAttributeId = 0;
