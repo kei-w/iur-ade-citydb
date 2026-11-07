@@ -57,6 +57,8 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final DmAttributeImporter dmAttributeImporter;
     private final RealEstateIDAttributeImporter realEstateIDAttributeImporter;
     private final BuildingUsecaseAttributeImporter buildingUsecaseAttributeImporter;
+    private final IfcAttributeImporter ifcAttributeImporter;
+    private final IndoorAttributeImporter indoorAttributeImporter;
 
     private int batchCounter;
 
@@ -68,8 +70,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDING)) + " " +
                 "(id, buildingidattribute_id, buildingdetailattribute_id, largecustomerfacilityattr_id," +
                 "bldgdataqualityattribute_id, bldgfacilityidattribute_id, bldgfacilitytypeattribute_id," +
-                "bldgrealestateidattribute_id, bldgusecaseattribute_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "bldgrealestateidattribute_id, bldgusecaseattribute_id, ifcbuildingattribute_id," +
+                "indoorbuildingattribute_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         buildingIDAttributeImporter = manager.getImporter(BuildingIDAttributeImporter.class);
         buildingDetailAttributeImporter = manager.getImporter(BuildingDetailAttributeImporter.class);
@@ -83,6 +86,8 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         realEstateIDAttributeImporter = manager.getImporter(RealEstateIDAttributeImporter.class);
         buildingUsecaseAttributeImporter = manager.getImporter(BuildingUsecaseAttributeImporter.class);
+        ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
+        indoorAttributeImporter = manager.getImporter(IndoorAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractBuilding parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -199,6 +204,34 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
             ps.setLong(9, bldgUsecaseAttributeId);
         else
             ps.setNull(9, Types.NULL);
+
+        long ifcBuildingAttributeId = 0;
+        if (properties.contains(IfcBuildingAttributePropertyElement.class)) {
+            IfcBuildingAttributePropertyElement property = properties.getFirst(IfcBuildingAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                ifcBuildingAttributeId = ifcAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (ifcBuildingAttributeId != 0)
+            ps.setLong(10, ifcBuildingAttributeId);
+        else
+            ps.setNull(10, Types.NULL);
+
+        long indoorBuildingAttributeId = 0;
+        if (properties.contains(IndoorBuildingAttributePropertyElement.class)) {
+            IndoorBuildingAttributePropertyElement property = properties.getFirst(IndoorBuildingAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                indoorBuildingAttributeId = indoorAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (indoorBuildingAttributeId != 0)
+            ps.setLong(11, indoorBuildingAttributeId);
+        else
+            ps.setNull(11, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

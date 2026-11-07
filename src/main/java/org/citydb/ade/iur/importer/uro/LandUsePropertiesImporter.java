@@ -45,6 +45,7 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
 
+    private final IfcAttributeImporter ifcAttributeImporter;
     private final LandUseDetailAttributeImporter landUseDetailAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
@@ -61,10 +62,11 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LAND_USE)) + " " +
-                "(id, landusedetailattribute_id, lusefacilityidattribute_id, lusefacilitytypeattribute_id," +
-                "lusedataqualityattribute_id) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, ifclanduseattribute_id, landusedetailattribute_id, lusefacilityidattribute_id," +
+                "lusefacilitytypeattribute_id, lusedataqualityattribute_id) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
+        ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
         landUseDetailAttributeImporter = manager.getImporter(LandUseDetailAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
@@ -77,6 +79,20 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     public void doImport(ADEPropertyCollection properties, LandUse parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         ps.setLong(1, parentId);
 
+        long ifcLandUseAttributeId = 0;
+        if (properties.contains(IfcLandUseAttributePropertyElement.class)) {
+            IfcLandUseAttributePropertyElement property = properties.getFirst(IfcLandUseAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                ifcLandUseAttributeId = ifcAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (ifcLandUseAttributeId != 0)
+            ps.setLong(2, ifcLandUseAttributeId);
+        else
+            ps.setNull(2, Types.NULL);
+
         long landUseDetailAttributeId = 0;
         if (properties.contains(LandUseDetailAttributePropertyElement.class)) {
             LandUseDetailAttributePropertyElement property = properties.getFirst(LandUseDetailAttributePropertyElement.class);
@@ -87,9 +103,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (landUseDetailAttributeId != 0)
-            ps.setLong(2, landUseDetailAttributeId);
+            ps.setLong(3, landUseDetailAttributeId);
         else
-            ps.setNull(2, Types.NULL);
+            ps.setNull(3, Types.NULL);
 
         long luseFacilityIdAttributeId = 0;
         if (properties.contains(LuseFacilityIdAttributePropertyElement.class)) {
@@ -101,9 +117,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (luseFacilityIdAttributeId != 0)
-            ps.setLong(3, luseFacilityIdAttributeId);
+            ps.setLong(4, luseFacilityIdAttributeId);
         else
-            ps.setNull(3, Types.NULL);
+            ps.setNull(4, Types.NULL);
 
         long luseFacilityTypeAttributeId = 0;
         if (properties.contains(LuseFacilityTypeAttributePropertyElement.class)) {
@@ -115,9 +131,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (luseFacilityTypeAttributeId != 0)
-            ps.setLong(4, luseFacilityTypeAttributeId);
+            ps.setLong(5, luseFacilityTypeAttributeId);
         else
-            ps.setNull(4, Types.NULL);
+            ps.setNull(5, Types.NULL);
 
         long luseDataQualityAttributeId = 0;
         if (properties.contains(LuseDataQualityAttributePropertyElement.class)) {
@@ -129,9 +145,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (luseDataQualityAttributeId != 0)
-            ps.setLong(5, luseDataQualityAttributeId);
+            ps.setLong(6, luseDataQualityAttributeId);
         else
-            ps.setNull(5, Types.NULL);
+            ps.setNull(6, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

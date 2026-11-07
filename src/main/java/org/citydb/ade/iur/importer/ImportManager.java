@@ -61,6 +61,11 @@ import org.citygml4j.model.citygml.tunnel.AbstractTunnel;
 import org.citygml4j.model.citygml.vegetation.AbstractVegetationObject;
 import org.citygml4j.model.citygml.waterbody.WaterBody;
 import org.citygml4j.model.citygml.relief.AbstractReliefComponent;
+import org.citygml4j.model.citygml.building.BuildingFurniture;
+import org.citygml4j.model.citygml.building.BuildingInstallation;
+import org.citygml4j.model.citygml.building.IntBuildingInstallation;
+import org.citygml4j.model.citygml.building.Room;
+import org.citygml4j.model.citygml.core.AbstractCityObject;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.OutputKeys;
@@ -167,10 +172,38 @@ public class ImportManager implements ADEImportManager {
             getImporter(BridgePropertiesImporter.class).doImport(properties, (AbstractBridge) parent, parentId, parentType);
         else if (parent instanceof AbstractBuilding)
             getImporter(BuildingPropertiesImporter.class).doImport(properties, (AbstractBuilding) parent, parentId, parentType);
-        else if (parent instanceof CityFurniture)
-            getImporter(CityFurniturePropertiesImporter.class).doImport(properties, (CityFurniture) parent, parentId, parentType);
+        else if (parent instanceof CityObjectGroup) {
+            if (properties.containsOneOf(org.citygml4j.ade.iur.model.urf.FiscalYearOfPublicationProperty.class,
+                    org.citygml4j.ade.iur.model.urf.LanguageProperty.class)) {
+                getImporter(org.citydb.ade.iur.importer.urf.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
+            }
+            if (properties.containsOneOf(org.citygml4j.ade.iur.model.urg.FiscalYearOfPublicationProperty.class,
+                    org.citygml4j.ade.iur.model.urg.LanguageProperty.class)) {
+                getImporter(org.citydb.ade.iur.importer.urg.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
+            }
+            if (properties.containsOneOf(org.citygml4j.ade.iur.model.uro.IfcBuildingStoreyAttributePropertyElement.class,
+                    org.citygml4j.ade.iur.model.uro.IndoorStoreyAttributePropertyElement.class,
+                    org.citygml4j.ade.iur.model.uro.FiscalYearOfPublicationProperty.class,
+                    org.citygml4j.ade.iur.model.uro.LanguageProperty.class)) {
+                getImporter(org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
+            }
+            if (properties.contains(DataTypeProperty.class))
+                getImporter(org.citydb.ade.iur.importer.urt.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
+        }
         else if (parent instanceof LandUse)
             getImporter(LandUsePropertiesImporter.class).doImport(properties, (LandUse) parent, parentId, parentType);
+        else if (parent instanceof Room)
+            getImporter(RoomPropertiesImporter.class).doImport(properties, (Room) parent, parentId, parentType);
+        else if (parent instanceof org.citygml4j.model.citygml.building.AbstractOpening)
+            getImporter(OpeningPropertiesImporter.class).doImport(properties, (org.citygml4j.model.citygml.building.AbstractOpening) parent, parentId, parentType);
+        else if (parent instanceof org.citygml4j.model.citygml.building.AbstractBoundarySurface)
+            getImporter(BoundarySurfacePropertiesImporter.class).doImport(properties, (org.citygml4j.model.citygml.building.AbstractBoundarySurface) parent, parentId, parentType);
+        else if (parent instanceof BuildingInstallation || parent instanceof IntBuildingInstallation)
+            getImporter(BuildingInstallationPropertiesImporter.class).doImport(properties, (AbstractCityObject) parent, parentId, parentType);
+        else if (parent instanceof BuildingFurniture)
+            getImporter(BuildingFurniturePropertiesImporter.class).doImport(properties, (BuildingFurniture) parent, parentId, parentType);
+        else if (parent instanceof CityFurniture)
+            getImporter(CityFurniturePropertiesImporter.class).doImport(properties, (CityFurniture) parent, parentId, parentType);
         else if (parent instanceof AbstractReliefComponent)
             getImporter(ReliefComponentPropertiesImporter.class).doImport(properties, (AbstractReliefComponent) parent, parentId, parentType);
         else if (parent instanceof ReliefFeature)
@@ -185,22 +218,6 @@ public class ImportManager implements ADEImportManager {
             getImporter(VegetationObjectPropertiesImporter.class).doImport(properties, (AbstractVegetationObject) parent, parentId, parentType);
         else if (parent instanceof WaterBody)
             getImporter(WaterBodyPropertiesImporter.class).doImport(properties, (WaterBody) parent, parentId, parentType);
-        else if (parent instanceof CityObjectGroup) {
-            if (properties.containsOneOf(org.citygml4j.ade.iur.model.urf.FiscalYearOfPublicationProperty.class,
-                    org.citygml4j.ade.iur.model.urf.LanguageProperty.class)) {
-                getImporter(org.citydb.ade.iur.importer.urf.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
-            }
-            if (properties.containsOneOf(org.citygml4j.ade.iur.model.urg.FiscalYearOfPublicationProperty.class,
-                    org.citygml4j.ade.iur.model.urg.LanguageProperty.class)) {
-                getImporter(org.citydb.ade.iur.importer.urg.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
-            }
-            if (properties.containsOneOf(org.citygml4j.ade.iur.model.uro.FiscalYearOfPublicationProperty.class,
-                    org.citygml4j.ade.iur.model.uro.LanguageProperty.class)) {
-                getImporter(org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
-            }
-            if (properties.contains(DataTypeProperty.class))
-                getImporter(org.citydb.ade.iur.importer.urt.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
-        }
     }
 
     @Override
@@ -310,10 +327,22 @@ public class ImportManager implements ADEImportManager {
                     importer = new BridgePropertiesImporter(connection, helper, this);
                 else if (type == BuildingPropertiesImporter.class)
                     importer = new BuildingPropertiesImporter(connection, helper, this);
-                else if (type == CityFurniturePropertiesImporter.class)
-                    importer = new CityFurniturePropertiesImporter(connection, helper, this);
+                else if (type == org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class)
+                    importer = new org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter(connection, helper, this);
                 else if (type == LandUsePropertiesImporter.class)
                     importer = new LandUsePropertiesImporter(connection, helper, this);
+                else if (type == RoomPropertiesImporter.class)
+                    importer = new RoomPropertiesImporter(connection, helper, this);
+                else if (type == OpeningPropertiesImporter.class)
+                    importer = new OpeningPropertiesImporter(connection, helper, this);
+                else if (type == BoundarySurfacePropertiesImporter.class)
+                    importer = new BoundarySurfacePropertiesImporter(connection, helper, this);
+                else if (type == BuildingInstallationPropertiesImporter.class)
+                    importer = new BuildingInstallationPropertiesImporter(connection, helper, this);
+                else if (type == BuildingFurniturePropertiesImporter.class)
+                    importer = new BuildingFurniturePropertiesImporter(connection, helper, this);
+                else if (type == CityFurniturePropertiesImporter.class)
+                    importer = new CityFurniturePropertiesImporter(connection, helper, this);
                 else if (type == ReliefComponentPropertiesImporter.class)
                     importer = new ReliefComponentPropertiesImporter(connection, helper, this);
                 else if (type == ReliefFeaturePropertiesImporter.class)
@@ -328,8 +357,6 @@ public class ImportManager implements ADEImportManager {
                     importer = new VegetationObjectPropertiesImporter(connection, helper, this);
                 else if (type == WaterBodyPropertiesImporter.class)
                     importer = new WaterBodyPropertiesImporter(connection, helper, this);
-                else if (type == org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class)
-                    importer = new org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter(connection, helper, this);
                 else if (type == ConstructionBaseAttributeImporter.class)
                     importer = new ConstructionBaseAttributeImporter(connection, helper, this);
                 else if (type == FacilityIdAttributeImporter.class)
@@ -430,6 +457,80 @@ public class ImportManager implements ADEImportManager {
                     importer = new RealEstateIDAttributeImporter(connection, helper, this);
                 else if (type == BuildingUsecaseAttributeImporter.class)
                     importer = new BuildingUsecaseAttributeImporter(connection, helper, this);
+                else if (type == IfcAttributeImporter.class)
+                    importer = new IfcAttributeImporter(connection, helper, this);
+                else if (type == IfcRootImporter.class)
+                    importer = new IfcRootImporter(connection, helper, this);
+                else if (type == IfcProductImporter.class)
+                    importer = new IfcProductImporter(connection, helper, this);
+                else if (type == IfcSpatialStructureElementImporter.class)
+                    importer = new IfcSpatialStructureElementImporter(connection, helper, this);
+                else if (type == IfcBuildingImporter.class)
+                    importer = new IfcBuildingImporter(connection, helper, this);
+                else if (type == IfcSiteImporter.class)
+                    importer = new IfcSiteImporter(connection, helper, this);
+                else if (type == IfcSpaceImporter.class)
+                    importer = new IfcSpaceImporter(connection, helper, this);
+                else if (type == IfcElementImporter.class)
+                    importer = new IfcElementImporter(connection, helper, this);
+                else if (type == IfcBuildingElementImporter.class)
+                    importer = new IfcBuildingElementImporter(connection, helper, this);
+                else if (type == IfcWallImporter.class)
+                    importer = new IfcWallImporter(connection, helper, this);
+                else if (type == IfcWindowImporter.class)
+                    importer = new IfcWindowImporter(connection, helper, this);
+                else if (type == IfcDoorImporter.class)
+                    importer = new IfcDoorImporter(connection, helper, this);
+                else if (type == IfcOpeningElementImporter.class)
+                    importer = new IfcOpeningElementImporter(connection, helper, this);
+                else if (type == IfcProjectImporter.class)
+                    importer = new IfcProjectImporter(connection, helper, this);
+                else if (type == IfcGeometricRepresentationContextImporter.class)
+                    importer = new IfcGeometricRepresentationContextImporter(connection, helper, this);
+                else if (type == IfcAxis2Placement3DImporter.class)
+                    importer = new IfcAxis2Placement3DImporter(connection, helper, this);
+                else if (type == IfcUnitImporter.class)
+                    importer = new IfcUnitImporter(connection, helper, this);
+                else if (type == IfcPsetBuildingCommonImporter.class)
+                    importer = new IfcPsetBuildingCommonImporter(connection, helper, this);
+                else if (type == IfcPsetSiteCommonImporter.class)
+                    importer = new IfcPsetSiteCommonImporter(connection, helper, this);
+                else if (type == IfcCoordinateReferenceSystemImporter.class)
+                    importer = new IfcCoordinateReferenceSystemImporter(connection, helper, this);
+                else if (type == IfcProjectedCRSImporter.class)
+                    importer = new IfcProjectedCRSImporter(connection, helper, this);
+                else if (type == IfcMapConversionImporter.class)
+                    importer = new IfcMapConversionImporter(connection, helper, this);
+                else if (type == IfcCoordinateReferenceSystemSelectImporter.class)
+                    importer = new IfcCoordinateReferenceSystemSelectImporter(connection, helper, this);
+                else if (type == IfcClassificationReferenceImporter.class)
+                    importer = new IfcClassificationReferenceImporter(connection, helper, this);
+                else if (type == IfcClassificationImporter.class)
+                    importer = new IfcClassificationImporter(connection, helper, this);
+                else if (type == IfcPsetSpaceCommonImporter.class)
+                    importer = new IfcPsetSpaceCommonImporter(connection, helper, this);
+                else if (type == IfcSpaceBaseQuantityImporter.class)
+                    importer = new IfcSpaceBaseQuantityImporter(connection, helper, this);
+                else if (type == IfcPsetWindowCommonImporter.class)
+                    importer = new IfcPsetWindowCommonImporter(connection, helper, this);
+                else if (type == IfcPsetDoorCommonImporter.class)
+                    importer = new IfcPsetDoorCommonImporter(connection, helper, this);
+                else if (type == IfcPsetOpeningElementCommonImporter.class)
+                    importer = new IfcPsetOpeningElementCommonImporter(connection, helper, this);
+                else if (type == IndoorAttributeImporter.class)
+                    importer = new IndoorAttributeImporter(connection, helper, this);
+                else if (type == IndoorSpaceAttributeImporter.class)
+                    importer = new IndoorSpaceAttributeImporter(connection, helper, this);
+                else if (type == IndoorFacilityAttributeImporter.class)
+                    importer = new IndoorFacilityAttributeImporter(connection, helper, this);
+                else if (type == IndoorStoreyAttributeImporter.class)
+                    importer = new IndoorStoreyAttributeImporter(connection, helper, this);
+                else if (type == IndoorTactileTileAttributeImporter.class)
+                    importer = new IndoorTactileTileAttributeImporter(connection, helper, this);
+                else if (type == IndoorUserDefinedAttributeImporter.class)
+                    importer = new IndoorUserDefinedAttributeImporter(connection, helper, this);
+                else if (type == UserDefinedValueImporter.class)
+                    importer = new UserDefinedValueImporter(connection, helper, this);
                 else if (type == CityFurnitureDetailAttributeImporter.class)
                     importer = new CityFurnitureDetailAttributeImporter(connection, helper, this);
                 else if (type == LandUseDetailAttributeImporter.class)

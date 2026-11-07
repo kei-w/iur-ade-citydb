@@ -51,14 +51,21 @@ public class CityObjectGroupPropertiesExporter implements UrbanObjectModuleExpor
     private final PreparedStatement ps;
     private final String module;
 
+    private final IfcAttributeExporter ifcAttributeExporter;
+    private final IndoorAttributeExporter indoorAttributeExporter;
+
     public CityObjectGroupPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECTGROUP_2);
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECTGROUP_1);
         module = UrbanObjectModule.v3_1.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("fiscalyearofpublication", "language", "language_codespace"))
+        Select select = new Select().addProjection(table.getColumns("ifcbuildingstoreyattribut_id", "indoorstoreyattribute_id", "fiscalyearofpublication", "language",
+                        "language_codespace"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
+        ifcAttributeExporter = manager.getExporter(IfcAttributeExporter.class);
+        indoorAttributeExporter = manager.getExporter(IndoorAttributeExporter.class);
     }
 
     public void doExport(CityObjectGroup parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -66,6 +73,24 @@ public class CityObjectGroupPropertiesExporter implements UrbanObjectModuleExpor
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
+                long ifcBuildingStoreyAttributeId = rs.getLong("ifcbuildingstoreyattribut_id");
+                if (ifcBuildingStoreyAttributeId != 0 && projectionFilter.containsProperty("ifcBuildingStoreyAttribute", module)) {
+                    IfcAttribute ifcBuildingStoreyAttribute = ifcAttributeExporter.doExport(ifcBuildingStoreyAttributeId);
+                    if (ifcBuildingStoreyAttribute != null) {
+                        IfcBuildingStoreyAttributePropertyElement property = new IfcBuildingStoreyAttributePropertyElement(new IfcAttributeProperty(ifcBuildingStoreyAttribute));
+                        parent.addGenericApplicationPropertyOfCityObjectGroup(property);
+                    }
+                }
+
+                long indoorStoreyAttributeId = rs.getLong("indoorstoreyattribute_id");
+                if (indoorStoreyAttributeId != 0 && projectionFilter.containsProperty("indoorStoreyAttribute", module)) {
+                    IndoorAttribute indoorStoreyAttribute = indoorAttributeExporter.doExport(indoorStoreyAttributeId);
+                    if (indoorStoreyAttribute != null) {
+                        IndoorStoreyAttributePropertyElement property = new IndoorStoreyAttributePropertyElement(new IndoorAttributeProperty(indoorStoreyAttribute));
+                        parent.addGenericApplicationPropertyOfCityObjectGroup(property);
+                    }
+                }
+
                 Date fiscalYearOfPublication = rs.getDate("fiscalyearofpublication");
                 if (!rs.wasNull() && projectionFilter.containsProperty("fiscalYearOfPublication", module))
                     parent.addGenericApplicationPropertyOfCityObjectGroup(new FiscalYearOfPublicationProperty(Year.of(fiscalYearOfPublication.toLocalDate().getYear())));

@@ -219,6 +219,17 @@ public class ADETableMapper {
                 add("ISTEMPORAL");
                 add("ISTEMPORAL_CODESPACE");
             }});
+            put(schemaMapper.getTableName(ADETable.BUILDING_FURNITURE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("IFCBUILDINGFURNITUREATTRI_ID");
+                add("INDOORFURNITUREATTRIBUTE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.BUILDING_INSTALLATION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("IFCBUILDINGINSTALLATIONAT_ID");
+                add("IFCINTBUILDINGINSTALLATIO_ID");
+                add("INDOORINTINSTALLATIONATTR_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.CALENDAR).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("ENDDATE");
@@ -300,6 +311,8 @@ public class ADETableMapper {
             put(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("FISCALYEAROFPUBLICATION");
+                add("IFCBUILDINGSTOREYATTRIBUT_ID");
+                add("INDOORSTOREYATTRIBUTE_ID");
                 add("LANGUAGE");
                 add("LANGUAGE_CODESPACE");
             }});
@@ -371,6 +384,11 @@ public class ADETableMapper {
                 add("ID");
                 add("COST");
                 add("COSTUNIT");
+            }});
+            put(schemaMapper.getTableName(ADETable.CRS).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CRS_ID");
+                add("CONTEXT_ID");
             }});
             put(schemaMapper.getTableName(ADETable.CYBERPORTMARINAANDPBS).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -798,6 +816,355 @@ public class ADETableMapper {
                 add("NUMBEROFMAINHOUSEHOLD");
                 add("NUMBEROFORDINARYHOUSEHOLD");
             }});
+            put(schemaMapper.getTableName(ADETable.IFCATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCAXIS2PLACEMENT3D).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("AXIS");
+                add("LOCATION");
+                add("REFDIRECTION");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCBUILDING).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("BUILDINGADDRESS_ID");
+                add("ELEVATIONOFREFHEIGHT");
+                add("ELEVATIONOFREFHEIGHT_UOM");
+                add("ELEVATIONOFTERRAIN");
+                add("ELEVATIONOFTERRAIN_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCBUILDINGELEMENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CAPACITYBYNUMBER");
+                add("CAPACITYBYWEIGHT");
+                add("CAPACITYBYWEIGHT_UOM");
+                add("ELEMENTTYPE");
+                add("ELEMENTTYPE_CODESPACE");
+                add("NUMBEROFRISER");
+                add("NUMBEROFTREADS");
+                add("OBJECTCLASS_ID");
+                add("OPERATIONTYPE");
+                add("PREDEFINEDTYPE");
+                add("PREDEFINEDTYPE_CODESPACE");
+                add("RISERHEIGHT");
+                add("RISERHEIGHT_UOM");
+                add("SHAPETYPE");
+                add("SHAPETYPE_CODESPACE");
+                add("TREADLENGTH");
+                add("TREADLENGTH_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCCLASSIFICATION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("EDITION");
+                add("EDITIONDATE");
+                add("NAME");
+                add("SOURCE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCCLASSIFICATIONREFER).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ITEMREFERENCE");
+                add("ITEMREFERENCE_CODESPACE");
+                add("LOCATION");
+                add("NAME");
+                add("REFERENCEDSOURCE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCCOORDINATEREFERENCE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DESCRIPTION");
+                add("GEODETICDATUM");
+                add("NAME");
+                add("VERTICALDATUM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCDOOR).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OVERALLHEIGHT");
+                add("OVERALLHEIGHT_UOM");
+                add("OVERALLWIDTH");
+                add("OVERALLWIDTH_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCELEMENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OBJECTCLASS_ID");
+                add("TAG");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCGEOMETRICREPRESENTA).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONTEXTIDENTIFIER");
+                add("CONTEXTTYPE");
+                add("COORDINATESPACEDIMENSION");
+                add("IFCAXIS2PLACEME_REFDIRECTION");
+                add("IFCAXIS2PLACEMENT3DTYPE_AXIS");
+                add("OBJECTCLASS_ID");
+                add("PRECISION");
+                add("TRUENORTH");
+                add("WORLDCOORDINATESYSTEM_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCMAPCONVERSION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("EASTINGS");
+                add("EASTINGS_UOM");
+                add("NORTHINGS");
+                add("NORTHINGS_UOM");
+                add("ORTHOGONALHEIGHT");
+                add("ORTHOGONALHEIGHT_UOM");
+                add("SCALE");
+                add("SOURCECRS_ID");
+                add("TARGETCRS_ID");
+                add("XAXISABSCISSA");
+                add("XAXISORDINATE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCOPENINGELEMENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("NOMINALAREA");
+                add("NOMINALAREA_UOM");
+                add("NOMINALVOLUME");
+                add("NOMINALVOLUME_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPRODUCT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPROJECT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("LONGNAME");
+                add("PHASE");
+                add("REPRESENTATIONCONTEXTS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPROJECTEDCRS).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("MAPPROJECTION");
+                add("MAPUNIT");
+                add("MAPZONE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETBUILDINGCOMMON).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ANCILLARYFIREUSE");
+                add("BUILDINGID");
+                add("GROSSPLANNEDAREA");
+                add("GROSSPLANNEDAREA_UOM");
+                add("ISLANDMARKED");
+                add("ISPERMANENTID");
+                add("MAINFIREUSE");
+                add("NUMBEROFSTOREYS");
+                add("OCCUPANCYTYPE");
+                add("OCCUPANCYTYPE_CODESPACE");
+                add("SPRINKLERPROTECTION");
+                add("SPRINKLERPROTECTIONAUTOMATIC");
+                add("YEAROFCONSTRUCTION");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETDOORCOMMON).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ACOUSTICRATING");
+                add("FIREEXIT");
+                add("FIRERATING");
+                add("GLAZINGAREAFRACTION");
+                add("HANDICAPACCESSIBLE");
+                add("INFILTRATION");
+                add("ISEXTERNAL");
+                add("REFERENCE");
+                add("SECURITYRATING");
+                add("SELFCLOSING");
+                add("SMOKESTOP");
+                add("THERMALTRANSMITTANCE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETOPENINGELEMENTC).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("FIREEXIT");
+                add("PARALLELJAMBS");
+                add("PROTECTEDOPENING");
+                add("PURPOSE");
+                add("REFERENCE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETSITECOMMON).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("BUILDABLEAREA");
+                add("BUILDABLEAREA_UOM");
+                add("BUILDINGHEIGHTLIMIT");
+                add("BUILDINGHEIGHTLIMIT_UOM");
+                add("TOTALAREA");
+                add("TOTALAREA_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETSPACECOMMON).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CATEGORY");
+                add("CEILINGCOVERING");
+                add("CONCEALEDCEILING");
+                add("CONCEALEDFLOORING");
+                add("FLOORCOVERING");
+                add("GROSSPLANNEDAREA");
+                add("GROSSPLANNEDAREA_UOM");
+                add("HANDICAPACCESSIBLE");
+                add("NETPLANNEDAREA");
+                add("NETPLANNEDAREA_UOM");
+                add("PUBLICLYACCESSIBLE");
+                add("REFERENCE");
+                add("SKIRTINGBOARD");
+                add("WALLCOVERING");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCPSETWINDOWCOMMON).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ACOUSTICRATING");
+                add("FIRERATING");
+                add("GLAZINGAREAFRACTION");
+                add("INFILTRATION");
+                add("ISEXTERNAL");
+                add("REFERENCE");
+                add("SECURITYRATING");
+                add("SMOKESTOP");
+                add("THERMALTRANSMITTANCE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCROOT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DESCRIPTION");
+                add("GLOBALID");
+                add("NAME");
+                add("OBJECTCLASS_ID");
+                add("OBJECTTYPE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCSITE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("LANDTITLENUMBER");
+                add("REFELEVATION");
+                add("REFELEVATION_UOM");
+                add("REFLATITUDE");
+                add("REFLONGITUDE");
+                add("SITEADDRESS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCSPACE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ELEVATIONWITHFLOORING");
+                add("ELEVATIONWITHFLOORING_UOM");
+                add("INTERIOROREXTERIORSPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCSPACEBASEQUANTITY).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CLEARHEIGHT");
+                add("CLEARHEIGHT_UOM");
+                add("FINISHCEILINGHEIGHT");
+                add("FINISHCEILINGHEIGHT_UOM");
+                add("GROSSCEILINGAREA");
+                add("GROSSCEILINGAREA_UOM");
+                add("GROSSFLOORAREA");
+                add("GROSSFLOORAREA_UOM");
+                add("GROSSPERIMETER");
+                add("GROSSPERIMETER_UOM");
+                add("GROSSVOLUME");
+                add("GROSSVOLUME_UOM");
+                add("GROSSWALLAREA");
+                add("GROSSWALLAREA_UOM");
+                add("NETCEILINGAREA");
+                add("NETCEILINGAREA_UOM");
+                add("NETFLOORAREA");
+                add("NETFLOORAREA_UOM");
+                add("NETPERIMETER");
+                add("NETPERIMETER_UOM");
+                add("NETVOLUME");
+                add("NETVOLUME_UOM");
+                add("NETWALLAREA");
+                add("NETWALLAREA_UOM");
+                add("NOMINALHEIGHT");
+                add("NOMINALHEIGHT_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCSPATIALSTRUCTUREELE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("COMPOSITIONTYPE");
+                add("ELEVATION");
+                add("ELEVATION_UOM");
+                add("LONGNAME");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCUNIT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DIMENSIONS");
+                add("IFCPROJECT_UNITSINCONTEXT_ID");
+                add("NAME");
+                add("PREFIX");
+                add("UNITTYPE");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCWALL).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("GROSSFOOTPRINTAREA");
+                add("GROSSFOOTPRINTAREA_UOM");
+                add("GROSSSIDEAREA");
+                add("GROSSSIDEAREA_UOM");
+                add("GROSSSIDEAREALEFT");
+                add("GROSSSIDEAREALEFT_UOM");
+                add("GROSSSIDEAREARIGHT");
+                add("GROSSSIDEAREARIGHT_UOM");
+                add("GROSSVOLUME");
+                add("GROSSVOLUME_UOM");
+                add("NETFOOTPRINTAREA");
+                add("NETFOOTPRINTAREA_UOM");
+                add("NETSIDEAREA");
+                add("NETSIDEAREA_UOM");
+                add("NETSIDEAREALEFT");
+                add("NETSIDEAREALEFT_UOM");
+                add("NETSIDEAREARIGHT");
+                add("NETSIDEAREARIGHT_UOM");
+                add("NETVOLUME");
+                add("NETVOLUME_UOM");
+                add("NOMINALHEIGHT");
+                add("NOMINALHEIGHT_UOM");
+                add("NOMINALLENGTH");
+                add("NOMINALLENGTH_UOM");
+                add("NOMINALWIDTH");
+                add("NOMINALWIDTH_UOM");
+                add("OBJECTCLASS_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.IFCWINDOW).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OVERALLHEIGHT");
+                add("OVERALLHEIGHT_UOM");
+                add("OVERALLWIDTH");
+                add("OVERALLWIDTH_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("FLOORID");
+                add("FLOORID_1");
+                add("OBJECTCLASS_ID");
+                add("SOURCE");
+                add("SOURCE_CODESPACE");
+                add("UCODE");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORFACILITYATTRIBUT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("PHONE");
+                add("WEBSITE");
+                add("WEEKDAYHOURS");
+                add("WEEKENDHOURS");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORSPACEATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("FLOORID");
+                add("ISPUBLIC");
+                add("ISRESTRICTED");
+                add("SUITE");
+                add("TOLLTYPE");
+                add("TOLLTYPE_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORSTOREYATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CATEGORY");
+                add("ORDINAL");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORTACTILETILEATTRI).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CATEGORY");
+                add("CATEGORY_CODESPACE");
+                add("ENDNODE");
+                add("FLOORID");
+                add("ROOF");
+                add("STARTNODE");
+            }});
+            put(schemaMapper.getTableName(ADETable.INDOORUSERDEFINEDATTRI).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DESCRIPTION");
+                add("NAME");
+                add("NOMINALVALUE_ID");
+                add("UNIT");
+            }});
             put(schemaMapper.getTableName(ADETable.KEYVALUEPAIR).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("CODEVALUE");
@@ -1032,6 +1399,11 @@ public class ADETableMapper {
                 add("ID");
                 add("NUMBEROFEMPLOYEES");
                 add("NUMBEROFOFFICES");
+            }});
+            put(schemaMapper.getTableName(ADETable.OPENING).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("IFCOPENINGATTRIBUTE_ID");
+                add("INDOOROPENINGATTRIBUTE_ID");
             }});
             put(schemaMapper.getTableName(ADETable.PARKFACILITYLONGEVITYP).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1462,6 +1834,11 @@ public class ADETableMapper {
                 add("WIDTHTYPE");
                 add("WIDTHTYPE_CODESPACE");
             }});
+            put(schemaMapper.getTableName(ADETable.ROOM).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("IFCROOMATTRIBUTE_ID");
+                add("INDOORROOMATTRIBUTE_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.ROUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("AGENCY_ID");
@@ -1613,6 +1990,11 @@ public class ADETableMapper {
                 add("TERMINALTYPE_CODESPACE");
                 add("USERTYPE");
                 add("USERTYPE_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.THEMATIC_SURFACE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("IFCBOUNDARYSURFACEATTRIBU_ID");
+                add("INDOORBOUNDARYSURFACEATTR_ID");
             }});
             put(schemaMapper.getTableName(ADETable.TRACKATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1813,6 +2195,18 @@ public class ADETableMapper {
                 add("ID");
                 add("PERIOD");
                 add("RESOURCES");
+            }});
+            put(schemaMapper.getTableName(ADETable.USERDEFINEDVALUE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CODEVALUE");
+                add("CODEVALUE_CODESPACE");
+                add("DATEVALUE");
+                add("DOUBLEVALUE");
+                add("INTVALUE");
+                add("MEASUREDVALUE");
+                add("MEASUREDVALUE_UOM");
+                add("STRINGVALUE");
+                add("URIVALUE");
             }});
             put(schemaMapper.getTableName(ADETable.VERTICALCURVETYPE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

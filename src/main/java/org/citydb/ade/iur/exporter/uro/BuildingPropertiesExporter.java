@@ -60,6 +60,8 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final DmAttributeExporter dmAttributeExporter;
     private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
     private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
+    private final IfcAttributeExporter ifcAttributeExporter;
+    private final IndoorAttributeExporter indoorAttributeExporter;
 
     public BuildingPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDING);
@@ -68,7 +70,8 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("buildingidattribute_id", "buildingdetailattribute_id", "largecustomerfacilityattr_id",
                         "bldgdataqualityattribute_id", "bldgfacilityidattribute_id", "bldgfacilitytypeattribute_id",
-                        "bldgrealestateidattribute_id", "bldgusecaseattribute_id"))
+                        "bldgrealestateidattribute_id", "bldgusecaseattribute_id", "ifcbuildingattribute_id",
+                        "indoorbuildingattribute_id"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -84,6 +87,8 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
         buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
+        ifcAttributeExporter = manager.getExporter(IfcAttributeExporter.class);
+        indoorAttributeExporter = manager.getExporter(IndoorAttributeExporter.class);
     }
 
     public void doExport(AbstractBuilding parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -189,6 +194,24 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
 
                     BldgUsecaseAttributePropertyElement property = new BldgUsecaseAttributePropertyElement(new BuildingUsecaseAttributeProperty(bldgUsecaseAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                }
+
+                long ifcBuildingAttributeId = rs.getLong("ifcbuildingattribute_id");
+                if (ifcBuildingAttributeId != 0 && projectionFilter.containsProperty("ifcBuildingAttribute", module)) {
+                    IfcAttribute ifcBuildingAttribute = ifcAttributeExporter.doExport(ifcBuildingAttributeId);
+                    if (ifcBuildingAttribute != null) {
+                        IfcBuildingAttributePropertyElement property = new IfcBuildingAttributePropertyElement(new IfcAttributeProperty(ifcBuildingAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
+                }
+
+                long indoorBuildingAttributeId = rs.getLong("indoorbuildingattribute_id");
+                if (indoorBuildingAttributeId != 0 && projectionFilter.containsProperty("indoorBuildingAttribute", module)) {
+                    IndoorAttribute indoorBuildingAttribute = indoorAttributeExporter.doExport(indoorBuildingAttributeId);
+                    if (indoorBuildingAttribute != null) {
+                        IndoorBuildingAttributePropertyElement property = new IndoorBuildingAttributePropertyElement(new IndoorAttributeProperty(indoorBuildingAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
                 }
             }
         }

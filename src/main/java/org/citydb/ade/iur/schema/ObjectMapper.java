@@ -357,6 +357,153 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "BuildingUsecaseAttribute":
                     typeClassIds.put(BuildingUsecaseAttribute.class, typeClassId);
                     break;
+                case "IfcAttribute":
+                    typeClassIds.put(IfcAttribute.class, typeClassId);
+                    break;
+                case "IfcRoot":
+                    typeClassIds.put(IfcRoot.class, typeClassId);
+                    break;
+                case "IfcObjectDefinition":
+                    typeClassIds.put(IfcObjectDefinition.class, typeClassId);
+                    break;
+                case "IfcObject":
+                    typeClassIds.put(IfcObject.class, typeClassId);
+                    break;
+                case "IfcProduct":
+                    typeClassIds.put(IfcProduct.class, typeClassId);
+                    break;
+                case "IfcSpatialStructureElement":
+                    typeClassIds.put(IfcSpatialStructureElement.class, typeClassId);
+                    break;
+                case "IfcBuilding":
+                    typeClassIds.put(IfcBuilding.class, typeClassId);
+                    break;
+                case "IfcSite":
+                    typeClassIds.put(IfcSite.class, typeClassId);
+                    break;
+                case "IfcSpace":
+                    typeClassIds.put(IfcSpace.class, typeClassId);
+                    break;
+                case "IfcBuildingStorey":
+                    typeClassIds.put(IfcBuildingStorey.class, typeClassId);
+                    break;
+                case "IfcElement":
+                    typeClassIds.put(IfcElement.class, typeClassId);
+                    break;
+                case "IfcBuildingElement":
+                    typeClassIds.put(IfcBuildingElement.class, typeClassId);
+                    break;
+                case "IfcWall":
+                    typeClassIds.put(IfcWall.class, typeClassId);
+                    break;
+                case "IfcWallStandardCase":
+                    typeClassIds.put(IfcWallStandardCase.class, typeClassId);
+                    break;
+                case "IfcCurtainWall":
+                    typeClassIds.put(IfcCurtainWall.class, typeClassId);
+                    break;
+                case "IfcRoof":
+                    typeClassIds.put(IfcRoof.class, typeClassId);
+                    break;
+                case "IfcWindow":
+                    typeClassIds.put(IfcWindow.class, typeClassId);
+                    break;
+                case "IfcDoor":
+                    typeClassIds.put(IfcDoor.class, typeClassId);
+                    break;
+                case "IfcOpeningElement":
+                    typeClassIds.put(IfcOpeningElement.class, typeClassId);
+                    break;
+                case "IfcFurnishingElement":
+                    typeClassIds.put(IfcFurnishingElement.class, typeClassId);
+                    break;
+                case "IfcProject":
+                    typeClassIds.put(IfcProject.class, typeClassId);
+                    break;
+                case "IfcGeometricRepresentationContext":
+                    typeClassIds.put(IfcGeometricRepresentationContext.class, typeClassId);
+                    break;
+                case "IfcAxis2Placement3D":
+                    typeClassIds.put(IfcAxis2Placement3D.class, typeClassId);
+                    break;
+                case "IfcUnit":
+                    typeClassIds.put(IfcUnit.class, typeClassId);
+                    break;
+                case "IfcGroup":
+                    typeClassIds.put(IfcGroup.class, typeClassId);
+                    break;
+                case "IfcZone":
+                    typeClassIds.put(IfcZone.class, typeClassId);
+                    break;
+                case "IfcPsetBuildingCommon":
+                    typeClassIds.put(IfcPsetBuildingCommon.class, typeClassId);
+                    break;
+                case "IfcPsetSiteCommon":
+                    typeClassIds.put(IfcPsetSiteCommon.class, typeClassId);
+                    break;
+                case "IfcCoordinateReferenceSystem":
+                    typeClassIds.put(IfcCoordinateReferenceSystem.class, typeClassId);
+                    break;
+                case "IfcProjectedCRS":
+                    typeClassIds.put(IfcProjectedCRS.class, typeClassId);
+                    break;
+                case "IfcMapConversion":
+                    typeClassIds.put(IfcMapConversion.class, typeClassId);
+                    break;
+                case "IfcCoordinateReferenceSystemSelect":
+                    typeClassIds.put(IfcCoordinateReferenceSystemSelect.class, typeClassId);
+                    break;
+                case "IfcClassificationReference":
+                    typeClassIds.put(IfcClassificationReference.class, typeClassId);
+                    break;
+                case "IfcClassification":
+                    typeClassIds.put(IfcClassification.class, typeClassId);
+                    break;
+                case "IfcPsetSpaceCommon":
+                    typeClassIds.put(IfcPsetSpaceCommon.class, typeClassId);
+                    break;
+                case "IfcSpaceBaseQuantity":
+                    typeClassIds.put(IfcSpaceBaseQuantity.class, typeClassId);
+                    break;
+                case "IfcPsetWindowCommon":
+                    typeClassIds.put(IfcPsetWindowCommon.class, typeClassId);
+                    break;
+                case "IfcPsetDoorCommon":
+                    typeClassIds.put(IfcPsetDoorCommon.class, typeClassId);
+                    break;
+                case "IfcPsetOpeningElementCommon":
+                    typeClassIds.put(IfcPsetOpeningElementCommon.class, typeClassId);
+                    break;
+                case "IndoorAttribute":
+                    typeClassIds.put(IndoorAttribute.class, typeClassId);
+                    break;
+                case "IndoorFurnishingAttribute":
+                    typeClassIds.put(IndoorFurnishingAttribute.class, typeClassId);
+                    break;
+                case "IndoorZoneAttribute":
+                    typeClassIds.put(IndoorZoneAttribute.class, typeClassId);
+                    break;
+                case "IndoorPublicTagAttribute":
+                    typeClassIds.put(IndoorPublicTagAttribute.class, typeClassId);
+                    break;
+                case "IndoorSpaceAttribute":
+                    typeClassIds.put(IndoorSpaceAttribute.class, typeClassId);
+                    break;
+                case "IndoorFacilityAttribute":
+                    typeClassIds.put(IndoorFacilityAttribute.class, typeClassId);
+                    break;
+                case "IndoorStoreyAttribute":
+                    typeClassIds.put(IndoorStoreyAttribute.class, typeClassId);
+                    break;
+                case "IndoorTactileTileAttribute":
+                    typeClassIds.put(IndoorTactileTileAttribute.class, typeClassId);
+                    break;
+                case "IndoorUserDefinedAttribute":
+                    typeClassIds.put(IndoorUserDefinedAttribute.class, typeClassId);
+                    break;
+                case "UserDefinedValue":
+                    typeClassIds.put(UserDefinedValue.class, typeClassId);
+                    break;
                 case "CityFurnitureAttribute":
                     typeClassIds.put(CityFurnitureAttribute.class, typeClassId);
                     break;

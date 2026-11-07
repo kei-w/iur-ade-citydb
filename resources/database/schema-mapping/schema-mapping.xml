@@ -2201,11 +2201,8 @@
             <attribute column="contexttype" type="string" maxOccurs="1" path="contextType" schema="ur_1"/>
             <attribute column="coordinatespacedimension" type="integer" maxOccurs="1" path="coordinateSpaceDimension" schema="ur_1"/>
             <attribute column="precision" type="double" maxOccurs="1" path="precision" schema="ur_1"/>
-            <complexProperty minOccurs="1" maxOccurs="1" path="worldCoordinateSystem" schema="ur_1">
-                <type path="IfcAxis2Placement3D" schema="ur_1">
-                    <attribute column="ifcaxis2placement3dtype_axis" type="string" maxOccurs="1" path="axis" schema="ur_1"/>
-                    <attribute column="ifcaxis2placeme_refdirection" type="string" maxOccurs="1" path="refDirection" schema="ur_1"/>
-                </type>
+            <complexProperty refType="ur_1_IfcAxis2Placement3DType" minOccurs="1" maxOccurs="1" path="worldCoordinateSystem" schema="ur_1">
+                <join table="ur_ifcaxis2placement3d" fromColumn="worldcoordinatesystem_id" toColumn="id" toRole="parent"/>
             </complexProperty>
             <attribute column="truenorth" type="string" maxOccurs="1" path="trueNorth" schema="ur_1"/>
         </complexType>
@@ -2237,11 +2234,19 @@
             <attribute column="mapprojection" type="string" maxOccurs="1" path="mapProjection" schema="ur_1"/>
             <attribute column="mapzone" type="string" maxOccurs="1" path="mapZone" schema="ur_1"/>
         </complexType>
+        <complexType id="ur_1_IfcCoordinateReferenceSystemSelectType" table="ur_crs" objectClassId="60230" path="IfcCoordinateReferenceSystemSelect" schema="ur_1">
+            <complexProperty refType="ur_1_IfcCoordinateReferenceSystemType" maxOccurs="1" path="crs" schema="ur_1">
+                <join table="ur_ifccoordinatereference" fromColumn="crs_id" toColumn="id" toRole="parent"/>
+            </complexProperty>
+            <complexProperty refType="ur_1_IfcGeometricRepresentationContextType" maxOccurs="1" path="context" schema="ur_1">
+                <join table="ur_ifcgeometricrepresenta" fromColumn="context_id" toColumn="id" toRole="parent"/>
+            </complexProperty>
+        </complexType>
         <complexType id="ur_1_IfcMapConversionType" table="ur_ifcmapconversion" objectClassId="60143" path="IfcMapConversion" schema="ur_1">
             <extension base="ur_1_IfcAttributeType">
                 <join table="ur_ifcattribute" fromColumn="id" toColumn="id" toRole="parent"/>
             </extension>
-            <complexProperty refType="ur_1_IfcCoordinateReferenceSystemPropertyType" maxOccurs="1" path="sourceCRS" schema="ur_1">
+            <complexProperty refType="ur_1_IfcCoordinateReferenceSystemSelectType" maxOccurs="1" path="sourceCRS" schema="ur_1">
                 <join table="ur_crs" fromColumn="sourcecrs_id" toColumn="id" toRole="parent"/>
             </complexProperty>
             <complexProperty refType="ur_1_IfcCoordinateReferenceSystemType" maxOccurs="1" path="targetCRS" schema="ur_1">

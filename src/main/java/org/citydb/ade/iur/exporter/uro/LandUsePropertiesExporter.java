@@ -48,6 +48,7 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
     private final String module;
 
+    private final IfcAttributeExporter ifcAttributeExporter;
     private final LandUseDetailAttributeExporter landUseDetailAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
@@ -61,11 +62,12 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
         module = UrbanObjectModule.v3_1.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("landusedetailattribute_id", "lusefacilityidattribute_id", "lusefacilitytypeattribute_id",
-                        "lusedataqualityattribute_id"))
+        Select select = new Select().addProjection(table.getColumns("ifclanduseattribute_id", "landusedetailattribute_id", "lusefacilityidattribute_id",
+                        "lusefacilitytypeattribute_id", "lusedataqualityattribute_id"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        ifcAttributeExporter = manager.getExporter(IfcAttributeExporter.class);
         landUseDetailAttributeExporter = manager.getExporter(LandUseDetailAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
@@ -80,6 +82,15 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
+                long ifcLandUseAttributeId = rs.getLong("ifclanduseattribute_id");
+                if (ifcLandUseAttributeId != 0 && projectionFilter.containsProperty("ifcLandUseAttribute", module)) {
+                    IfcAttribute ifcLandUseAttribute = ifcAttributeExporter.doExport(ifcLandUseAttributeId);
+                    if (ifcLandUseAttribute != null) {
+                        IfcLandUseAttributePropertyElement property = new IfcLandUseAttributePropertyElement(new IfcAttributeProperty(ifcLandUseAttribute));
+                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    }
+                }
+
                 long landUseDetailAttributeId = rs.getLong("landusedetailattribute_id");
                 if (landUseDetailAttributeId != 0 && projectionFilter.containsProperty("landUseDetailAttribute", module)) {
                     LandUseDetailAttribute landUseDetailAttribute = new LandUseDetailAttribute();

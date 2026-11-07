@@ -47,6 +47,9 @@ public class CityObjectGroupPropertiesImporter implements UrbanObjectModuleImpor
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
 
+    private final IfcAttributeImporter ifcAttributeImporter;
+    private final IndoorAttributeImporter indoorAttributeImporter;
+
     private int batchCounter;
 
     public CityObjectGroupPropertiesImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
@@ -54,33 +57,64 @@ public class CityObjectGroupPropertiesImporter implements UrbanObjectModuleImpor
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2)) + " " +
-                "(id, fiscalyearofpublication, language, language_codespace) " +
-                "values (?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1)) + " " +
+                "(id, ifcbuildingstoreyattribut_id, indoorstoreyattribute_id, fiscalyearofpublication, language," +
+                "language_codespace) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
+        ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
+        indoorAttributeImporter = manager.getImporter(IndoorAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, CityObjectGroup parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         ps.setLong(1, parentId);
 
+        long ifcBuildingStoreyAttributeId = 0;
+        if (properties.contains(IfcBuildingStoreyAttributePropertyElement.class)) {
+            IfcBuildingStoreyAttributePropertyElement property = properties.getFirst(IfcBuildingStoreyAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                ifcBuildingStoreyAttributeId = ifcAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (ifcBuildingStoreyAttributeId != 0)
+            ps.setLong(2, ifcBuildingStoreyAttributeId);
+        else
+            ps.setNull(2, Types.NULL);
+
+        long indoorStoreyAttributeId = 0;
+        if (properties.contains(IndoorStoreyAttributePropertyElement.class)) {
+            IndoorStoreyAttributePropertyElement property = properties.getFirst(IndoorStoreyAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                indoorStoreyAttributeId = indoorAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (indoorStoreyAttributeId != 0)
+            ps.setLong(3, indoorStoreyAttributeId);
+        else
+            ps.setNull(3, Types.NULL);
+
         FiscalYearOfPublicationProperty fiscalYearOfPublication = properties.getFirst(FiscalYearOfPublicationProperty.class);
         if (fiscalYearOfPublication != null && fiscalYearOfPublication.isSetValue())
-            ps.setDate(2, Date.valueOf(LocalDate.of(fiscalYearOfPublication.getValue().getValue(), 1, 1)));
+            ps.setDate(4, Date.valueOf(LocalDate.of(fiscalYearOfPublication.getValue().getValue(), 1, 1)));
         else
-            ps.setNull(2, Types.DATE);
+            ps.setNull(4, Types.DATE);
 
         LanguageProperty language = properties.getFirst(LanguageProperty.class);
         if (language != null && language.isSetValue()) {
-            ps.setString(3, language.getValue().getValue());
-            ps.setString(4, language.getValue().getCodeSpace());
+            ps.setString(5, language.getValue().getValue());
+            ps.setString(6, language.getValue().getCodeSpace());
         } else {
-            ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
         }
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1));
     }
 
     @Override
