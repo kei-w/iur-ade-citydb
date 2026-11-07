@@ -17,7 +17,7 @@ Change Log
   including GML geometries of DM attributes and the ifc coordinate reference system properties.
 * The ADE Manager output is patched where it cannot represent the schema (multi-valued dates, the
   `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
-* Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
+* Importers, exporters and schema registrations are generated from the schema mapping by the `iur-ade-generator` repository.
 
 #### Changes (ADE feature types, 2026-11-07)
 * Import/export of the ADE feature types of the i-UR 3.0 Urban Object module (`uro:OtherConstruction` with its boundary
@@ -30,10 +30,10 @@ Change Log
 
 #### Changes (Urban Function module, 2026-11-07)
 * **Breaking:** import/export of the Urban Function module (`urf`) version 3.0 of the i-UR ADE: 129 feature types and
-  29 data types. The `urf` tables are generated in the style of the ADE Manager (`poc/gen/gen_mapping.py` in the
-  PoC workspace; the ADE Manager itself does not finish the transformation of the urban function hierarchy) and
-  replace the 1.4 tables; every concrete `urf` feature is top-level, references between members and `urf:target`
-  are join tables exported as xlinks.
+  29 data types. The `urf` tables are generated in the style of the ADE Manager (`iur-ade gen-mapping` of the
+  `iur-ade-generator` repository; the ADE Manager itself does not finish the transformation of the urban function
+  hierarchy) and replace the 1.4 tables; every concrete `urf` feature is top-level, references between members and
+  `urf:target` are join tables exported as xlinks.
 * **Breaking:** multi-valued data type properties of all modules are stored in join tables (`ur_<owner>_to_<type>`)
   instead of one foreign key column per owner in the type's table: the Importer/Exporter orders its batch commits by
   table weights summed along the schema mapping joins in `int` arithmetic, and the shared `uro` data types made the
