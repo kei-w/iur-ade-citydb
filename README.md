@@ -21,7 +21,7 @@ This extension adds support for managing i-UR ADE data inside the 3DCityDB and e
 
 :warning: This fork targets the **PLATEAU** flavour of the i-UR ADE: the Urban Object module (`uro`) follows
 *i-UR ADE version 3.1* (`https://www.geospatial.jp/iur/uro/3.1`) and currently covers the building attributes.
-The i-UR 2.0 edition is kept on the `feature/iur-2.0` branch.
+The i-UR 2.0 edition is kept on the `iur-2.0` branch.
 The `urf`, `urg` and `urt` modules still follow version 1.4. See `CHANGES.md` for details. Building this fork
 requires the matching `iur-ade-citygml4j` fork to be published to the local Maven repository first
 (`gradlew publishToMavenLocal`).
