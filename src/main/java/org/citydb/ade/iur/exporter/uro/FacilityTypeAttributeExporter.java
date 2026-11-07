@@ -36,24 +36,39 @@ import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.FacilityTypeAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import java.sql.*;
 
 public class FacilityTypeAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
+    private final Map<String, PreparedStatement> psByParent = new HashMap<>();
     private final AttributeValueSplitter valueSplitter;
 
     public FacilityTypeAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.FACILITYTYPEATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("class", "class_codespace", "function", "function_codespace"))
+        Select select = new Select().addProjection(table.getColumns("id", "class", "class_codespace", "function", "function_codespace"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
+        for (String parentColumn : Arrays.asList("construction_consfacility_id")) {
+            Select parentSelect = new Select().addProjection(table.getColumns("id", "class", "class_codespace", "function", "function_codespace"))
+                    .addSelection(ComparisonFactory.equalTo(table.getColumn(parentColumn), new PlaceHolder<>()))
+                    .addOrderBy(new OrderByToken(table.getColumn("id")));
+            psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
+        }
 
         valueSplitter = helper.getAttributeValueSplitter();
     }
@@ -62,25 +77,48 @@ public class FacilityTypeAttributeExporter implements UrbanObjectModuleExporter 
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                String classifier = rs.getString("class");
-                if (!rs.wasNull()) {
-                    Code code = new Code(classifier);
-                    code.setCodeSpace(rs.getString("class_codespace"));
-                    facilityTypeAttribute.setClassifier(code);
-                }
+            if (rs.next())
+                doExport(facilityTypeAttribute, objectId, rs);
+        }
+    }
 
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("function"), rs.getString("function_codespace"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    facilityTypeAttribute.getFunction().add(code);
-                }
+    public List<FacilityTypeAttribute> doExport(long parentId, String parentColumn) throws CityGMLExportException, SQLException {
+        PreparedStatement ps = psByParent.get(parentColumn);
+        ps.setLong(1, parentId);
+
+        List<FacilityTypeAttribute> result = new ArrayList<>();
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                FacilityTypeAttribute facilityTypeAttribute = new FacilityTypeAttribute();
+                long objectId = rs.getLong("id");
+                doExport(facilityTypeAttribute, objectId, rs);
+
+                result.add(facilityTypeAttribute);
             }
+        }
+
+        return result;
+    }
+
+    private void doExport(FacilityTypeAttribute facilityTypeAttribute, long objectId, ResultSet rs) throws CityGMLExportException, SQLException {
+        String classifier = rs.getString("class");
+        if (!rs.wasNull()) {
+            Code code = new Code(classifier);
+            code.setCodeSpace(rs.getString("class_codespace"));
+            facilityTypeAttribute.setClassifier(code);
+        }
+
+        for (SplitValue splitValue : valueSplitter.split(rs.getString("function"), rs.getString("function_codespace"))) {
+            Code code = new Code(splitValue.result(0));
+            code.setCodeSpace(splitValue.result(1));
+            facilityTypeAttribute.getFunction().add(code);
         }
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        for (PreparedStatement ps : psByParent.values())
+            ps.close();
     }
 }

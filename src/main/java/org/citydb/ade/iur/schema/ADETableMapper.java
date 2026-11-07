@@ -74,6 +74,13 @@ public class ADETableMapper {
                 add("TRIP_ID");
                 add("URL");
             }});
+            put(schemaMapper.getTableName(ADETable.BOUNDARYSURFACE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONSTRUCTION_BOUNDEDBY_ID");
+                add("LOD2MULTISURFACE_ID");
+                add("LOD3MULTISURFACE_ID");
+                add("OBJECTCLASS_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.BRIDGE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("BRIDBASEATTRIBUTE_ID");
@@ -262,6 +269,13 @@ public class ADETableMapper {
                 add("IFCINTBUILDINGINSTALLATIO_ID");
                 add("INDOORINTINSTALLATIONATTR_ID");
             }});
+            put(schemaMapper.getTableName(ADETable.CABLE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CABLES");
+                add("COLUMNS");
+                add("OBJECTCLASS_ID");
+                add("ROWS_");
+            }});
             put(schemaMapper.getTableName(ADETable.CALENDAR).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("ENDDATE");
@@ -370,6 +384,26 @@ public class ADETableMapper {
                 add("FRNFACILITYIDATTRIBUTE_ID");
                 add("FRNFACILITYTYPEATTRIBUTE_ID");
             }});
+            put(schemaMapper.getTableName(ADETable.CONSTRUCTION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONDITIONOFCONSTRUCTION");
+                add("CONSBASEATTRIBUTE_ID");
+                add("CONSDATAQUALITYATTRIBUTE_ID");
+                add("CONSFACILITYIDATTRIBUTE_ID");
+                add("CONSSTRUCTUREATTRIBUTE_ID");
+                add("DATEOFCONSTRUCTION");
+                add("DATEOFDEMOLITION");
+                add("LOD0GEOMETRY_BREP_ID");
+                add("LOD0GEOMETRY_OTHER_GEOM");
+                add("LOD1GEOMETRY_BREP_ID");
+                add("LOD1GEOMETRY_OTHER_GEOM");
+                add("LOD2GEOMETRY_BREP_ID");
+                add("LOD2GEOMETRY_OTHER_GEOM");
+                add("LOD3GEOMETRY_BREP_ID");
+                add("LOD3GEOMETRY_OTHER_GEOM");
+                add("LOD4GEOMETRY_BREP_ID");
+                add("LOD4GEOMETRY_OTHER_GEOM");
+            }});
             put(schemaMapper.getTableName(ADETable.CONSTRUCTIONBASEATTRIB).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("ADMINISTORATOR");
@@ -408,6 +442,28 @@ public class ADETableMapper {
                 add("THEMATICSRCDESC");
                 add("THEMATICSRCDESC_CODESPACE");
             }});
+            put(schemaMapper.getTableName(ADETable.CONSTRUCTIONEVENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONSTRUCTION_CONSTRUCTION_ID");
+                add("DATEOFEVENT");
+                add("DESCRIPTION");
+                add("EVENT");
+                add("EVENT_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.CONSTRUCTIONINSTALLATI).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CLASS");
+                add("CLASS_CODESPACE");
+                add("CONSTRUCTION_CONSTRUCTION_ID");
+                add("FUNCTION");
+                add("FUNCTION_CODESPACE");
+                add("LOD2GEOMETRY_BREP_ID");
+                add("LOD2GEOMETRY_OTHER_GEOM");
+                add("LOD3GEOMETRY_BREP_ID");
+                add("LOD3GEOMETRY_OTHER_GEOM");
+                add("USAGE");
+                add("USAGE_CODESPACE");
+            }});
             put(schemaMapper.getTableName(ADETable.CONSTRUCTIONRISKASSESS).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("REFERENCEDATE");
@@ -416,6 +472,20 @@ public class ADETableMapper {
                 add("STATUS");
                 add("STATUS_CODESPACE");
                 add("SURVEYYEAR");
+            }});
+            put(schemaMapper.getTableName(ADETable.CONSTRUCTIONSTRUCTUREA).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DEPTH");
+                add("DEPTH_UOM");
+                add("LENGTH");
+                add("LENGTH_UOM");
+                add("OBJECTCLASS_ID");
+                add("STRUCTURETYPE");
+                add("STRUCTURETYPE_CODESPACE");
+                add("VOLUME");
+                add("VOLUME_UOM");
+                add("WIDTH");
+                add("WIDTH_UOM");
             }});
             put(schemaMapper.getTableName(ADETable.CONTROLPOINT).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -499,6 +569,13 @@ public class ADETableMapper {
                 add("VEHICLEBOARDINGWIDTH_UOM");
                 add("WAVEDISSIPATORLENGTH");
                 add("WAVEDISSIPATORLENGTH_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.DAMATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DAMCODE");
+                add("DAMCODE_CODESPACE");
+                add("TOTALWATERSTORAGE");
+                add("TOTALWATERSTORAGE_UOM");
             }});
             put(schemaMapper.getTableName(ADETable.DESCRIPTION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -625,6 +702,22 @@ public class ADETableMapper {
                 add("SHAPETYPE");
                 add("SHAPETYPE_CODESPACE");
                 add("VISIBILITY");
+            }});
+            put(schemaMapper.getTableName(ADETable.ELEVATION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONSTRUCTION_ELEVATION_ID");
+                add("ELEVATIONREFERENCE");
+                add("ELEVATIONREFERENCE_CODESPACE");
+                add("ELEVATIONVALUE");
+            }});
+            put(schemaMapper.getTableName(ADETable.EMBANKMENTATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CEILINGHEIGHT");
+                add("CEILINGHEIGHT_UOM");
+                add("MAINPARTLENGTH");
+                add("MAINPARTLENGTH_UOM");
+                add("WAVEDISSIPATORLENGTH");
+                add("WAVEDISSIPATORLENGTH_UOM");
             }});
             put(schemaMapper.getTableName(ADETable.FACILITYATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -820,6 +913,17 @@ public class ADETableMapper {
                 add("STRUCTURALLIMITATIONS_UOM");
                 add("SUBSIDY");
                 add("TOTALCOST");
+            }});
+            put(schemaMapper.getTableName(ADETable.HEIGHT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONSTRUCTION_HEIGHT_ID");
+                add("HIGHREFERENCE");
+                add("HIGHREFERENCE_CODESPACE");
+                add("LOWREFERENCE");
+                add("LOWREFERENCE_CODESPACE");
+                add("STATUS");
+                add("VALUE");
+                add("VALUE_UOM");
             }});
             put(schemaMapper.getTableName(ADETable.HOUSEHOLDS).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1309,6 +1413,16 @@ public class ADETableMapper {
                 add("NAMEOFREGULATION");
                 add("NAMEOFREGULATION_CODESPACE");
             }});
+            put(schemaMapper.getTableName(ADETable.LENGTHATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("LENGTH");
+                add("LENGTH_UOM");
+                add("MESURETYPE");
+                add("MESURETYPE_CODESPACE");
+                add("PHASETYPE");
+                add("PHASETYPE_CODESPACE");
+                add("UTILITYLINK_LENGTHATTRIBU_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.MAINTENANCEHISTORYATTR).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("DESCRIPTION");
@@ -1396,6 +1510,15 @@ public class ADETableMapper {
                 add("CLASS_CODESPACE");
                 add("NUMBER_");
             }});
+            put(schemaMapper.getTableName(ADETable.OCCUPANCY).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CONSTRUCTION_OCCUPANCY_ID");
+                add("INTERVAL");
+                add("INTERVAL_CODESPACE");
+                add("NUMBEROFOCCUPANTS");
+                add("OCCUPANTTYPE");
+                add("OCCUPANTTYPE_CODESPACE");
+            }});
             put(schemaMapper.getTableName(ADETable.OFFICE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("NAME");
@@ -1407,10 +1530,32 @@ public class ADETableMapper {
                 add("NUMBEROFEMPLOYEES");
                 add("NUMBEROFOFFICES");
             }});
+            put(schemaMapper.getTableName(ADETable.OFFSETDEPTH).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DEPTH");
+                add("DEPTH_UOM");
+                add("MAXDEPTH");
+                add("MAXDEPTH_UOM");
+                add("MINDEPTH");
+                add("MINDEPTH_UOM");
+                add("OFFSET_");
+                add("OFFSET_UOM");
+                add("POS");
+                add("UTILITYNETWOR_OFFSETDEPTH_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.OPENING).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("IFCOPENINGATTRIBUTE_ID");
                 add("INDOOROPENINGATTRIBUTE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.OTHERCONSTRUCTION).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("CLASS");
+                add("CLASS_CODESPACE");
+                add("FUNCTION");
+                add("FUNCTION_CODESPACE");
+                add("USAGE");
+                add("USAGE_CODESPACE");
             }});
             put(schemaMapper.getTableName(ADETable.PATHWAY).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1428,6 +1573,18 @@ public class ADETableMapper {
                 add("STAIRCOUNT");
                 add("TO_ID");
                 add("TRAVERSALTIME");
+            }});
+            put(schemaMapper.getTableName(ADETable.PIPE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("INNERDIAMITER");
+                add("INNERDIAMITER_UOM");
+                add("OBJECTCLASS_ID");
+                add("OUTERDIAMITER");
+                add("OUTERDIAMITER_UOM");
+                add("SLEEVETYPE");
+                add("SLEEVETYPE_CODESPACE");
+                add("SLOPE");
+                add("SLOPE_UOM");
             }});
             put(schemaMapper.getTableName(ADETable.POINT).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1638,6 +1795,18 @@ public class ADETableMapper {
                 add("TOTALCOST");
                 add("TOTALFLOORAREA");
                 add("TOTALFLOORAREA_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.PUBLICLAND).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("AREA");
+                add("AREA_UOM");
+                add("ID_1");
+                add("LANDCATEGORY");
+                add("NOTE");
+                add("OWNERNAME");
+                add("OWNERTYPE");
+                add("OWNERTYPE_CODESPACE");
+                add("STATUS");
             }});
             put(schemaMapper.getTableName(ADETable.PUBLICTRANSIT).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -1927,6 +2096,16 @@ public class ADETableMapper {
                 add("USERTYPE");
                 add("USERTYPE_CODESPACE");
             }});
+            put(schemaMapper.getTableName(ADETable.THEMATICSHAPE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("HEIGHTTYPE");
+                add("HEIGHTTYPE_CODESPACE");
+                add("HORIZONTALTYPE");
+                add("HORIZONTALTYPE_CODESPACE");
+                add("SHAPE_BREP_ID");
+                add("SHAPE_OTHER_GEOM");
+                add("UTILITYNETWO_THEMATICSHAP_ID");
+            }});
             put(schemaMapper.getTableName(ADETable.THEMATIC_SURFACE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("IFCBOUNDARYSURFACEATTRIBU_ID");
@@ -2080,6 +2259,9 @@ public class ADETableMapper {
                 add("WIDTH");
                 add("WIDTH_UOM");
             }});
+            put(schemaMapper.getTableName(ADETable.UNDERGROUNDBUILDING).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+            }});
             put(schemaMapper.getTableName(ADETable.URBANFUNCTION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("ABSTRACT");
@@ -2139,6 +2321,67 @@ public class ADETableMapper {
                 add("MEASUREDVALUE_UOM");
                 add("STRINGVALUE");
                 add("URIVALUE");
+            }});
+            put(schemaMapper.getTableName(ADETable.UTILITYLINK).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("DEPTH");
+                add("DEPTH_UOM");
+                add("ENDNODE");
+                add("MATERIAL");
+                add("MATERIAL_CODESPACE");
+                add("MAXDEPTH");
+                add("MAXDEPTH_UOM");
+                add("MAXWIDTH");
+                add("MAXWIDTH_UOM");
+                add("MINDEPTH");
+                add("MINDEPTH_UOM");
+                add("OBJECTCLASS_ID");
+                add("OFFSET_");
+                add("OFFSET_UOM");
+                add("ROUTEENDNODE");
+                add("ROUTESTARTNODE");
+                add("STARTNODE");
+                add("WIDTH");
+                add("WIDTH_UOM");
+            }});
+            put(schemaMapper.getTableName(ADETable.UTILITYNETWORKELEMENT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("ADMINISTRATOR");
+                add("ADMINISTRATOR_CODESPACE");
+                add("OBJECTCLASS_ID");
+                add("OCCUPIERNAME");
+                add("OCCUPIERNAME_CODESPACE");
+                add("OCCUPIERTYPE");
+                add("OCCUPIERTYPE_CODESPACE");
+                add("YEAR");
+                add("YEARTYPE");
+                add("YEARTYPE_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.UTILITYNODE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("APPURTENANCETYPE");
+                add("APPURTENANCETYPE_CODESPACE");
+                add("NEXTLINK");
+                add("PREVIOUSLINK");
+                add("ROTATIONANGLE");
+            }});
+            put(schemaMapper.getTableName(ADETable.UTILITYNODECONTAINER).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("APPURTENANCE");
+                add("CONTAINERTYPE");
+                add("CONTAINERTYPE_CODESPACE");
+                add("DEPTH");
+                add("DEPTH_UOM");
+                add("INNERDIAMITERLONG");
+                add("INNERDIAMITERLONG_UOM");
+                add("INNERDIAMITERSHORT");
+                add("INNERDIAMITERSHORT_UOM");
+                add("OBJECTCLASS_ID");
+                add("OUTERDIAMITERLONG");
+                add("OUTERDIAMITERLONG_UOM");
+                add("OUTERDIAMITERSHORT");
+                add("OUTERDIAMITERSHORT_UOM");
+                add("ROTATIONANGLE");
             }});
             put(schemaMapper.getTableName(ADETable.VEGETATIONATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -2200,6 +2443,28 @@ public class ADETableMapper {
                 add("DURATION_UOM");
                 add("SCALE");
                 add("SCALE_CODESPACE");
+            }});
+            put(schemaMapper.getTableName(ADETable.WATERWAY).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("WATERWAYDETAILATTRIBUTE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.WATERWAYDETAILATTRIBUT).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("LENGTH");
+                add("LENGTH_UOM");
+                add("MAXIMUMWIDTH");
+                add("MAXIMUMWIDTH_UOM");
+                add("MINIMUMWIDTH");
+                add("MINIMUMWIDTH_UOM");
+                add("NAVIGATION");
+                add("PLANNEDDEPTH");
+                add("PLANNEDDEPTH_UOM");
+                add("ROUTEDIRECTION");
+                add("ROUTEDIRECTION_CODESPACE");
+                add("ROUTEID");
+                add("SPEEDLIMIT");
+                add("SPEEDLIMIT_UOM");
+                add("TARGETSHIPTYPE");
             }});
             put(schemaMapper.getTableName(ADETable.ZONE).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

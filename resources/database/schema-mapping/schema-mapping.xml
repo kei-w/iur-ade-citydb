@@ -3067,7 +3067,7 @@
                 <join table="ur_waterwaydetailattribut" fromColumn="waterwaydetailattribute_id" toColumn="id" toRole="parent"/>
             </complexProperty>
         </featureType>
-        <featureType id="ur_1_AbstractConstructionType" table="ur_construction" objectClassId="60074" path="AbstractConstruction" schema="ur_1">
+        <featureType id="ur_1_AbstractConstructionType" table="ur_construction" objectClassId="60074" topLevel="true" path="AbstractConstruction" schema="ur_1">
             <extension base="AbstractCityObjectType">
                 <join table="cityobject" fromColumn="id" toColumn="id" toRole="parent"/>
             </extension>
@@ -3158,7 +3158,7 @@
             <geometryProperty lod="2" refColumn="lod2geometry_brep_id" inlineColumn="lod2geometry_other_geom" type="AbstractGeometry" maxOccurs="1" path="lod2Geometry" schema="ur_1"/>
             <geometryProperty lod="3" refColumn="lod3geometry_brep_id" inlineColumn="lod3geometry_other_geom" type="AbstractGeometry" maxOccurs="1" path="lod3Geometry" schema="ur_1"/>
         </featureType>
-        <featureType id="ur_1_OtherConstructionType" table="ur_otherconstruction" objectClassId="60081" path="OtherConstruction" schema="ur_1">
+        <featureType id="ur_1_OtherConstructionType" table="ur_otherconstruction" objectClassId="60081" topLevel="true" path="OtherConstruction" schema="ur_1">
             <extension base="ur_1_AbstractConstructionType">
                 <join table="ur_construction" fromColumn="id" toColumn="id" toRole="parent"/>
             </extension>
@@ -3193,7 +3193,7 @@
         <featureType id="ur_1_ClosureSurfaceType" table="ur_boundarysurface" objectClassId="60087" path="ClosureSurface" schema="ur_1">
             <extension base="ur_1__BoundarySurfaceType"/>
         </featureType>
-        <featureType id="ur_1_UndergroundBuildingType" table="ur_undergroundbuilding" objectClassId="60088" path="UndergroundBuilding" schema="ur_1">
+        <featureType id="ur_1_UndergroundBuildingType" table="ur_undergroundbuilding" objectClassId="60088" topLevel="true" path="UndergroundBuilding" schema="ur_1">
             <extension base="AbstractBuildingType">
                 <join table="building" fromColumn="id" toColumn="id" toRole="parent"/>
             </extension>
