@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-### 3.0.0 - 2026-11-07
+### 2.2.0 - 2026-11-07
 
 #### Breaking changes
 * Updated the Urban Object module (`uro`) to version 2.0 of the i-UR ADE. The database schema for `uro` was
