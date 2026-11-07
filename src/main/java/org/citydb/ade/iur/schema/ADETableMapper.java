@@ -76,9 +76,13 @@ public class ADETableMapper {
             }});
             put(schemaMapper.getTableName(ADETable.BUILDING).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
+                add("BLDGFACILITYIDATTRIBUTE_ID");
+                add("BLDGFACILITYTYPEATTRIBUTE_ID");
                 add("BUILDINGDATAQUALITYATTRIB_ID");
                 add("BUILDINGDETAILATTRIBUTE_ID");
                 add("BUILDINGIDATTRIBUTE_ID");
+                add("IFCBUILDINGATTRIBUTE_ID");
+                add("INDOORBUILDINGATTRIBUTE_ID");
                 add("LARGECUSTOMERFACILITYATTR_ID");
             }});
             put(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
@@ -410,6 +414,8 @@ public class ADETableMapper {
                 add("TOTALSTOREFLOORAREA_UOM");
                 add("URBANPLANTYPE");
                 add("URBANPLANTYPE_CODESPACE");
+                add("YEARCLOSED");
+                add("YEAROPENED");
             }});
             put(schemaMapper.getTableName(ADETable.LEGALGROUNDS).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
@@ -478,7 +484,6 @@ public class ADETableMapper {
                 add("POINTSEQUENCE");
                 add("PUBLICTRANSIT_POINT_ID");
             }});
-
             put(schemaMapper.getTableName(ADETable.POLLUTION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("CAUSE");
@@ -660,10 +665,6 @@ public class ADETableMapper {
                 add("WHEELCHAIRACCESSIB_CODESPACE");
                 add("WHEELCHAIRACCESSIBLE");
             }});
-            put(schemaMapper.getTableName(ADETable.URBANFUNC_TO_CITYOBJEC).toUpperCase(), new LinkedHashSet<String>() {{
-                add("CITYOBJECT_ID");
-                add("URBANFUNCTION_ID");
-            }});
             put(schemaMapper.getTableName(ADETable.URBANFUNCTION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
                 add("ABSTRACT");
@@ -702,6 +703,10 @@ public class ADETableMapper {
                 add("URBANPLANTYPE");
                 add("URBANPLANTYPE_CODESPACE");
                 add("VALIDITY");
+            }});
+            put(schemaMapper.getTableName(ADETable.URBANFUNC_TO_CITYOBJEC).toUpperCase(), new LinkedHashSet<String>() {{
+                add("CITYOBJECT_ID");
+                add("URBANFUNCTION_ID");
             }});
             put(schemaMapper.getTableName(ADETable.URBANIZATION).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

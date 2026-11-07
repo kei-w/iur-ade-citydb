@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns="https://www.geospatial.jp/iur/2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://www.geospatial.jp/iur/2.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema xmlns="https://www.geospatial.jp/iur/3.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://www.geospatial.jp/iur/3.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.0">
   <xs:import namespace="http://www.kantei.go.jp/jp/singi/tiiki/toshisaisei/itoshisaisei/iur/urg/1.4" schemaLocation="schemas/statisticalGrid.xsd"/>
-  <xs:import namespace="https://www.geospatial.jp/iur/uro/2.0" schemaLocation="schemas/urbanObject.xsd"/>
+  <xs:import namespace="https://www.geospatial.jp/iur/uro/3.0" schemaLocation="schemas/urbanObject.xsd"/>
   <xs:import namespace="http://www.kantei.go.jp/jp/singi/tiiki/toshisaisei/itoshisaisei/iur/urf/1.4" schemaLocation="schemas/urbanFunction.xsd"/>
   <xs:import namespace="http://www.kantei.go.jp/jp/singi/tiiki/toshisaisei/itoshisaisei/iur/urt/1.4" schemaLocation="schemas/publicTransit.xsd"/>
 </xs:schema>
