@@ -19,10 +19,20 @@ Change Log
   `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
 * Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
 
+#### Changes (ADE feature types, 2026-11-07)
+* Import/export of the ADE feature types of the i-UR 3.0 Urban Object module (`uro:OtherConstruction` with its boundary
+  surfaces and installations, `uro:UndergroundBuilding`, `uro:Waterway`, `uro:PublicLand` and the utility network
+  elements), one importer and exporter per table in the style of the `urf` feature classes. Nested features are imported
+  through the Importer/Exporter with the parent id as foreign key and exported through the extension's own exporters
+  (the Importer/Exporter creates nested ADE objects as stubs).
+* `OtherConstruction` and `UndergroundBuilding` are marked top-level in the schema mapping (the ADE Manager left them
+  without `topLevel`).
+
 #### Known limitations
 * `uro:ControlPoint/uro:parameter` is not supported: the 3.0 XSD declares it with the type of `uro:ControlPoint` itself.
-* ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
-  supported; `urf`, `urg` and `urt` remain at 1.4.
+* `gml:pos` values (`uro:Elevation/elevationValue`, `uro:OffsetDepth/pos`) keep their coordinates only; `srsName` and
+  `srsDimension` are not stored.
+* `urf`, `urg` and `urt` remain at 1.4.
 
 ### 3.0.0 - 2026-11-07
 
