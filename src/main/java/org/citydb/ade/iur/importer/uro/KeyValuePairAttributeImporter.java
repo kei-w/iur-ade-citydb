@@ -51,58 +51,58 @@ public class KeyValuePairAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE)) + " " +
-                "(id, building_keyvaluepairattr_id, key, key_codespace, codevalue, codevalue_codespace, datevalue, " +
-                "doublevalue, intvalue, measuredvalue, measuredvalue_uom, stringvalue, urivalue) " +
+                "(id, building_keyvaluepairattr_id, key, key_codespace, codevalue, codevalue_codespace, stringvalue," +
+                "intvalue, doublevalue, measuredvalue, measuredvalue_uom, datevalue, urivalue) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(KeyValuePairAttribute keyValuePair, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(KeyValuePairAttribute keyValuePairAttribute, long parentId) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.KEYVALUEPAIRATTRIB_SEQ));
         ps.setLong(1, objectId);
-
         ps.setLong(2, parentId);
 
-        if (keyValuePair.getKey() != null && keyValuePair.getKey().isSetValue()) {
-            ps.setString(3, keyValuePair.getKey().getValue());
-            ps.setString(4, keyValuePair.getKey().getCodeSpace());
+        if (keyValuePairAttribute.getKey() != null && keyValuePairAttribute.getKey().isSetValue()) {
+            ps.setString(3, keyValuePairAttribute.getKey().getValue());
+            ps.setString(4, keyValuePairAttribute.getKey().getCodeSpace());
         } else {
             ps.setNull(3, Types.VARCHAR);
             ps.setNull(4, Types.VARCHAR);
         }
 
-        if (keyValuePair.isSetCodeValue() && keyValuePair.getCodeValue().isSetValue()) {
-            ps.setString(5, keyValuePair.getCodeValue().getValue());
-            ps.setString(6, keyValuePair.getCodeValue().getCodeSpace());
+        if (keyValuePairAttribute.getCodeValue() != null && keyValuePairAttribute.getCodeValue().isSetValue()) {
+            ps.setString(5, keyValuePairAttribute.getCodeValue().getValue());
+            ps.setString(6, keyValuePairAttribute.getCodeValue().getCodeSpace());
         } else {
             ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
         }
 
-        if (keyValuePair.isSetDateValue())
-            ps.setDate(7, Date.valueOf(keyValuePair.getDateValue()));
-        else
-            ps.setNull(7, Types.DATE);
+        ps.setString(7, keyValuePairAttribute.getStringValue());
 
-        if (keyValuePair.isSetDoubleValue())
-            ps.setDouble(8, keyValuePair.getDoubleValue());
+        if (keyValuePairAttribute.getIntValue() != null)
+            ps.setInt(8, keyValuePairAttribute.getIntValue());
         else
-            ps.setNull(8, Types.DOUBLE);
+            ps.setNull(8, Types.INTEGER);
 
-        if (keyValuePair.isSetIntValue())
-            ps.setInt(9, keyValuePair.getIntValue());
+        if (keyValuePairAttribute.getDoubleValue() != null)
+            ps.setDouble(9, keyValuePairAttribute.getDoubleValue());
         else
-            ps.setNull(9, Types.INTEGER);
+            ps.setNull(9, Types.DOUBLE);
 
-        if (keyValuePair.isSetMeasuredValue() && keyValuePair.getMeasuredValue().isSetValue()) {
-            ps.setDouble(10, keyValuePair.getMeasuredValue().getValue());
-            ps.setString(11, keyValuePair.getMeasuredValue().getUom());
+        if (keyValuePairAttribute.getMeasuredValue() != null && keyValuePairAttribute.getMeasuredValue().isSetValue()) {
+            ps.setDouble(10, keyValuePairAttribute.getMeasuredValue().getValue());
+            ps.setString(11, keyValuePairAttribute.getMeasuredValue().getUom());
         } else {
             ps.setNull(10, Types.DOUBLE);
             ps.setNull(11, Types.VARCHAR);
         }
 
-        ps.setString(12, keyValuePair.getStringValue());
-        ps.setString(13, keyValuePair.getUriValue());
+        if (keyValuePairAttribute.getDateValue() != null)
+            ps.setDate(12, Date.valueOf(keyValuePairAttribute.getDateValue()));
+        else
+            ps.setNull(12, Types.DATE);
+
+        ps.setString(13, keyValuePairAttribute.getUriValue());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

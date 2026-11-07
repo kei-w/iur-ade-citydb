@@ -36,51 +36,31 @@ import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.uro.BuildingIDAttribute;
-import org.citygml4j.model.gml.basicTypes.Code;
+import org.citygml4j.ade.iur.model.uro.TrafficAreaStructureAttribute;
 
 import java.sql.*;
 
-public class BuildingIDAttributeExporter implements UrbanObjectModuleExporter {
+public class TrafficAreaStructureAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
 
-    public BuildingIDAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGIDATTRIBUTE);
+    public TrafficAreaStructureAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.TRAFFICAREAATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("branchid", "buildingid", "city", "city_codespace", "partid", "prefecture", "prefecture_codespace"))
+        Select select = new Select().addProjection(table.getColumns("numberoflanes"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
     }
 
-    public void doExport(BuildingIDAttribute buildingIDAttribute, long objectId) throws CityGMLExportException, SQLException {
+    public void doExport(TrafficAreaStructureAttribute trafficAreaStructureAttribute, long objectId) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                int branchID = rs.getInt("branchid");
+                int numberOfLanes = rs.getInt("numberoflanes");
                 if (!rs.wasNull())
-                    buildingIDAttribute.setBranchID(branchID);
-
-                buildingIDAttribute.setBuildingID(rs.getString("buildingid"));
-
-                String city = rs.getString("city");
-                if (!rs.wasNull()) {
-                    Code code = new Code(city);
-                    code.setCodeSpace(rs.getString("city_codespace"));
-                    buildingIDAttribute.setCity(code);
-                }
-
-                int partID = rs.getInt("partid");
-                if (!rs.wasNull())
-                    buildingIDAttribute.setPartID(partID);
-
-                String prefecture = rs.getString("prefecture");
-                if (!rs.wasNull()) {
-                    Code code = new Code(prefecture);
-                    code.setCodeSpace(rs.getString("prefecture_codespace"));
-                    buildingIDAttribute.setPrefecture(code);
-                }
+                    trafficAreaStructureAttribute.setNumberOfLanes(numberOfLanes);
             }
         }
     }

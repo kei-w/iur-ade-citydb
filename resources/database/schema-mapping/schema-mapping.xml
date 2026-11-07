@@ -1355,7 +1355,7 @@
                 <join table="ur_landuseattribute" fromColumn="landusedetailattribute_id" toColumn="id" toRole="parent"/>
             </complexProperty>
         </propertyInjection>
-        <propertyInjection table="ur_transportation_complex" defaultBase="RoadType">
+        <propertyInjection table="ur_transportation_complex" defaultBase="TransportationComplexType">
             <join table="ur_transportation_complex" fromColumn="ID" toColumn="ID" toRole="child"/>
             <complexProperty refType="ur_1_TrafficVolumeAttributeType" maxOccurs="1" path="trafficVolumeAttribute" schema="ur_1">
                 <join table="ur_trafficvolumeattribute" fromColumn="trafficvolumeattribute_id" toColumn="id" toRole="parent"/>

@@ -38,66 +38,59 @@ import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.uro.BuildingDataQualityAttribute;
+import org.citygml4j.ade.iur.model.uro.CityFurnitureDataQualityAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 
 import java.sql.*;
 
-public class BuildingDataQualityAttributeExporter implements UrbanObjectModuleExporter {
+public class CityFurnitureDataQualityAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
     private final AttributeValueSplitter valueSplitter;
 
-    public BuildingDataQualityAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGDATAQUALITYATT);
+    public CityFurnitureDataQualityAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYFURNITUREDATAQUALI);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("appearancesrcdesc", "appearancesrcdesc_codespace", "geometrysrcdesc", "geometrysrcdesc_codespace",
-                        "lod1heighttype", "lod1heighttype_codespace", "lodtype", "srcscale", "srcscale_codespace",
-                        "thematicsrcdesc", "thematicsrcdesc_codespace"))
+        Select select = new Select().addProjection(table.getColumns("srcscale", "srcscale_codespace", "geometrysrcdesc", "geometrysrcdesc_codespace",
+                        "thematicsrcdesc", "thematicsrcdesc_codespace", "appearancesrcdesc", "appearancesrcdesc_codespace",
+                        "lodtype"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
         valueSplitter = helper.getAttributeValueSplitter();
     }
 
-    public void doExport(BuildingDataQualityAttribute buildingDataQualityAttribute, long objectId) throws CityGMLExportException, SQLException {
+    public void doExport(CityFurnitureDataQualityAttribute cityFurnitureDataQualityAttribute, long objectId) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesc"), rs.getString("appearancesrcdesc_codespace"))) {
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("srcscale"), rs.getString("srcscale_codespace"))) {
                     Code code = new Code(splitValue.result(0));
                     code.setCodeSpace(splitValue.result(1));
-                    buildingDataQualityAttribute.getAppearanceSrcDesc().add(code);
+                    cityFurnitureDataQualityAttribute.getSrcScale().add(code);
                 }
 
                 for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesc"), rs.getString("geometrysrcdesc_codespace"))) {
                     Code code = new Code(splitValue.result(0));
                     code.setCodeSpace(splitValue.result(1));
-                    buildingDataQualityAttribute.getGeometrySrcDesc().add(code);
-                }
-
-                String lod1HeightType = rs.getString("lod1heighttype");
-                if (!rs.wasNull()) {
-                    Code code = new Code(lod1HeightType);
-                    code.setCodeSpace(rs.getString("lod1heighttype_codespace"));
-                    buildingDataQualityAttribute.setLod1HeightType(code);
-                }
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("lodtype")))
-                    buildingDataQualityAttribute.getLodType().add(splitValue.result(0));
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("srcscale"), rs.getString("srcscale_codespace"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    buildingDataQualityAttribute.getSrcScale().add(code);
+                    cityFurnitureDataQualityAttribute.getGeometrySrcDesc().add(code);
                 }
 
                 for (SplitValue splitValue : valueSplitter.split(rs.getString("thematicsrcdesc"), rs.getString("thematicsrcdesc_codespace"))) {
                     Code code = new Code(splitValue.result(0));
                     code.setCodeSpace(splitValue.result(1));
-                    buildingDataQualityAttribute.getThematicSrcDesc().add(code);
+                    cityFurnitureDataQualityAttribute.getThematicSrcDesc().add(code);
                 }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesc"), rs.getString("appearancesrcdesc_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    cityFurnitureDataQualityAttribute.getAppearanceSrcDesc().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("lodtype")))
+                    cityFurnitureDataQualityAttribute.getLodType().add(splitValue.result(0));
             }
         }
     }

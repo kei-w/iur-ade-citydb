@@ -35,10 +35,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.uro.BuildingRiverFloodingRiskAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class BuildingRiverFloodingRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
@@ -53,7 +50,7 @@ public class BuildingRiverFloodingRiskAttributeImporter implements UrbanObjectMo
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGRIVERFLOODINGR)) + " " +
-                "(id, admintype, admintype_codespace, duration, duration_uom, scale, scale_codespace) " +
+                "(id, admintype, admintype_codespace, scale, scale_codespace, duration, duration_uom) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
     }
 
@@ -68,19 +65,19 @@ public class BuildingRiverFloodingRiskAttributeImporter implements UrbanObjectMo
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (buildingRiverFloodingRiskAttribute.getDuration() != null && buildingRiverFloodingRiskAttribute.getDuration().isSetValue()) {
-            ps.setDouble(4, buildingRiverFloodingRiskAttribute.getDuration().getValue());
-            ps.setString(5, buildingRiverFloodingRiskAttribute.getDuration().getUom());
+        if (buildingRiverFloodingRiskAttribute.getScale() != null && buildingRiverFloodingRiskAttribute.getScale().isSetValue()) {
+            ps.setString(4, buildingRiverFloodingRiskAttribute.getScale().getValue());
+            ps.setString(5, buildingRiverFloodingRiskAttribute.getScale().getCodeSpace());
         } else {
-            ps.setNull(4, Types.DOUBLE);
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (buildingRiverFloodingRiskAttribute.getScale() != null && buildingRiverFloodingRiskAttribute.getScale().isSetValue()) {
-            ps.setString(6, buildingRiverFloodingRiskAttribute.getScale().getValue());
-            ps.setString(7, buildingRiverFloodingRiskAttribute.getScale().getCodeSpace());
+        if (buildingRiverFloodingRiskAttribute.getDuration() != null && buildingRiverFloodingRiskAttribute.getDuration().isSetValue()) {
+            ps.setDouble(6, buildingRiverFloodingRiskAttribute.getDuration().getValue());
+            ps.setString(7, buildingRiverFloodingRiskAttribute.getDuration().getUom());
         } else {
-            ps.setNull(6, Types.VARCHAR);
+            ps.setNull(6, Types.DOUBLE);
             ps.setNull(7, Types.VARCHAR);
         }
 

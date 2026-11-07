@@ -51,6 +51,12 @@ import org.citygml4j.model.citygml.ade.binding.ADEModelObject;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 import org.citygml4j.model.gml.feature.AbstractFeature;
+import org.citygml4j.model.citygml.cityfurniture.CityFurniture;
+import org.citygml4j.model.citygml.landuse.LandUse;
+import org.citygml4j.model.citygml.transportation.TrafficArea;
+import org.citygml4j.model.citygml.transportation.TransportationComplex;
+import org.citygml4j.model.citygml.vegetation.AbstractVegetationObject;
+import org.citygml4j.model.citygml.waterbody.WaterBody;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.OutputKeys;
@@ -155,7 +161,19 @@ public class ImportManager implements ADEImportManager {
     public void importGenericApplicationProperties(ADEPropertyCollection properties, AbstractFeature parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         if (parent instanceof AbstractBuilding)
             getImporter(BuildingPropertiesImporter.class).doImport(properties, (AbstractBuilding) parent, parentId, parentType);
-        else if (parent instanceof CityObjectGroup) {
+        if (parent instanceof LandUse)
+            getImporter(LandUsePropertiesImporter.class).doImport(properties, (LandUse) parent, parentId, parentType);
+        if (parent instanceof TransportationComplex)
+            getImporter(TransportationComplexPropertiesImporter.class).doImport(properties, (TransportationComplex) parent, parentId, parentType);
+        if (parent instanceof TrafficArea)
+            getImporter(TrafficAreaPropertiesImporter.class).doImport(properties, (TrafficArea) parent, parentId, parentType);
+        if (parent instanceof CityFurniture)
+            getImporter(CityFurniturePropertiesImporter.class).doImport(properties, (CityFurniture) parent, parentId, parentType);
+        if (parent instanceof AbstractVegetationObject)
+            getImporter(VegetationObjectPropertiesImporter.class).doImport(properties, (AbstractVegetationObject) parent, parentId, parentType);
+        if (parent instanceof WaterBody)
+            getImporter(WaterBodyPropertiesImporter.class).doImport(properties, (WaterBody) parent, parentId, parentType);
+        if (parent instanceof CityObjectGroup) {
             if (properties.containsOneOf(org.citygml4j.ade.iur.model.urf.FiscalYearOfPublicationProperty.class,
                     org.citygml4j.ade.iur.model.urf.LanguageProperty.class)) {
                 getImporter(org.citydb.ade.iur.importer.urf.CityObjectGroupPropertiesImporter.class).doImport(properties, (CityObjectGroup) parent, parentId, parentType);
@@ -278,6 +296,18 @@ public class ImportManager implements ADEImportManager {
                 // urban object module
                 if (type == BuildingPropertiesImporter.class)
                     importer = new BuildingPropertiesImporter(connection, helper, this);
+                else if (type == LandUsePropertiesImporter.class)
+                    importer = new LandUsePropertiesImporter(connection, helper, this);
+                else if (type == TransportationComplexPropertiesImporter.class)
+                    importer = new TransportationComplexPropertiesImporter(connection, helper, this);
+                else if (type == TrafficAreaPropertiesImporter.class)
+                    importer = new TrafficAreaPropertiesImporter(connection, helper, this);
+                else if (type == CityFurniturePropertiesImporter.class)
+                    importer = new CityFurniturePropertiesImporter(connection, helper, this);
+                else if (type == VegetationObjectPropertiesImporter.class)
+                    importer = new VegetationObjectPropertiesImporter(connection, helper, this);
+                else if (type == WaterBodyPropertiesImporter.class)
+                    importer = new WaterBodyPropertiesImporter(connection, helper, this);
                 else if (type == org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter.class)
                     importer = new org.citydb.ade.iur.importer.uro.CityObjectGroupPropertiesImporter(connection, helper, this);
                 else if (type == BuildingAttributeImporter.class)
@@ -298,6 +328,30 @@ public class ImportManager implements ADEImportManager {
                     importer = new KeyValuePairAttributeImporter(connection, helper, this);
                 else if (type == BuildingDataQualityAttributeImporter.class)
                     importer = new BuildingDataQualityAttributeImporter(connection, helper, this);
+                else if (type == LandUseDetailAttributeImporter.class)
+                    importer = new LandUseDetailAttributeImporter(connection, helper, this);
+                else if (type == RoadAttributeImporter.class)
+                    importer = new RoadAttributeImporter(connection, helper, this);
+                else if (type == TrafficVolumeAttributeImporter.class)
+                    importer = new TrafficVolumeAttributeImporter(connection, helper, this);
+                else if (type == RoadStructureAttributeImporter.class)
+                    importer = new RoadStructureAttributeImporter(connection, helper, this);
+                else if (type == RoadDataQualityAttributeImporter.class)
+                    importer = new RoadDataQualityAttributeImporter(connection, helper, this);
+                else if (type == TrafficAreaStructureAttributeImporter.class)
+                    importer = new TrafficAreaStructureAttributeImporter(connection, helper, this);
+                else if (type == CityFurnitureAttributeImporter.class)
+                    importer = new CityFurnitureAttributeImporter(connection, helper, this);
+                else if (type == CityFurnitureDetailAttributeImporter.class)
+                    importer = new CityFurnitureDetailAttributeImporter(connection, helper, this);
+                else if (type == CityFurnitureDataQualityAttributeImporter.class)
+                    importer = new CityFurnitureDataQualityAttributeImporter(connection, helper, this);
+                else if (type == VegetationDataQualityAttributeImporter.class)
+                    importer = new VegetationDataQualityAttributeImporter(connection, helper, this);
+                else if (type == WaterBodyAttributeImporter.class)
+                    importer = new WaterBodyAttributeImporter(connection, helper, this);
+                else if (type == WaterBodyRiverFloodingRiskAttributeImporter.class)
+                    importer = new WaterBodyRiverFloodingRiskAttributeImporter(connection, helper, this);
             } else if (PublicTransitModuleImporter.class.isAssignableFrom(type)) {
                 // public transit module
                 if (type == AgencyImporter.class)

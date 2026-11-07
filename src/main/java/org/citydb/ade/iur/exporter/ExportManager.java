@@ -53,6 +53,12 @@ import org.citygml4j.model.citygml.ade.binding.ADEModelObject;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 import org.citygml4j.model.gml.feature.AbstractFeature;
+import org.citygml4j.model.citygml.cityfurniture.CityFurniture;
+import org.citygml4j.model.citygml.landuse.LandUse;
+import org.citygml4j.model.citygml.transportation.TrafficArea;
+import org.citygml4j.model.citygml.transportation.TransportationComplex;
+import org.citygml4j.model.citygml.vegetation.AbstractVegetationObject;
+import org.citygml4j.model.citygml.waterbody.WaterBody;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -160,7 +166,19 @@ public class ExportManager implements ADEExportManager {
     public void exportGenericApplicationProperties(String adeHookTable, AbstractFeature parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         if (adeHookTable.equals(schemaMapper.getTableName(ADETable.BUILDING)) && parent instanceof AbstractBuilding)
             getExporter(BuildingPropertiesExporter.class).doExport((AbstractBuilding) parent, parentId, parentType, projectionFilter);
-        else if (parent instanceof CityObjectGroup) {
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.LAND_USE)) && parent instanceof LandUse)
+            getExporter(LandUsePropertiesExporter.class).doExport((LandUse) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX)) && parent instanceof TransportationComplex)
+            getExporter(TransportationComplexPropertiesExporter.class).doExport((TransportationComplex) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.TRAFFIC_AREA)) && parent instanceof TrafficArea)
+            getExporter(TrafficAreaPropertiesExporter.class).doExport((TrafficArea) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITY_FURNITURE)) && parent instanceof CityFurniture)
+            getExporter(CityFurniturePropertiesExporter.class).doExport((CityFurniture) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECT)) && parent instanceof AbstractVegetationObject)
+            getExporter(VegetationObjectPropertiesExporter.class).doExport((AbstractVegetationObject) parent, parentId, parentType, projectionFilter);
+        if (adeHookTable.equals(schemaMapper.getTableName(ADETable.WATERBODY)) && parent instanceof WaterBody)
+            getExporter(WaterBodyPropertiesExporter.class).doExport((WaterBody) parent, parentId, parentType, projectionFilter);
+        if (parent instanceof CityObjectGroup) {
             if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP)))
                 getExporter(org.citydb.ade.iur.exporter.urg.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
             else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1)))
@@ -251,20 +269,42 @@ public class ExportManager implements ADEExportManager {
                 // urban object module
                 if (type == BuildingPropertiesExporter.class)
                     exporter = new BuildingPropertiesExporter(connection, helper, this);
+                else if (type == LandUsePropertiesExporter.class)
+                    exporter = new LandUsePropertiesExporter(connection, helper, this);
+                else if (type == TransportationComplexPropertiesExporter.class)
+                    exporter = new TransportationComplexPropertiesExporter(connection, helper, this);
+                else if (type == TrafficAreaPropertiesExporter.class)
+                    exporter = new TrafficAreaPropertiesExporter(connection, helper, this);
+                else if (type == CityFurniturePropertiesExporter.class)
+                    exporter = new CityFurniturePropertiesExporter(connection, helper, this);
+                else if (type == VegetationObjectPropertiesExporter.class)
+                    exporter = new VegetationObjectPropertiesExporter(connection, helper, this);
+                else if (type == WaterBodyPropertiesExporter.class)
+                    exporter = new WaterBodyPropertiesExporter(connection, helper, this);
                 else if (type == org.citydb.ade.iur.exporter.uro.CityObjectGroupPropertiesExporter.class)
                     exporter = new org.citydb.ade.iur.exporter.uro.CityObjectGroupPropertiesExporter(connection, helper, this);
-                else if (type == BuildingIDAttributeExporter.class)
-                    exporter = new BuildingIDAttributeExporter(connection, helper, this);
-                else if (type == BuildingDetailAttributeExporter.class)
-                    exporter = new BuildingDetailAttributeExporter(connection, helper, this);
-                else if (type == LargeCustomerFacilityAttributeExporter.class)
-                    exporter = new LargeCustomerFacilityAttributeExporter(connection, helper, this);
-                else if (type == BuildingDisasterRiskAttributeExporter.class)
-                    exporter = new BuildingDisasterRiskAttributeExporter(connection, helper, this);
+                else if (type == BuildingAttributeExporter.class)
+                    exporter = new BuildingAttributeExporter(connection, helper, this);
                 else if (type == KeyValuePairAttributeExporter.class)
                     exporter = new KeyValuePairAttributeExporter(connection, helper, this);
-                else if (type == BuildingDataQualityAttributeExporter.class)
-                    exporter = new BuildingDataQualityAttributeExporter(connection, helper, this);
+                else if (type == LandUseDetailAttributeExporter.class)
+                    exporter = new LandUseDetailAttributeExporter(connection, helper, this);
+                else if (type == TrafficVolumeAttributeExporter.class)
+                    exporter = new TrafficVolumeAttributeExporter(connection, helper, this);
+                else if (type == RoadStructureAttributeExporter.class)
+                    exporter = new RoadStructureAttributeExporter(connection, helper, this);
+                else if (type == RoadDataQualityAttributeExporter.class)
+                    exporter = new RoadDataQualityAttributeExporter(connection, helper, this);
+                else if (type == TrafficAreaStructureAttributeExporter.class)
+                    exporter = new TrafficAreaStructureAttributeExporter(connection, helper, this);
+                else if (type == CityFurnitureDetailAttributeExporter.class)
+                    exporter = new CityFurnitureDetailAttributeExporter(connection, helper, this);
+                else if (type == CityFurnitureDataQualityAttributeExporter.class)
+                    exporter = new CityFurnitureDataQualityAttributeExporter(connection, helper, this);
+                else if (type == VegetationDataQualityAttributeExporter.class)
+                    exporter = new VegetationDataQualityAttributeExporter(connection, helper, this);
+                else if (type == WaterBodyAttributeExporter.class)
+                    exporter = new WaterBodyAttributeExporter(connection, helper, this);
             } else if (PublicTransitModuleExporter.class.isAssignableFrom(type)) {
                 // public transit module
                 if (type == AgencyExporter.class)
