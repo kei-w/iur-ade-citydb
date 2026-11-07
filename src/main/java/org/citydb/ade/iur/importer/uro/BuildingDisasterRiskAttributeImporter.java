@@ -38,17 +38,13 @@ import org.citygml4j.ade.iur.model.uro.BuildingDisasterRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingFloodingRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingLandSlideRiskAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final BuildingAttributeImporter buildingAttributeImporter;
     private final BuildingFloodingRiskAttributeImporter buildingFloodingRiskAttributeImporter;
 
     private int batchCounter;
@@ -60,18 +56,20 @@ public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleI
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT)) + " " +
-                "(id, objectclass_id, building_buildingdisaster_id, description, description_codespace, areatype, areatype_codespace) " +
+                "(id, objectclass_id, building_buildingdisaster_id, description, description_codespace, areatype," +
+                "areatype_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
 
-        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         buildingFloodingRiskAttributeImporter = manager.getImporter(BuildingFloodingRiskAttributeImporter.class);
     }
 
-    public long doImport(BuildingDisasterRiskAttribute buildingDisasterRiskAttribute, long parentId) throws CityGMLImportException, SQLException {
-        long objectId = buildingAttributeImporter.doImport(buildingDisasterRiskAttribute);
+    public void doImport(BuildingDisasterRiskAttribute buildingDisasterRiskAttribute, long objectId, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(buildingDisasterRiskAttribute.getClass()));
-        ps.setLong(3, parentId);
+        if ("building_buildingdisaster_id".equals(parentColumn))
+            ps.setLong(3, parentId);
+        else
+            ps.setNull(3, Types.NULL);
 
         if (buildingDisasterRiskAttribute.getDescription() != null && buildingDisasterRiskAttribute.getDescription().isSetValue()) {
             ps.setString(4, buildingDisasterRiskAttribute.getDescription().getValue());
@@ -81,11 +79,15 @@ public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleI
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (buildingDisasterRiskAttribute instanceof BuildingLandSlideRiskAttribute
-                && ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType() != null
-                && ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().isSetValue()) {
-            ps.setString(6, ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().getValue());
-            ps.setString(7, ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().getCodeSpace());
+        if (buildingDisasterRiskAttribute instanceof BuildingLandSlideRiskAttribute) {
+            BuildingLandSlideRiskAttribute buildingLandSlideRiskAttribute = (BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute;
+            if (buildingLandSlideRiskAttribute.getAreaType() != null && buildingLandSlideRiskAttribute.getAreaType().isSetValue()) {
+                ps.setString(6, buildingLandSlideRiskAttribute.getAreaType().getValue());
+                ps.setString(7, buildingLandSlideRiskAttribute.getAreaType().getCodeSpace());
+            } else {
+                ps.setNull(6, Types.VARCHAR);
+                ps.setNull(7, Types.VARCHAR);
+            }
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
@@ -97,8 +99,6 @@ public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleI
 
         if (buildingDisasterRiskAttribute instanceof BuildingFloodingRiskAttribute)
             buildingFloodingRiskAttributeImporter.doImport((BuildingFloodingRiskAttribute) buildingDisasterRiskAttribute, objectId);
-
-        return objectId;
     }
 
     @Override

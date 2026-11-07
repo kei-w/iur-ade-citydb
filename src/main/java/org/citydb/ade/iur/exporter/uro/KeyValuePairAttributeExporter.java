@@ -38,85 +38,83 @@ import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
-import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributeProperty;
-import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributePropertyElement;
-import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.sql.*;
 
 public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement ps;
+    private final PreparedStatement psByParent;
 
     public KeyValuePairAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.KEYVALUEPAIRATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace",
-                        "datevalue", "doublevalue", "intvalue", "measuredvalue", "measuredvalue_uom", "stringvalue", "urivalue"))
+        Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace", "stringvalue", "intvalue",
+                        "doublevalue", "measuredvalue", "measuredvalue_uom", "datevalue", "urivalue"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("building_keyvaluepairattr_id"), new PlaceHolder<>()))
                 .addOrderBy(new OrderByToken(table.getColumn("id")));
-        ps = connection.prepareStatement(select.toString());
+        psByParent = connection.prepareStatement(select.toString());
+
     }
 
-    public void doExport(AbstractBuilding parent, long parentId) throws CityGMLExportException, SQLException {
+    public List<KeyValuePairAttribute> doExport(long parentId) throws CityGMLExportException, SQLException {
+        PreparedStatement ps = psByParent;
         ps.setLong(1, parentId);
 
+        List<KeyValuePairAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                KeyValuePairAttribute keyValuePair = new KeyValuePairAttribute();
-
+                KeyValuePairAttribute keyValuePairAttribute = new KeyValuePairAttribute();
                 String key = rs.getString("key");
                 if (!rs.wasNull()) {
                     Code code = new Code(key);
                     code.setCodeSpace(rs.getString("key_codespace"));
-                    keyValuePair.setKey(code);
-                } else
-                    continue;
+                    keyValuePairAttribute.setKey(code);
+                }
 
                 String codeValue = rs.getString("codevalue");
                 if (!rs.wasNull()) {
                     Code code = new Code(codeValue);
                     code.setCodeSpace(rs.getString("codevalue_codespace"));
-                    keyValuePair.setCodeValue(code);
+                    keyValuePairAttribute.setCodeValue(code);
                 }
 
-                Date dateValue = rs.getDate("datevalue");
-                if (!rs.wasNull())
-                    keyValuePair.setDateValue(dateValue.toLocalDate());
-
-                double doubleValue = rs.getDouble("doublevalue");
-                if (!rs.wasNull())
-                    keyValuePair.setDoubleValue(doubleValue);
+                keyValuePairAttribute.setStringValue(rs.getString("stringvalue"));
 
                 int intValue = rs.getInt("intvalue");
                 if (!rs.wasNull())
-                    keyValuePair.setIntValue(intValue);
+                    keyValuePairAttribute.setIntValue(intValue);
+
+                double doubleValue = rs.getDouble("doublevalue");
+                if (!rs.wasNull())
+                    keyValuePairAttribute.setDoubleValue(doubleValue);
 
                 double measuredValue = rs.getDouble("measuredvalue");
                 if (!rs.wasNull()) {
                     Measure measure = new Measure(measuredValue);
                     measure.setUom(rs.getString("measuredvalue_uom"));
-                    keyValuePair.setMeasuredValue(measure);
+                    keyValuePairAttribute.setMeasuredValue(measure);
                 }
 
-                String stringValue = rs.getString("stringvalue");
+                Date dateValue = rs.getDate("datevalue");
                 if (!rs.wasNull())
-                    keyValuePair.setStringValue(stringValue);
+                    keyValuePairAttribute.setDateValue(dateValue.toLocalDate());
 
-                String uriValue = rs.getString("urivalue");
-                if (!rs.wasNull())
-                    keyValuePair.setUriValue(uriValue);
+                keyValuePairAttribute.setUriValue(rs.getString("urivalue"));
 
-                KeyValuePairAttributePropertyElement property = new KeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePair));
-                parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                result.add(keyValuePairAttribute);
             }
         }
+
+        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        ps.close();
+        psByParent.close();
     }
 }

@@ -875,6 +875,8 @@ CREATE TABLE ur_controlpointtype
 CREATE TABLE ur_crs
 (
     id NUMBER(38) NOT NULL,
+    crs_id NUMBER,
+    context_id NUMBER,
     PRIMARY KEY (id)
 );
 
@@ -1601,6 +1603,7 @@ CREATE TABLE ur_ifcgeometricrepresenta
     objectclass_id INTEGER,
     precision NUMBER,
     truenorth VARCHAR2(1000),
+    worldcoordinatesystem_id NUMBER,
     PRIMARY KEY (id)
 );
 
@@ -3101,7 +3104,7 @@ CREATE TABLE ur_squareurbanplanattribu
     city VARCHAR2(1000),
     city_codespace VARCHAR2(1000),
     dateofdecision TIMESTAMP,
-    dateofrevision TIMESTAMP,
+    dateofrevision VARCHAR2(1000),
     enforcer VARCHAR2(1000),
     isauthorized NUMBER,
     iscompleted NUMBER,

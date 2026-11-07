@@ -36,16 +36,24 @@ import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.uro.BuildingAttribute;
+import org.citygml4j.ade.iur.model.uro.BuildingDataQualityAttribute;
+import org.citygml4j.ade.iur.model.uro.BuildingDetailAttribute;
+import org.citygml4j.ade.iur.model.uro.BuildingDisasterRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.BuildingIDAttribute;
+import org.citygml4j.ade.iur.model.uro.LargeCustomerFacilityAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final BuildingIDAttributeImporter buildingIDAttributeImporter;
+    private final BuildingDetailAttributeImporter buildingDetailAttributeImporter;
+    private final LargeCustomerFacilityAttributeImporter largeCustomerFacilityAttributeImporter;
+    private final BuildingDisasterRiskAttributeImporter buildingDisasterRiskAttributeImporter;
+    private final BuildingDataQualityAttributeImporter buildingDataQualityAttributeImporter;
 
     private int batchCounter;
 
@@ -55,12 +63,22 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
         this.objectMapper = manager.getObjectMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGATTRIBUTE)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE)) + " " +
                 "(id, objectclass_id) " +
                 "values (?, ?)");
+
+        buildingIDAttributeImporter = manager.getImporter(BuildingIDAttributeImporter.class);
+        buildingDetailAttributeImporter = manager.getImporter(BuildingDetailAttributeImporter.class);
+        largeCustomerFacilityAttributeImporter = manager.getImporter(LargeCustomerFacilityAttributeImporter.class);
+        buildingDisasterRiskAttributeImporter = manager.getImporter(BuildingDisasterRiskAttributeImporter.class);
+        buildingDataQualityAttributeImporter = manager.getImporter(BuildingDataQualityAttributeImporter.class);
     }
 
     public long doImport(BuildingAttribute buildingAttribute) throws CityGMLImportException, SQLException {
+        return doImport(buildingAttribute, 0, null);
+    }
+
+    public long doImport(BuildingAttribute buildingAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.BUILDINGATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(buildingAttribute.getClass()));
@@ -68,6 +86,21 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE));
+
+        if (buildingAttribute instanceof BuildingIDAttribute)
+            buildingIDAttributeImporter.doImport((BuildingIDAttribute) buildingAttribute, objectId);
+
+        if (buildingAttribute instanceof BuildingDetailAttribute)
+            buildingDetailAttributeImporter.doImport((BuildingDetailAttribute) buildingAttribute, objectId);
+
+        if (buildingAttribute instanceof LargeCustomerFacilityAttribute)
+            largeCustomerFacilityAttributeImporter.doImport((LargeCustomerFacilityAttribute) buildingAttribute, objectId);
+
+        if (buildingAttribute instanceof BuildingDisasterRiskAttribute)
+            buildingDisasterRiskAttributeImporter.doImport((BuildingDisasterRiskAttribute) buildingAttribute, objectId, parentId, parentColumn);
+
+        if (buildingAttribute instanceof BuildingDataQualityAttribute)
+            buildingDataQualityAttributeImporter.doImport((BuildingDataQualityAttribute) buildingAttribute, objectId);
 
         return objectId;
     }

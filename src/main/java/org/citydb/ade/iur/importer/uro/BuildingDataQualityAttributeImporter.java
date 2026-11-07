@@ -43,7 +43,6 @@ public class BuildingDataQualityAttributeImporter implements UrbanObjectModuleIm
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final BuildingAttributeImporter buildingAttributeImporter;
     private final AttributeValueJoiner valueJoiner;
 
     private int batchCounter;
@@ -54,21 +53,19 @@ public class BuildingDataQualityAttributeImporter implements UrbanObjectModuleIm
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGDATAQUALITYATT)) + " " +
-                "(id, appearancesrcdesc, appearancesrcdesc_codespace, geometrysrcdesc, geometrysrcdesc_codespace," +
-                "lod1heighttype, lod1heighttype_codespace, lodtype, srcscale, srcscale_codespace, thematicsrcdesc," +
-                "thematicsrcdesc_codespace) " +
+                "(id, srcscale, srcscale_codespace, geometrysrcdesc, geometrysrcdesc_codespace, thematicsrcdesc," +
+                "thematicsrcdesc_codespace, appearancesrcdesc, appearancesrcdesc_codespace, lod1heighttype," +
+                "lod1heighttype_codespace, lodtype) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         valueJoiner = helper.getAttributeValueJoiner();
     }
 
-    public long doImport(BuildingDataQualityAttribute buildingDataQualityAttribute) throws CityGMLImportException, SQLException {
-        long objectId = buildingAttributeImporter.doImport(buildingDataQualityAttribute);
+    public void doImport(BuildingDataQualityAttribute buildingDataQualityAttribute, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
 
-        if (!buildingDataQualityAttribute.getAppearanceSrcDesc().isEmpty()) {
-            valueJoiner.join(buildingDataQualityAttribute.getAppearanceSrcDesc(), Code::getValue, Code::getCodeSpace);
+        if (!buildingDataQualityAttribute.getSrcScale().isEmpty()) {
+            valueJoiner.join(buildingDataQualityAttribute.getSrcScale(), Code::getValue, Code::getCodeSpace);
             ps.setString(2, valueJoiner.result(0));
             ps.setString(3, valueJoiner.result(1));
         } else {
@@ -85,42 +82,40 @@ public class BuildingDataQualityAttributeImporter implements UrbanObjectModuleIm
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (buildingDataQualityAttribute.getLod1HeightType() != null && buildingDataQualityAttribute.getLod1HeightType().isSetValue()) {
-            ps.setString(6, buildingDataQualityAttribute.getLod1HeightType().getValue());
-            ps.setString(7, buildingDataQualityAttribute.getLod1HeightType().getCodeSpace());
+        if (!buildingDataQualityAttribute.getThematicSrcDesc().isEmpty()) {
+            valueJoiner.join(buildingDataQualityAttribute.getThematicSrcDesc(), Code::getValue, Code::getCodeSpace);
+            ps.setString(6, valueJoiner.result(0));
+            ps.setString(7, valueJoiner.result(1));
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
         }
 
-        if (!buildingDataQualityAttribute.getLodType().isEmpty())
-            ps.setString(8, valueJoiner.join(buildingDataQualityAttribute.getLodType()));
-        else
+        if (!buildingDataQualityAttribute.getAppearanceSrcDesc().isEmpty()) {
+            valueJoiner.join(buildingDataQualityAttribute.getAppearanceSrcDesc(), Code::getValue, Code::getCodeSpace);
+            ps.setString(8, valueJoiner.result(0));
+            ps.setString(9, valueJoiner.result(1));
+        } else {
             ps.setNull(8, Types.VARCHAR);
-
-        if (!buildingDataQualityAttribute.getSrcScale().isEmpty()) {
-            valueJoiner.join(buildingDataQualityAttribute.getSrcScale(), Code::getValue, Code::getCodeSpace);
-            ps.setString(9, valueJoiner.result(0));
-            ps.setString(10, valueJoiner.result(1));
-        } else {
             ps.setNull(9, Types.VARCHAR);
-            ps.setNull(10, Types.VARCHAR);
         }
 
-        if (!buildingDataQualityAttribute.getThematicSrcDesc().isEmpty()) {
-            valueJoiner.join(buildingDataQualityAttribute.getThematicSrcDesc(), Code::getValue, Code::getCodeSpace);
-            ps.setString(11, valueJoiner.result(0));
-            ps.setString(12, valueJoiner.result(1));
+        if (buildingDataQualityAttribute.getLod1HeightType() != null && buildingDataQualityAttribute.getLod1HeightType().isSetValue()) {
+            ps.setString(10, buildingDataQualityAttribute.getLod1HeightType().getValue());
+            ps.setString(11, buildingDataQualityAttribute.getLod1HeightType().getCodeSpace());
         } else {
+            ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
-            ps.setNull(12, Types.VARCHAR);
         }
+
+        if (!buildingDataQualityAttribute.getLodType().isEmpty())
+            ps.setString(12, valueJoiner.join(buildingDataQualityAttribute.getLodType()));
+        else
+            ps.setNull(12, Types.VARCHAR);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDINGDATAQUALITYATT));
-
-        return objectId;
     }
 
     @Override

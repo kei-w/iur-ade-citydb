@@ -36,51 +36,52 @@ import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.uro.BuildingIDAttribute;
+import org.citygml4j.ade.iur.model.uro.ConstructionRiskAssessmentAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
+
+import java.time.Year;
 
 import java.sql.*;
 
-public class BuildingIDAttributeExporter implements UrbanObjectModuleExporter {
+public class ConstructionRiskAssessmentAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
 
-    public BuildingIDAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGIDATTRIBUTE);
+    public ConstructionRiskAssessmentAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.CONSTRUCTIONRISKASSESS);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("branchid", "buildingid", "city", "city_codespace", "partid", "prefecture", "prefecture_codespace"))
+        Select select = new Select().addProjection(table.getColumns("surveyyear", "risktype", "risktype_codespace", "status", "status_codespace", "referencedate"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
     }
 
-    public void doExport(BuildingIDAttribute buildingIDAttribute, long objectId) throws CityGMLExportException, SQLException {
+    public void doExport(ConstructionRiskAssessmentAttribute constructionRiskAssessmentAttribute, long objectId) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                int branchID = rs.getInt("branchid");
+                Date surveyYear = rs.getDate("surveyyear");
                 if (!rs.wasNull())
-                    buildingIDAttribute.setBranchID(branchID);
+                    constructionRiskAssessmentAttribute.setSurveyYear(Year.of(surveyYear.toLocalDate().getYear()));
 
-                buildingIDAttribute.setBuildingID(rs.getString("buildingid"));
-
-                String city = rs.getString("city");
+                String riskType = rs.getString("risktype");
                 if (!rs.wasNull()) {
-                    Code code = new Code(city);
-                    code.setCodeSpace(rs.getString("city_codespace"));
-                    buildingIDAttribute.setCity(code);
+                    Code code = new Code(riskType);
+                    code.setCodeSpace(rs.getString("risktype_codespace"));
+                    constructionRiskAssessmentAttribute.setRiskType(code);
                 }
 
-                int partID = rs.getInt("partid");
-                if (!rs.wasNull())
-                    buildingIDAttribute.setPartID(partID);
-
-                String prefecture = rs.getString("prefecture");
+                String status = rs.getString("status");
                 if (!rs.wasNull()) {
-                    Code code = new Code(prefecture);
-                    code.setCodeSpace(rs.getString("prefecture_codespace"));
-                    buildingIDAttribute.setPrefecture(code);
+                    Code code = new Code(status);
+                    code.setCodeSpace(rs.getString("status_codespace"));
+                    constructionRiskAssessmentAttribute.setStatus(code);
                 }
+
+                Date referenceDate = rs.getDate("referencedate");
+                if (!rs.wasNull())
+                    constructionRiskAssessmentAttribute.setReferenceDate(referenceDate.toLocalDate());
             }
         }
     }
