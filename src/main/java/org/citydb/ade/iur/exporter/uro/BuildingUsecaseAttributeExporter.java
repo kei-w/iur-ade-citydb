@@ -49,9 +49,10 @@ public class BuildingUsecaseAttributeExporter implements UrbanObjectModuleExport
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGUSECASEATTRIBU);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("floorheight", "floorheight_uom", "isgroundflooropen", "istemporal", "istemporal_codespace"))
+        Select select = new Select().addProjection(table.getColumns("istemporal", "istemporal_codespace", "floorheight", "floorheight_uom", "isgroundflooropen"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
     }
 
     public void doExport(BuildingUsecaseAttribute buildingUsecaseAttribute, long objectId) throws CityGMLExportException, SQLException {
@@ -59,6 +60,13 @@ public class BuildingUsecaseAttributeExporter implements UrbanObjectModuleExport
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
+                String isTemporal = rs.getString("istemporal");
+                if (!rs.wasNull()) {
+                    Code code = new Code(isTemporal);
+                    code.setCodeSpace(rs.getString("istemporal_codespace"));
+                    buildingUsecaseAttribute.setIsTemporal(code);
+                }
+
                 double floorHeight = rs.getDouble("floorheight");
                 if (!rs.wasNull()) {
                     Length length = new Length(floorHeight);
@@ -69,13 +77,6 @@ public class BuildingUsecaseAttributeExporter implements UrbanObjectModuleExport
                 boolean isGroundFloorOpen = rs.getBoolean("isgroundflooropen");
                 if (!rs.wasNull())
                     buildingUsecaseAttribute.setIsGroundFloorOpen(isGroundFloorOpen);
-
-                String isTemporal = rs.getString("istemporal");
-                if (!rs.wasNull()) {
-                    Code code = new Code(isTemporal);
-                    code.setCodeSpace(rs.getString("istemporal_codespace"));
-                    buildingUsecaseAttribute.setIsTemporal(code);
-                }
             }
         }
     }

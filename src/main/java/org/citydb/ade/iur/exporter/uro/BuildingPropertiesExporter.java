@@ -42,42 +42,44 @@ import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
 import org.citygml4j.ade.iur.model.uro.*;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
     private final String module;
 
-    private final DataQualityAttributeExporter dataQualityAttributeExporter;
-    private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
-    private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
-    private final BuildingDetailAttributeExporter buildingDetailAttributeExporter;
     private final BuildingIDAttributeExporter buildingIDAttributeExporter;
+    private final BuildingDetailAttributeExporter buildingDetailAttributeExporter;
     private final LargeCustomerFacilityAttributeExporter largeCustomerFacilityAttributeExporter;
     private final DisasterRiskAttributeExporter disasterRiskAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final DataQualityAttributeExporter dataQualityAttributeExporter;
+    private final FacilityIdAttributeExporter facilityIdAttributeExporter;
+    private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
+    private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
 
     public BuildingPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDING);
         module = UrbanObjectModule.v3_1.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("bldgdataqualityattribute_id", "bldgrealestateidattribute_id",
-                        "bldgusecaseattribute_id", "buildingdetailattribute_id", "buildingidattribute_id", "largecustomerfacilityattr_id"))
+        Select select = new Select().addProjection(table.getColumns("buildingidattribute_id", "buildingdetailattribute_id", "largecustomerfacilityattr_id",
+                        "bldgdataqualityattribute_id", "bldgfacilityidattribute_id", "bldgfacilitytypeattribute_id",
+                        "bldgrealestateidattribute_id", "bldgusecaseattribute_id"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
-        dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
-        realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
-        buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
-        buildingDetailAttributeExporter = manager.getExporter(BuildingDetailAttributeExporter.class);
         buildingIDAttributeExporter = manager.getExporter(BuildingIDAttributeExporter.class);
+        buildingDetailAttributeExporter = manager.getExporter(BuildingDetailAttributeExporter.class);
         largeCustomerFacilityAttributeExporter = manager.getExporter(LargeCustomerFacilityAttributeExporter.class);
         disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
+        dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
+        facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
+        facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
+        buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
     }
 
     public void doExport(AbstractBuilding parent, long parentId, FeatureType parentType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -112,36 +114,62 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
 
-                if (projectionFilter.containsProperty("bldgDisasterRiskAttribute", module))
-                    disasterRiskAttributeExporter.doExport(parent, parentId);
+                if (projectionFilter.containsProperty("bldgDisasterRiskAttribute", module)) {
+                    for (DisasterRiskAttribute bldgDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "building_bldgdisasterrisk_id")) {
+                        BldgDisasterRiskAttributePropertyElement property = new BldgDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(bldgDisasterRiskAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
+                }
 
-                if (projectionFilter.containsProperty("bldgKeyValuePairAttribute", module))
-                    keyValuePairAttributeExporter.doExport(parent, parentId);
+                if (projectionFilter.containsProperty("bldgKeyValuePairAttribute", module)) {
+                    for (KeyValuePairAttribute bldgKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "building_bldgkeyvaluepair_id")) {
+                        BldgKeyValuePairAttributePropertyElement property = new BldgKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(bldgKeyValuePairAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
+                }
 
-                long dataQualityAttributeId = rs.getLong("bldgdataqualityattribute_id");
-                if (dataQualityAttributeId != 0 && projectionFilter.containsProperty("bldgDataQualityAttribute", module)) {
-                    DataQualityAttribute dataQualityAttribute = new DataQualityAttribute();
-                    dataQualityAttributeExporter.doExport(dataQualityAttribute, dataQualityAttributeId);
+                long bldgDataQualityAttributeId = rs.getLong("bldgdataqualityattribute_id");
+                if (bldgDataQualityAttributeId != 0 && projectionFilter.containsProperty("bldgDataQualityAttribute", module)) {
+                    DataQualityAttribute bldgDataQualityAttribute = new DataQualityAttribute();
+                    dataQualityAttributeExporter.doExport(bldgDataQualityAttribute, bldgDataQualityAttributeId);
 
-                    BldgDataQualityAttributePropertyElement property = new BldgDataQualityAttributePropertyElement(new DataQualityAttributeProperty(dataQualityAttribute));
+                    BldgDataQualityAttributePropertyElement property = new BldgDataQualityAttributePropertyElement(new DataQualityAttributeProperty(bldgDataQualityAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
 
-                long realEstateIDAttributeId = rs.getLong("bldgrealestateidattribute_id");
-                if (realEstateIDAttributeId != 0 && projectionFilter.containsProperty("bldgRealEstateIDAttribute", module)) {
-                    RealEstateIDAttribute realEstateIDAttribute = new RealEstateIDAttribute();
-                    realEstateIDAttributeExporter.doExport(realEstateIDAttribute, realEstateIDAttributeId);
+                long bldgFacilityIdAttributeId = rs.getLong("bldgfacilityidattribute_id");
+                if (bldgFacilityIdAttributeId != 0 && projectionFilter.containsProperty("bldgFacilityIdAttribute", module)) {
+                    FacilityIdAttribute bldgFacilityIdAttribute = facilityIdAttributeExporter.doExport(bldgFacilityIdAttributeId);
+                    if (bldgFacilityIdAttribute != null) {
+                        BldgFacilityIdAttributePropertyElement property = new BldgFacilityIdAttributePropertyElement(new FacilityIdAttributeProperty(bldgFacilityIdAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
+                }
 
-                    BldgRealEstateIDAttributePropertyElement property = new BldgRealEstateIDAttributePropertyElement(new RealEstateIDAttributeProperty(realEstateIDAttribute));
+                long bldgFacilityTypeAttributeId = rs.getLong("bldgfacilitytypeattribute_id");
+                if (bldgFacilityTypeAttributeId != 0 && projectionFilter.containsProperty("bldgFacilityTypeAttribute", module)) {
+                    FacilityTypeAttribute bldgFacilityTypeAttribute = new FacilityTypeAttribute();
+                    facilityTypeAttributeExporter.doExport(bldgFacilityTypeAttribute, bldgFacilityTypeAttributeId);
+
+                    BldgFacilityTypeAttributePropertyElement property = new BldgFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(bldgFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
 
-                long buildingUsecaseAttributeId = rs.getLong("bldgusecaseattribute_id");
-                if (buildingUsecaseAttributeId != 0 && projectionFilter.containsProperty("bldgUsecaseAttribute", module)) {
-                    BuildingUsecaseAttribute buildingUsecaseAttribute = new BuildingUsecaseAttribute();
-                    buildingUsecaseAttributeExporter.doExport(buildingUsecaseAttribute, buildingUsecaseAttributeId);
+                long bldgRealEstateIDAttributeId = rs.getLong("bldgrealestateidattribute_id");
+                if (bldgRealEstateIDAttributeId != 0 && projectionFilter.containsProperty("bldgRealEstateIDAttribute", module)) {
+                    RealEstateIDAttribute bldgRealEstateIDAttribute = new RealEstateIDAttribute();
+                    realEstateIDAttributeExporter.doExport(bldgRealEstateIDAttribute, bldgRealEstateIDAttributeId);
 
-                    BldgUsecaseAttributePropertyElement property = new BldgUsecaseAttributePropertyElement(new BuildingUsecaseAttributeProperty(buildingUsecaseAttribute));
+                    BldgRealEstateIDAttributePropertyElement property = new BldgRealEstateIDAttributePropertyElement(new RealEstateIDAttributeProperty(bldgRealEstateIDAttribute));
+                    parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                }
+
+                long bldgUsecaseAttributeId = rs.getLong("bldgusecaseattribute_id");
+                if (bldgUsecaseAttributeId != 0 && projectionFilter.containsProperty("bldgUsecaseAttribute", module)) {
+                    BuildingUsecaseAttribute bldgUsecaseAttribute = new BuildingUsecaseAttribute();
+                    buildingUsecaseAttributeExporter.doExport(bldgUsecaseAttribute, bldgUsecaseAttributeId);
+
+                    BldgUsecaseAttributePropertyElement property = new BldgUsecaseAttributePropertyElement(new BuildingUsecaseAttributeProperty(bldgUsecaseAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
             }

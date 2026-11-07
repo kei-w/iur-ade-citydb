@@ -54,12 +54,12 @@ public class PublicSurveyDataQualityAttributeImporter implements UrbanObjectModu
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PUBLICSURVEYDATAQUALIT)) + " " +
-                "(id, publicsurveysrcdesclod0, publicsurveysrcdes_codespace, publicsurveysrcdesclod1, " +
-                "publicsurveysrcd_codespace_1, publicsurveysrcdesclod2, publicsurveysrcd_codespace_2, " +
-                "publicsurveysrcdesclod3, publicsurveysrcd_codespace_3, publicsurveysrcdesclod4, " +
-                "publicsurveysrcd_codespace_4, srcscalelod0, srcscalelod0_codespace, srcscalelod1, " +
-                "srcscalelod1_codespace, srcscalelod2, srcscalelod2_codespace, srcscalelod3, srcscalelod3_codespace, " +
-                "srcscalelod4, srcscalelod4_codespace) " +
+                "(id, srcscalelod0, srcscalelod0_codespace, srcscalelod1, srcscalelod1_codespace, srcscalelod2," +
+                "srcscalelod2_codespace, srcscalelod3, srcscalelod3_codespace, srcscalelod4, srcscalelod4_codespace," +
+                "publicsurveysrcdesclod0, publicsurveysrcdes_codespace, publicsurveysrcdesclod1," +
+                "publicsurveysrcd_codespace_1, publicsurveysrcdesclod2, publicsurveysrcd_codespace_2," +
+                "publicsurveysrcdesclod3, publicsurveysrcd_codespace_3, publicsurveysrcdesclod4," +
+                "publicsurveysrcd_codespace_4) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         valueJoiner = helper.getAttributeValueJoiner();
@@ -69,86 +69,86 @@ public class PublicSurveyDataQualityAttributeImporter implements UrbanObjectModu
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.PUBLICSURVEYDATAQU_SEQ));
         ps.setLong(1, objectId);
 
-        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0().isEmpty()) {
-            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0(), Code::getValue, Code::getCodeSpace);
-            ps.setString(2, valueJoiner.result(0));
-            ps.setString(3, valueJoiner.result(1));
+        if (publicSurveyDataQualityAttribute.getSrcScaleLod0() != null && publicSurveyDataQualityAttribute.getSrcScaleLod0().isSetValue()) {
+            ps.setString(2, publicSurveyDataQualityAttribute.getSrcScaleLod0().getValue());
+            ps.setString(3, publicSurveyDataQualityAttribute.getSrcScaleLod0().getCodeSpace());
         } else {
             ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1().isEmpty()) {
-            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1(), Code::getValue, Code::getCodeSpace);
-            ps.setString(4, valueJoiner.result(0));
-            ps.setString(5, valueJoiner.result(1));
+        if (publicSurveyDataQualityAttribute.getSrcScaleLod1() != null && publicSurveyDataQualityAttribute.getSrcScaleLod1().isSetValue()) {
+            ps.setString(4, publicSurveyDataQualityAttribute.getSrcScaleLod1().getValue());
+            ps.setString(5, publicSurveyDataQualityAttribute.getSrcScaleLod1().getCodeSpace());
         } else {
             ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2().isEmpty()) {
-            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2(), Code::getValue, Code::getCodeSpace);
-            ps.setString(6, valueJoiner.result(0));
-            ps.setString(7, valueJoiner.result(1));
+        if (publicSurveyDataQualityAttribute.getSrcScaleLod2() != null && publicSurveyDataQualityAttribute.getSrcScaleLod2().isSetValue()) {
+            ps.setString(6, publicSurveyDataQualityAttribute.getSrcScaleLod2().getValue());
+            ps.setString(7, publicSurveyDataQualityAttribute.getSrcScaleLod2().getCodeSpace());
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
         }
 
-        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3().isEmpty()) {
-            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3(), Code::getValue, Code::getCodeSpace);
-            ps.setString(8, valueJoiner.result(0));
-            ps.setString(9, valueJoiner.result(1));
+        if (publicSurveyDataQualityAttribute.getSrcScaleLod3() != null && publicSurveyDataQualityAttribute.getSrcScaleLod3().isSetValue()) {
+            ps.setString(8, publicSurveyDataQualityAttribute.getSrcScaleLod3().getValue());
+            ps.setString(9, publicSurveyDataQualityAttribute.getSrcScaleLod3().getCodeSpace());
         } else {
             ps.setNull(8, Types.VARCHAR);
             ps.setNull(9, Types.VARCHAR);
         }
 
-        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4().isEmpty()) {
-            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4(), Code::getValue, Code::getCodeSpace);
-            ps.setString(10, valueJoiner.result(0));
-            ps.setString(11, valueJoiner.result(1));
+        if (publicSurveyDataQualityAttribute.getSrcScaleLod4() != null && publicSurveyDataQualityAttribute.getSrcScaleLod4().isSetValue()) {
+            ps.setString(10, publicSurveyDataQualityAttribute.getSrcScaleLod4().getValue());
+            ps.setString(11, publicSurveyDataQualityAttribute.getSrcScaleLod4().getCodeSpace());
         } else {
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
         }
 
-        if (publicSurveyDataQualityAttribute.getSrcScaleLod0() != null && publicSurveyDataQualityAttribute.getSrcScaleLod0().isSetValue()) {
-            ps.setString(12, publicSurveyDataQualityAttribute.getSrcScaleLod0().getValue());
-            ps.setString(13, publicSurveyDataQualityAttribute.getSrcScaleLod0().getCodeSpace());
+        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0().isEmpty()) {
+            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0(), Code::getValue, Code::getCodeSpace);
+            ps.setString(12, valueJoiner.result(0));
+            ps.setString(13, valueJoiner.result(1));
         } else {
             ps.setNull(12, Types.VARCHAR);
             ps.setNull(13, Types.VARCHAR);
         }
 
-        if (publicSurveyDataQualityAttribute.getSrcScaleLod1() != null && publicSurveyDataQualityAttribute.getSrcScaleLod1().isSetValue()) {
-            ps.setString(14, publicSurveyDataQualityAttribute.getSrcScaleLod1().getValue());
-            ps.setString(15, publicSurveyDataQualityAttribute.getSrcScaleLod1().getCodeSpace());
+        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1().isEmpty()) {
+            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1(), Code::getValue, Code::getCodeSpace);
+            ps.setString(14, valueJoiner.result(0));
+            ps.setString(15, valueJoiner.result(1));
         } else {
             ps.setNull(14, Types.VARCHAR);
             ps.setNull(15, Types.VARCHAR);
         }
 
-        if (publicSurveyDataQualityAttribute.getSrcScaleLod2() != null && publicSurveyDataQualityAttribute.getSrcScaleLod2().isSetValue()) {
-            ps.setString(16, publicSurveyDataQualityAttribute.getSrcScaleLod2().getValue());
-            ps.setString(17, publicSurveyDataQualityAttribute.getSrcScaleLod2().getCodeSpace());
+        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2().isEmpty()) {
+            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2(), Code::getValue, Code::getCodeSpace);
+            ps.setString(16, valueJoiner.result(0));
+            ps.setString(17, valueJoiner.result(1));
         } else {
             ps.setNull(16, Types.VARCHAR);
             ps.setNull(17, Types.VARCHAR);
         }
 
-        if (publicSurveyDataQualityAttribute.getSrcScaleLod3() != null && publicSurveyDataQualityAttribute.getSrcScaleLod3().isSetValue()) {
-            ps.setString(18, publicSurveyDataQualityAttribute.getSrcScaleLod3().getValue());
-            ps.setString(19, publicSurveyDataQualityAttribute.getSrcScaleLod3().getCodeSpace());
+        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3().isEmpty()) {
+            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3(), Code::getValue, Code::getCodeSpace);
+            ps.setString(18, valueJoiner.result(0));
+            ps.setString(19, valueJoiner.result(1));
         } else {
             ps.setNull(18, Types.VARCHAR);
             ps.setNull(19, Types.VARCHAR);
         }
 
-        if (publicSurveyDataQualityAttribute.getSrcScaleLod4() != null && publicSurveyDataQualityAttribute.getSrcScaleLod4().isSetValue()) {
-            ps.setString(20, publicSurveyDataQualityAttribute.getSrcScaleLod4().getValue());
-            ps.setString(21, publicSurveyDataQualityAttribute.getSrcScaleLod4().getCodeSpace());
+        if (!publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4().isEmpty()) {
+            valueJoiner.join(publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4(), Code::getValue, Code::getCodeSpace);
+            ps.setString(20, valueJoiner.result(0));
+            ps.setString(21, valueJoiner.result(1));
         } else {
             ps.setNull(20, Types.VARCHAR);
             ps.setNull(21, Types.VARCHAR);

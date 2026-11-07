@@ -764,7 +764,7 @@
             <attribute column="urbanplanningareaname" type="string" maxOccurs="1" path="urbanPlanningAreaName" schema="ur_1"/>
             <attribute column="enforcer" type="string" path="enforcer" schema="ur_1"/>
             <attribute column="dateofdecision" type="timestamp" maxOccurs="1" path="dateOfDecision" schema="ur_1"/>
-            <attribute column="dateofrevision" type="timestamp" path="dateOfRevision" schema="ur_1"/>
+            <attribute column="dateofrevision" type="string" path="dateOfRevision" schema="ur_1"/>
             <complexAttribute maxOccurs="1" path="areaPlanned" schema="ur_1">
                 <attribute column="areaplanned_uom" type="string" path="@uom" schema="gml"/>
                 <attribute column="areaplanned" type="double" path="." schema="ur_1"/>

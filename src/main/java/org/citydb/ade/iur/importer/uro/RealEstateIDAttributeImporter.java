@@ -53,8 +53,8 @@ public class RealEstateIDAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.REALESTATEIDATTRIBUTE)) + " " +
-                "(id, matchingscore, numberofbuildingunitownershi, numberofrealestateidofland, " +
-                "realestateidofbuilding, realestateidofbuildingunitow, realestateidofland) " +
+                "(id, realestateidofbuilding, numberofbuildingunitownershi, realestateidofbuildingunitow," +
+                "numberofrealestateidofland, realestateidofland, matchingscore) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
@@ -65,32 +65,32 @@ public class RealEstateIDAttributeImporter implements UrbanObjectModuleImporter 
         long objectId = buildingAttributeImporter.doImport(realEstateIDAttribute);
         ps.setLong(1, objectId);
 
-        if (realEstateIDAttribute.getMatchingScore() != null)
-            ps.setInt(2, realEstateIDAttribute.getMatchingScore());
-        else
-            ps.setNull(2, Types.INTEGER);
+        ps.setString(2, realEstateIDAttribute.getRealEstateIDOfBuilding());
 
         if (realEstateIDAttribute.getNumberOfBuildingUnitOwnership() != null)
             ps.setInt(3, realEstateIDAttribute.getNumberOfBuildingUnitOwnership());
         else
             ps.setNull(3, Types.INTEGER);
 
-        if (realEstateIDAttribute.getNumberOfRealEstateIDOfLand() != null)
-            ps.setInt(4, realEstateIDAttribute.getNumberOfRealEstateIDOfLand());
-        else
-            ps.setNull(4, Types.INTEGER);
-
-        ps.setString(5, realEstateIDAttribute.getRealEstateIDOfBuilding());
-
         if (!realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership().isEmpty())
-            ps.setString(6, valueJoiner.join(realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership()));
+            ps.setString(4, valueJoiner.join(realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership()));
+        else
+            ps.setNull(4, Types.VARCHAR);
+
+        if (realEstateIDAttribute.getNumberOfRealEstateIDOfLand() != null)
+            ps.setInt(5, realEstateIDAttribute.getNumberOfRealEstateIDOfLand());
+        else
+            ps.setNull(5, Types.INTEGER);
+
+        if (!realEstateIDAttribute.getRealEstateIDOfLand().isEmpty())
+            ps.setString(6, valueJoiner.join(realEstateIDAttribute.getRealEstateIDOfLand()));
         else
             ps.setNull(6, Types.VARCHAR);
 
-        if (!realEstateIDAttribute.getRealEstateIDOfLand().isEmpty())
-            ps.setString(7, valueJoiner.join(realEstateIDAttribute.getRealEstateIDOfLand()));
+        if (realEstateIDAttribute.getMatchingScore() != null)
+            ps.setInt(7, realEstateIDAttribute.getMatchingScore());
         else
-            ps.setNull(7, Types.VARCHAR);
+            ps.setNull(7, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

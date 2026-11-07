@@ -50,7 +50,7 @@ public class RiverFloodingRiskAttributeImporter implements UrbanObjectModuleImpo
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.RIVERFLOODINGRISKATTRI)) + " " +
-                "(id, admintype, admintype_codespace, duration, duration_uom, scale, scale_codespace) " +
+                "(id, admintype, admintype_codespace, scale, scale_codespace, duration, duration_uom) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
     }
 
@@ -65,19 +65,19 @@ public class RiverFloodingRiskAttributeImporter implements UrbanObjectModuleImpo
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (riverFloodingRiskAttribute.getDuration() != null && riverFloodingRiskAttribute.getDuration().isSetValue()) {
-            ps.setDouble(4, riverFloodingRiskAttribute.getDuration().getValue());
-            ps.setString(5, riverFloodingRiskAttribute.getDuration().getUom());
+        if (riverFloodingRiskAttribute.getScale() != null && riverFloodingRiskAttribute.getScale().isSetValue()) {
+            ps.setString(4, riverFloodingRiskAttribute.getScale().getValue());
+            ps.setString(5, riverFloodingRiskAttribute.getScale().getCodeSpace());
         } else {
-            ps.setNull(4, Types.DOUBLE);
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (riverFloodingRiskAttribute.getScale() != null && riverFloodingRiskAttribute.getScale().isSetValue()) {
-            ps.setString(6, riverFloodingRiskAttribute.getScale().getValue());
-            ps.setString(7, riverFloodingRiskAttribute.getScale().getCodeSpace());
+        if (riverFloodingRiskAttribute.getDuration() != null && riverFloodingRiskAttribute.getDuration().isSetValue()) {
+            ps.setDouble(6, riverFloodingRiskAttribute.getDuration().getValue());
+            ps.setString(7, riverFloodingRiskAttribute.getDuration().getUom());
         } else {
-            ps.setNull(6, Types.VARCHAR);
+            ps.setNull(6, Types.DOUBLE);
             ps.setNull(7, Types.VARCHAR);
         }
 

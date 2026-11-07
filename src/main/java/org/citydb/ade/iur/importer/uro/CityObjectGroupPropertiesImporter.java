@@ -35,12 +35,12 @@ import org.citydb.core.ade.importer.ADEPropertyCollection;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.uro.FiscalYearOfPublicationProperty;
-import org.citygml4j.ade.iur.model.uro.LanguageProperty;
+import org.citygml4j.ade.iur.model.uro.*;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 
-import java.sql.*;
 import java.time.LocalDate;
+
+import java.sql.*;
 
 public class CityObjectGroupPropertiesImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
@@ -54,9 +54,10 @@ public class CityObjectGroupPropertiesImporter implements UrbanObjectModuleImpor
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2)) + " " +
                 "(id, fiscalyearofpublication, language, language_codespace) " +
                 "values (?, ?, ?, ?)");
+
     }
 
     public void doImport(ADEPropertyCollection properties, CityObjectGroup parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -79,7 +80,7 @@ public class CityObjectGroupPropertiesImporter implements UrbanObjectModuleImpor
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2));
     }
 
     @Override

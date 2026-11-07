@@ -51,29 +51,67 @@ public class KeyValuePairAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE)) + " " +
-                "(id, building_bldgkeyvaluepair_id, codevalue, codevalue_codespace, key, key_codespace) " +
-                "values (?, ?, ?, ?, ?, ?)");
+                "(id, bridge_bridkeyvaluepairat_id, building_bldgkeyvaluepair_id, city_furniture_frnkeyvalu_id," +
+                "land_use_lusekeyvaluepair_id, relief_feature_demkeyvalu_id, transpor_complex_trankeyv_id," +
+                "tunnel_tunkeyvaluepairatt_id, cityobject_vegkeyvaluepai_id, waterbody_wtrkeyvaluepair_id, key," +
+                "key_codespace, codevalue, codevalue_codespace) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(KeyValuePairAttribute keyValuePair, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(KeyValuePairAttribute keyValuePairAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.KEYVALUEPAIRATTRIB_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
+        if ("bridge_bridkeyvaluepairat_id".equals(parentColumn))
+            ps.setLong(2, parentId);
+        else
+            ps.setNull(2, Types.NULL);
+        if ("building_bldgkeyvaluepair_id".equals(parentColumn))
+            ps.setLong(3, parentId);
+        else
+            ps.setNull(3, Types.NULL);
+        if ("city_furniture_frnkeyvalu_id".equals(parentColumn))
+            ps.setLong(4, parentId);
+        else
+            ps.setNull(4, Types.NULL);
+        if ("land_use_lusekeyvaluepair_id".equals(parentColumn))
+            ps.setLong(5, parentId);
+        else
+            ps.setNull(5, Types.NULL);
+        if ("relief_feature_demkeyvalu_id".equals(parentColumn))
+            ps.setLong(6, parentId);
+        else
+            ps.setNull(6, Types.NULL);
+        if ("transpor_complex_trankeyv_id".equals(parentColumn))
+            ps.setLong(7, parentId);
+        else
+            ps.setNull(7, Types.NULL);
+        if ("tunnel_tunkeyvaluepairatt_id".equals(parentColumn))
+            ps.setLong(8, parentId);
+        else
+            ps.setNull(8, Types.NULL);
+        if ("cityobject_vegkeyvaluepai_id".equals(parentColumn))
+            ps.setLong(9, parentId);
+        else
+            ps.setNull(9, Types.NULL);
+        if ("waterbody_wtrkeyvaluepair_id".equals(parentColumn))
+            ps.setLong(10, parentId);
+        else
+            ps.setNull(10, Types.NULL);
 
-        if (keyValuePair.getCodeValue() != null && keyValuePair.getCodeValue().isSetValue()) {
-            ps.setString(3, keyValuePair.getCodeValue().getValue());
-            ps.setString(4, keyValuePair.getCodeValue().getCodeSpace());
+        if (keyValuePairAttribute.getKey() != null && keyValuePairAttribute.getKey().isSetValue()) {
+            ps.setString(11, keyValuePairAttribute.getKey().getValue());
+            ps.setString(12, keyValuePairAttribute.getKey().getCodeSpace());
         } else {
-            ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(11, Types.VARCHAR);
+            ps.setNull(12, Types.VARCHAR);
         }
 
-        if (keyValuePair.getKey() != null && keyValuePair.getKey().isSetValue()) {
-            ps.setString(5, keyValuePair.getKey().getValue());
-            ps.setString(6, keyValuePair.getKey().getCodeSpace());
+        if (keyValuePairAttribute.getCodeValue() != null && keyValuePairAttribute.getCodeValue().isSetValue()) {
+            ps.setString(13, keyValuePairAttribute.getCodeValue().getValue());
+            ps.setString(14, keyValuePairAttribute.getCodeValue().getCodeSpace());
         } else {
-            ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
+            ps.setNull(13, Types.VARCHAR);
+            ps.setNull(14, Types.VARCHAR);
         }
 
         ps.addBatch();

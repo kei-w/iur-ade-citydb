@@ -37,60 +37,65 @@ import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.uro.BldgKeyValuePairAttributePropertyElement;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
-import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributeProperty;
-import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import java.sql.*;
 
 public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement ps;
+    private final Map<String, PreparedStatement> psByParent = new HashMap<>();
 
     public KeyValuePairAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.KEYVALUEPAIRATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_bldgkeyvaluepair_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        ps = connection.prepareStatement(select.toString());
+        for (String parentColumn : Arrays.asList("bridge_bridkeyvaluepairat_id", "building_bldgkeyvaluepair_id", "city_furniture_frnkeyvalu_id", "land_use_lusekeyvaluepair_id", "relief_feature_demkeyvalu_id", "transpor_complex_trankeyv_id", "tunnel_tunkeyvaluepairatt_id", "cityobject_vegkeyvaluepai_id", "waterbody_wtrkeyvaluepair_id")) {
+            Select parentSelect = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace"))
+                    .addSelection(ComparisonFactory.equalTo(table.getColumn(parentColumn), new PlaceHolder<>()))
+                    .addOrderBy(new OrderByToken(table.getColumn("id")));
+            psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
+        }
+
     }
 
-    public void doExport(AbstractBuilding parent, long parentId) throws CityGMLExportException, SQLException {
+    public List<KeyValuePairAttribute> doExport(long parentId, String parentColumn) throws CityGMLExportException, SQLException {
+        PreparedStatement ps = psByParent.get(parentColumn);
         ps.setLong(1, parentId);
 
+        List<KeyValuePairAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                KeyValuePairAttribute keyValuePair = new KeyValuePairAttribute();
-
+                KeyValuePairAttribute keyValuePairAttribute = new KeyValuePairAttribute();
                 String key = rs.getString("key");
                 if (!rs.wasNull()) {
                     Code code = new Code(key);
                     code.setCodeSpace(rs.getString("key_codespace"));
-                    keyValuePair.setKey(code);
-                } else
-                    continue;
+                    keyValuePairAttribute.setKey(code);
+                }
 
                 String codeValue = rs.getString("codevalue");
                 if (!rs.wasNull()) {
                     Code code = new Code(codeValue);
                     code.setCodeSpace(rs.getString("codevalue_codespace"));
-                    keyValuePair.setCodeValue(code);
+                    keyValuePairAttribute.setCodeValue(code);
                 }
 
-                BldgKeyValuePairAttributePropertyElement property = new BldgKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePair));
-                parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                result.add(keyValuePairAttribute);
             }
         }
+
+        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        ps.close();
+        for (PreparedStatement ps : psByParent.values())
+            ps.close();
     }
 }

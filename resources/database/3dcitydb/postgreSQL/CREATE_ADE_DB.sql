@@ -3721,7 +3721,7 @@ CREATE TABLE ur_squareurbanplanattribu
     city VARCHAR(1000),
     city_codespace VARCHAR(1000),
     dateofdecision TIMESTAMP WITH TIME ZONE,
-    dateofrevision TIMESTAMP WITH TIME ZONE,
+    dateofrevision VARCHAR(1000),
     enforcer VARCHAR(1000),
     isauthorized NUMERIC,
     iscompleted NUMERIC,

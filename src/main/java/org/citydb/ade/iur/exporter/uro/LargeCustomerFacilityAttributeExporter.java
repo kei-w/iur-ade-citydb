@@ -42,8 +42,9 @@ import org.citygml4j.ade.iur.model.uro.LargeCustomerFacilityAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
 
-import java.sql.*;
 import java.time.Year;
+
+import java.sql.*;
 
 public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
@@ -53,11 +54,11 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LARGECUSTOMERFACILITYA);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("areaclassificationtype", "areaclassification_codespace", "availability", "capacity", "class",
-                        "class_codespace", "districtsandzonestype", "districtsandzonest_codespace", "inauguraldate",
-                        "keytenants", "landusetype", "landusetype_codespace", "name", "note", "owner", "reference",
-                        "surveyyear", "totalfloorarea", "totalfloorarea_uom", "totalstorefloorarea",
-                        "totalstorefloorarea_uom", "urbanplantype", "urbanplantype_codespace", "yearclosed", "yearopened"))
+        Select select = new Select().addProjection(table.getColumns("class", "class_codespace", "name", "capacity", "owner", "totalfloorarea", "totalfloorarea_uom",
+                        "totalstorefloorarea", "totalstorefloorarea_uom", "inauguraldate", "yearopened", "yearclosed",
+                        "keytenants", "availability", "urbanplantype", "urbanplantype_codespace", "areaclassificationtype",
+                        "areaclassification_codespace", "districtsandzonestype", "districtsandzonest_codespace",
+                        "landusetype", "landusetype_codespace", "reference", "note", "surveyyear"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -69,21 +70,6 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                String areaClassificationType = rs.getString("areaclassificationtype");
-                if (!rs.wasNull()) {
-                    Code code = new Code(areaClassificationType);
-                    code.setCodeSpace(rs.getString("areaclassification_codespace"));
-                    largeCustomerFacilityAttribute.setAreaClassificationType(code);
-                }
-
-                boolean availability = rs.getBoolean("availability");
-                if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setAvailability(availability);
-
-                int capacity = rs.getInt("capacity");
-                if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setCapacity(capacity);
-
                 String classifier = rs.getString("class");
                 if (!rs.wasNull()) {
                     Code code = new Code(classifier);
@@ -91,36 +77,13 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
                     largeCustomerFacilityAttribute.setClassifier(code);
                 }
 
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("districtsandzonestype"), rs.getString("districtsandzonest_codespace"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    largeCustomerFacilityAttribute.getDistrictsAndZonesType().add(code);
-                }
-
-                Date inauguralDate = rs.getDate("inauguraldate");
-                if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setInauguralDate(inauguralDate.toLocalDate());
-
-                largeCustomerFacilityAttribute.setKeyTenants(rs.getString("keytenants"));
-
-                String landUseType = rs.getString("landusetype");
-                if (!rs.wasNull()) {
-                    Code code = new Code(landUseType);
-                    code.setCodeSpace(rs.getString("landusetype_codespace"));
-                    largeCustomerFacilityAttribute.setLandUseType(code);
-                }
-
                 largeCustomerFacilityAttribute.setName(rs.getString("name"));
 
-                largeCustomerFacilityAttribute.setNote(rs.getString("note"));
+                int capacity = rs.getInt("capacity");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setCapacity(capacity);
 
                 largeCustomerFacilityAttribute.setOwner(rs.getString("owner"));
-
-                largeCustomerFacilityAttribute.setReference(rs.getString("reference"));
-
-                Date surveyYear = rs.getDate("surveyyear");
-                if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setSurveyYear(Year.of(surveyYear.toLocalDate().getYear()));
 
                 double totalFloorArea = rs.getDouble("totalfloorarea");
                 if (!rs.wasNull()) {
@@ -136,6 +99,24 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
                     largeCustomerFacilityAttribute.setTotalStoreFloorArea(measure);
                 }
 
+                Date inauguralDate = rs.getDate("inauguraldate");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setInauguralDate(inauguralDate.toLocalDate());
+
+                Date yearOpened = rs.getDate("yearopened");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setYearOpened(Year.of(yearOpened.toLocalDate().getYear()));
+
+                Date yearClosed = rs.getDate("yearclosed");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setYearClosed(Year.of(yearClosed.toLocalDate().getYear()));
+
+                largeCustomerFacilityAttribute.setKeyTenants(rs.getString("keytenants"));
+
+                boolean availability = rs.getBoolean("availability");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setAvailability(availability);
+
                 String urbanPlanType = rs.getString("urbanplantype");
                 if (!rs.wasNull()) {
                     Code code = new Code(urbanPlanType);
@@ -143,13 +124,33 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
                     largeCustomerFacilityAttribute.setUrbanPlanType(code);
                 }
 
-                Date yearClosed = rs.getDate("yearclosed");
-                if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setYearClosed(Year.of(yearClosed.toLocalDate().getYear()));
+                String areaClassificationType = rs.getString("areaclassificationtype");
+                if (!rs.wasNull()) {
+                    Code code = new Code(areaClassificationType);
+                    code.setCodeSpace(rs.getString("areaclassification_codespace"));
+                    largeCustomerFacilityAttribute.setAreaClassificationType(code);
+                }
 
-                Date yearOpened = rs.getDate("yearopened");
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("districtsandzonestype"), rs.getString("districtsandzonest_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    largeCustomerFacilityAttribute.getDistrictsAndZonesType().add(code);
+                }
+
+                String landUseType = rs.getString("landusetype");
+                if (!rs.wasNull()) {
+                    Code code = new Code(landUseType);
+                    code.setCodeSpace(rs.getString("landusetype_codespace"));
+                    largeCustomerFacilityAttribute.setLandUseType(code);
+                }
+
+                largeCustomerFacilityAttribute.setReference(rs.getString("reference"));
+
+                largeCustomerFacilityAttribute.setNote(rs.getString("note"));
+
+                Date surveyYear = rs.getDate("surveyyear");
                 if (!rs.wasNull())
-                    largeCustomerFacilityAttribute.setYearOpened(Year.of(yearOpened.toLocalDate().getYear()));
+                    largeCustomerFacilityAttribute.setSurveyYear(Year.of(surveyYear.toLocalDate().getYear()));
             }
         }
     }

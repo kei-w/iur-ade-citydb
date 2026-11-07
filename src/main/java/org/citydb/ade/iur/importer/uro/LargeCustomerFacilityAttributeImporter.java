@@ -55,11 +55,11 @@ public class LargeCustomerFacilityAttributeImporter implements UrbanObjectModule
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LARGECUSTOMERFACILITYA)) + " " +
-                "(id, areaclassificationtype, areaclassification_codespace, availability, capacity, class, " +
-                "class_codespace, districtsandzonestype, districtsandzonest_codespace, inauguraldate, keytenants, " +
-                "landusetype, landusetype_codespace, name, note, owner, reference, surveyyear, totalfloorarea, " +
-                "totalfloorarea_uom, totalstorefloorarea, totalstorefloorarea_uom, urbanplantype, " +
-                "urbanplantype_codespace, yearclosed, yearopened) " +
+                "(id, class, class_codespace, name, capacity, owner, totalfloorarea, totalfloorarea_uom," +
+                "totalstorefloorarea, totalstorefloorarea_uom, inauguraldate, yearopened, yearclosed, keytenants," +
+                "availability, urbanplantype, urbanplantype_codespace, areaclassificationtype," +
+                "areaclassification_codespace, districtsandzonestype, districtsandzonest_codespace, landusetype," +
+                "landusetype_codespace, reference, note, surveyyear) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
@@ -70,100 +70,100 @@ public class LargeCustomerFacilityAttributeImporter implements UrbanObjectModule
         long objectId = buildingAttributeImporter.doImport(largeCustomerFacilityAttribute);
         ps.setLong(1, objectId);
 
-        if (largeCustomerFacilityAttribute.getAreaClassificationType() != null && largeCustomerFacilityAttribute.getAreaClassificationType().isSetValue()) {
-            ps.setString(2, largeCustomerFacilityAttribute.getAreaClassificationType().getValue());
-            ps.setString(3, largeCustomerFacilityAttribute.getAreaClassificationType().getCodeSpace());
+        if (largeCustomerFacilityAttribute.getClassifier() != null && largeCustomerFacilityAttribute.getClassifier().isSetValue()) {
+            ps.setString(2, largeCustomerFacilityAttribute.getClassifier().getValue());
+            ps.setString(3, largeCustomerFacilityAttribute.getClassifier().getCodeSpace());
         } else {
             ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (largeCustomerFacilityAttribute.getAvailability() != null)
-            ps.setInt(4, largeCustomerFacilityAttribute.getAvailability() ? 1 : 0);
-        else
-            ps.setNull(4, Types.INTEGER);
+        ps.setString(4, largeCustomerFacilityAttribute.getName());
 
         if (largeCustomerFacilityAttribute.getCapacity() != null)
             ps.setInt(5, largeCustomerFacilityAttribute.getCapacity());
         else
             ps.setNull(5, Types.INTEGER);
 
-        if (largeCustomerFacilityAttribute.getClassifier() != null && largeCustomerFacilityAttribute.getClassifier().isSetValue()) {
-            ps.setString(6, largeCustomerFacilityAttribute.getClassifier().getValue());
-            ps.setString(7, largeCustomerFacilityAttribute.getClassifier().getCodeSpace());
+        ps.setString(6, largeCustomerFacilityAttribute.getOwner());
+
+        if (largeCustomerFacilityAttribute.getTotalFloorArea() != null && largeCustomerFacilityAttribute.getTotalFloorArea().isSetValue()) {
+            ps.setDouble(7, largeCustomerFacilityAttribute.getTotalFloorArea().getValue());
+            ps.setString(8, largeCustomerFacilityAttribute.getTotalFloorArea().getUom());
         } else {
-            ps.setNull(6, Types.VARCHAR);
-            ps.setNull(7, Types.VARCHAR);
+            ps.setNull(7, Types.DOUBLE);
+            ps.setNull(8, Types.VARCHAR);
+        }
+
+        if (largeCustomerFacilityAttribute.getTotalStoreFloorArea() != null && largeCustomerFacilityAttribute.getTotalStoreFloorArea().isSetValue()) {
+            ps.setDouble(9, largeCustomerFacilityAttribute.getTotalStoreFloorArea().getValue());
+            ps.setString(10, largeCustomerFacilityAttribute.getTotalStoreFloorArea().getUom());
+        } else {
+            ps.setNull(9, Types.DOUBLE);
+            ps.setNull(10, Types.VARCHAR);
+        }
+
+        if (largeCustomerFacilityAttribute.getInauguralDate() != null)
+            ps.setDate(11, Date.valueOf(largeCustomerFacilityAttribute.getInauguralDate()));
+        else
+            ps.setNull(11, Types.DATE);
+
+        if (largeCustomerFacilityAttribute.getYearOpened() != null)
+            ps.setDate(12, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearOpened().getValue(), 1, 1)));
+        else
+            ps.setNull(12, Types.DATE);
+
+        if (largeCustomerFacilityAttribute.getYearClosed() != null)
+            ps.setDate(13, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearClosed().getValue(), 1, 1)));
+        else
+            ps.setNull(13, Types.DATE);
+
+        ps.setString(14, largeCustomerFacilityAttribute.getKeyTenants());
+
+        if (largeCustomerFacilityAttribute.getAvailability() != null)
+            ps.setInt(15, largeCustomerFacilityAttribute.getAvailability() ? 1 : 0);
+        else
+            ps.setNull(15, Types.INTEGER);
+
+        if (largeCustomerFacilityAttribute.getUrbanPlanType() != null && largeCustomerFacilityAttribute.getUrbanPlanType().isSetValue()) {
+            ps.setString(16, largeCustomerFacilityAttribute.getUrbanPlanType().getValue());
+            ps.setString(17, largeCustomerFacilityAttribute.getUrbanPlanType().getCodeSpace());
+        } else {
+            ps.setNull(16, Types.VARCHAR);
+            ps.setNull(17, Types.VARCHAR);
+        }
+
+        if (largeCustomerFacilityAttribute.getAreaClassificationType() != null && largeCustomerFacilityAttribute.getAreaClassificationType().isSetValue()) {
+            ps.setString(18, largeCustomerFacilityAttribute.getAreaClassificationType().getValue());
+            ps.setString(19, largeCustomerFacilityAttribute.getAreaClassificationType().getCodeSpace());
+        } else {
+            ps.setNull(18, Types.VARCHAR);
+            ps.setNull(19, Types.VARCHAR);
         }
 
         if (!largeCustomerFacilityAttribute.getDistrictsAndZonesType().isEmpty()) {
             valueJoiner.join(largeCustomerFacilityAttribute.getDistrictsAndZonesType(), Code::getValue, Code::getCodeSpace);
-            ps.setString(8, valueJoiner.result(0));
-            ps.setString(9, valueJoiner.result(1));
+            ps.setString(20, valueJoiner.result(0));
+            ps.setString(21, valueJoiner.result(1));
         } else {
-            ps.setNull(8, Types.VARCHAR);
-            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(20, Types.VARCHAR);
+            ps.setNull(21, Types.VARCHAR);
         }
-
-        if (largeCustomerFacilityAttribute.getInauguralDate() != null)
-            ps.setDate(10, Date.valueOf(largeCustomerFacilityAttribute.getInauguralDate()));
-        else
-            ps.setNull(10, Types.DATE);
-
-        ps.setString(11, largeCustomerFacilityAttribute.getKeyTenants());
 
         if (largeCustomerFacilityAttribute.getLandUseType() != null && largeCustomerFacilityAttribute.getLandUseType().isSetValue()) {
-            ps.setString(12, largeCustomerFacilityAttribute.getLandUseType().getValue());
-            ps.setString(13, largeCustomerFacilityAttribute.getLandUseType().getCodeSpace());
+            ps.setString(22, largeCustomerFacilityAttribute.getLandUseType().getValue());
+            ps.setString(23, largeCustomerFacilityAttribute.getLandUseType().getCodeSpace());
         } else {
-            ps.setNull(12, Types.VARCHAR);
-            ps.setNull(13, Types.VARCHAR);
+            ps.setNull(22, Types.VARCHAR);
+            ps.setNull(23, Types.VARCHAR);
         }
 
-        ps.setString(14, largeCustomerFacilityAttribute.getName());
+        ps.setString(24, largeCustomerFacilityAttribute.getReference());
 
-        ps.setString(15, largeCustomerFacilityAttribute.getNote());
-
-        ps.setString(16, largeCustomerFacilityAttribute.getOwner());
-
-        ps.setString(17, largeCustomerFacilityAttribute.getReference());
+        ps.setString(25, largeCustomerFacilityAttribute.getNote());
 
         if (largeCustomerFacilityAttribute.getSurveyYear() != null)
-            ps.setDate(18, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getSurveyYear().getValue(), 1, 1)));
-        else
-            ps.setNull(18, Types.DATE);
-
-        if (largeCustomerFacilityAttribute.getTotalFloorArea() != null && largeCustomerFacilityAttribute.getTotalFloorArea().isSetValue()) {
-            ps.setDouble(19, largeCustomerFacilityAttribute.getTotalFloorArea().getValue());
-            ps.setString(20, largeCustomerFacilityAttribute.getTotalFloorArea().getUom());
-        } else {
-            ps.setNull(19, Types.DOUBLE);
-            ps.setNull(20, Types.VARCHAR);
-        }
-
-        if (largeCustomerFacilityAttribute.getTotalStoreFloorArea() != null && largeCustomerFacilityAttribute.getTotalStoreFloorArea().isSetValue()) {
-            ps.setDouble(21, largeCustomerFacilityAttribute.getTotalStoreFloorArea().getValue());
-            ps.setString(22, largeCustomerFacilityAttribute.getTotalStoreFloorArea().getUom());
-        } else {
-            ps.setNull(21, Types.DOUBLE);
-            ps.setNull(22, Types.VARCHAR);
-        }
-
-        if (largeCustomerFacilityAttribute.getUrbanPlanType() != null && largeCustomerFacilityAttribute.getUrbanPlanType().isSetValue()) {
-            ps.setString(23, largeCustomerFacilityAttribute.getUrbanPlanType().getValue());
-            ps.setString(24, largeCustomerFacilityAttribute.getUrbanPlanType().getCodeSpace());
-        } else {
-            ps.setNull(23, Types.VARCHAR);
-            ps.setNull(24, Types.VARCHAR);
-        }
-
-        if (largeCustomerFacilityAttribute.getYearClosed() != null)
-            ps.setDate(25, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearClosed().getValue(), 1, 1)));
-        else
-            ps.setNull(25, Types.DATE);
-
-        if (largeCustomerFacilityAttribute.getYearOpened() != null)
-            ps.setDate(26, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearOpened().getValue(), 1, 1)));
+            ps.setDate(26, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getSurveyYear().getValue(), 1, 1)));
         else
             ps.setNull(26, Types.DATE);
 

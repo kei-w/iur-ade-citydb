@@ -3177,7 +3177,7 @@ CREATE TABLE ur_squareurbanplanattribu
     city VARCHAR2(1000),
     city_codespace VARCHAR2(1000),
     dateofdecision TIMESTAMP,
-    dateofrevision TIMESTAMP,
+    dateofrevision VARCHAR2(1000),
     enforcer VARCHAR2(1000),
     isauthorized NUMBER,
     iscompleted NUMBER,

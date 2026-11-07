@@ -37,10 +37,7 @@ import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.uro.FloodingRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.RiverFloodingRiskAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class FloodingRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
@@ -58,38 +55,43 @@ public class FloodingRiskAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FLOODINGRISKATTRIBUTE)) + " " +
-                "(id, objectclass_id, depth, depth_uom, rank, rank_codespace, rankorg, rankorg_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, waterbody_floodingriskatt_id, rank, rank_codespace, rankorg, rankorg_codespace," +
+                "depth, depth_uom) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         riverFloodingRiskAttributeImporter = manager.getImporter(RiverFloodingRiskAttributeImporter.class);
     }
 
-    public void doImport(FloodingRiskAttribute floodingRiskAttribute, long objectId) throws CityGMLImportException, SQLException {
+    public void doImport(FloodingRiskAttribute floodingRiskAttribute, long objectId, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(floodingRiskAttribute.getClass()));
-
-        if (floodingRiskAttribute.getDepth() != null && floodingRiskAttribute.getDepth().isSetValue()) {
-            ps.setDouble(3, floodingRiskAttribute.getDepth().getValue());
-            ps.setString(4, floodingRiskAttribute.getDepth().getUom());
-        } else {
-            ps.setNull(3, Types.DOUBLE);
-            ps.setNull(4, Types.VARCHAR);
-        }
+        if ("waterbody_floodingriskatt_id".equals(parentColumn))
+            ps.setLong(3, parentId);
+        else
+            ps.setNull(3, Types.NULL);
 
         if (floodingRiskAttribute.getRank() != null && floodingRiskAttribute.getRank().isSetValue()) {
-            ps.setString(5, floodingRiskAttribute.getRank().getValue());
-            ps.setString(6, floodingRiskAttribute.getRank().getCodeSpace());
+            ps.setString(4, floodingRiskAttribute.getRank().getValue());
+            ps.setString(5, floodingRiskAttribute.getRank().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         if (floodingRiskAttribute.getRankOrg() != null && floodingRiskAttribute.getRankOrg().isSetValue()) {
-            ps.setString(7, floodingRiskAttribute.getRankOrg().getValue());
-            ps.setString(8, floodingRiskAttribute.getRankOrg().getCodeSpace());
+            ps.setString(6, floodingRiskAttribute.getRankOrg().getValue());
+            ps.setString(7, floodingRiskAttribute.getRankOrg().getCodeSpace());
         } else {
+            ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
-            ps.setNull(8, Types.VARCHAR);
+        }
+
+        if (floodingRiskAttribute.getDepth() != null && floodingRiskAttribute.getDepth().isSetValue()) {
+            ps.setDouble(8, floodingRiskAttribute.getDepth().getValue());
+            ps.setString(9, floodingRiskAttribute.getDepth().getUom());
+        } else {
+            ps.setNull(8, Types.DOUBLE);
+            ps.setNull(9, Types.VARCHAR);
         }
 
         ps.addBatch();
