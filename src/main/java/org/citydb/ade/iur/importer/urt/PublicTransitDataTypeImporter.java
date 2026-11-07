@@ -35,17 +35,27 @@ import org.citydb.ade.iur.schema.ObjectMapper;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
+import org.citygml4j.ade.iur.model.urt.FareRule;
+import org.citygml4j.ade.iur.model.urt.FeedInfo;
+import org.citygml4j.ade.iur.model.urt.Frequency;
 import org.citygml4j.ade.iur.model.urt.PublicTransitDataType;
+import org.citygml4j.ade.iur.model.urt.StopTime;
+import org.citygml4j.ade.iur.model.urt.Transfer;
+import org.citygml4j.ade.iur.model.urt.Translation;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class PublicTransitDataTypeImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final FeedInfoImporter feedInfoImporter;
+    private final TranslationImporter translationImporter;
+    private final TransferImporter transferImporter;
+    private final FrequencyImporter frequencyImporter;
+    private final StopTimeImporter stopTimeImporter;
+    private final FareRuleImporter fareRuleImporter;
 
     private int batchCounter;
 
@@ -55,20 +65,44 @@ public class PublicTransitDataTypeImporter implements PublicTransitModuleImporte
         this.objectMapper = manager.getObjectMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSITDATATYPE)) + " " +
-                "(id, objectclass_id, cityobjectgroup_datatype_id) " +
-                "values (?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PUBLICTRANSITDATATYPE)) + " " +
+                "(id, objectclass_id) " +
+                "values (?, ?)");
+
+        feedInfoImporter = manager.getImporter(FeedInfoImporter.class);
+        translationImporter = manager.getImporter(TranslationImporter.class);
+        transferImporter = manager.getImporter(TransferImporter.class);
+        frequencyImporter = manager.getImporter(FrequencyImporter.class);
+        stopTimeImporter = manager.getImporter(StopTimeImporter.class);
+        fareRuleImporter = manager.getImporter(FareRuleImporter.class);
     }
 
-    public long doImport(PublicTransitDataType dataType, long cityObjectGroupId) throws CityGMLImportException, SQLException {
+    public long doImport(PublicTransitDataType publicTransitDataType) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.PUBLICTRANSITDATAT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, objectMapper.getTypeClassId(dataType.getClass()));
-        ps.setLong(3, cityObjectGroupId);
+        ps.setLong(2, objectMapper.getTypeClassId(publicTransitDataType.getClass()));
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.PUBLICTRANSITDATATYPE));
+
+        if (publicTransitDataType instanceof FeedInfo)
+            feedInfoImporter.doImport((FeedInfo) publicTransitDataType, objectId);
+
+        if (publicTransitDataType instanceof Translation)
+            translationImporter.doImport((Translation) publicTransitDataType, objectId);
+
+        if (publicTransitDataType instanceof Transfer)
+            transferImporter.doImport((Transfer) publicTransitDataType, objectId);
+
+        if (publicTransitDataType instanceof Frequency)
+            frequencyImporter.doImport((Frequency) publicTransitDataType, objectId);
+
+        if (publicTransitDataType instanceof StopTime)
+            stopTimeImporter.doImport((StopTime) publicTransitDataType, objectId);
+
+        if (publicTransitDataType instanceof FareRule)
+            fareRuleImporter.doImport((FareRule) publicTransitDataType, objectId);
 
         return objectId;
     }

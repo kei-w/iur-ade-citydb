@@ -36,10 +36,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.PopulationByAgeAndSex;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PopulationByAgeAndSexImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
@@ -54,31 +51,32 @@ public class PopulationByAgeAndSexImporter implements StatisticalGridModuleImpor
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.POPULATIONBYAGEANDSEX)) + " " +
-                "(id, population_populationbyag_id, ageandsex, ageandsex_codespace, number_) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, ageandsex, ageandsex_codespace, number_) " +
+                "values (?, ?, ?, ?)");
     }
 
-    public void doImport(PopulationByAgeAndSex populationByAgeAndSex, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(PopulationByAgeAndSex populationByAgeAndSex) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.POPULATIONBYAGEAND_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (populationByAgeAndSex.getAgeAndSex() != null && populationByAgeAndSex.getAgeAndSex().isSetValue()) {
-            ps.setString(3, populationByAgeAndSex.getAgeAndSex().getValue());
-            ps.setString(4, populationByAgeAndSex.getAgeAndSex().getCodeSpace());
+            ps.setString(2, populationByAgeAndSex.getAgeAndSex().getValue());
+            ps.setString(3, populationByAgeAndSex.getAgeAndSex().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (populationByAgeAndSex.getNumber() != null)
-            ps.setInt(5, populationByAgeAndSex.getNumber());
+            ps.setInt(4, populationByAgeAndSex.getNumber());
         else
-            ps.setNull(5, Types.INTEGER);
+            ps.setNull(4, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.POPULATIONBYAGEANDSEX));
+
+        return objectId;
     }
 
     @Override

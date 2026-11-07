@@ -34,66 +34,53 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urt.Pathway;
 import org.citygml4j.ade.iur.model.urt.StopProperty;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class PathwayExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psFrom;
+    private final PreparedStatement psTo;
 
     public PathwayExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.PATHWAY);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-        Table from = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-        Table to = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-
-        Select select = new Select().addProjection(table.getColumns("isbidirectional", "isbidirectional_codespace"))
-                .addProjection(from.getColumn("gmlid", "fgmlid"), to.getColumn("gmlid", "tgmlid"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                .addJoin(JoinFactory.left(from, "id", ComparisonName.EQUAL_TO, table.getColumn("from_id")))
-                .addJoin(JoinFactory.left(to, "id", ComparisonName.EQUAL_TO, table.getColumn("to_id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
-        if (projectionFilter.containsProperty("mode", module))
-            select.addProjection(table.getColumns("mode_", "mode_codespace"));
-        if (projectionFilter.containsProperty("length", module))
-            select.addProjection(table.getColumns("length", "length_uom"));
-        if (projectionFilter.containsProperty("traversalTime", module))
-            select.addProjection(table.getColumn("traversaltime"));
-        if (projectionFilter.containsProperty("stairCount", module))
-            select.addProjection(table.getColumn("staircount"));
-        if (projectionFilter.containsProperty("maxSlope", module))
-            select.addProjection(table.getColumn("maxslope"));
-        if (projectionFilter.containsProperty("minWidth", module))
-            select.addProjection(table.getColumn("minwidth"));
-        if (projectionFilter.containsProperty("signpostedAs", module))
-            select.addProjection(table.getColumn("signpostedas"));
-        if (projectionFilter.containsProperty("reversedSignpostedAs", module))
-            select.addProjection(table.getColumn("reversedsignpostedas"));
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
+
+        Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table froms = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PATHWAY_TO_STOP)));
+        Select fromSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, froms.getColumn("stop_id")))
+                .addSelection(ComparisonFactory.equalTo(froms.getColumn("pathway_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psFrom = connection.prepareStatement(fromSelect.toString());
+        Table tos = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PATHWAY_TO_STOP_2)));
+        Select toSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, tos.getColumn("stop_id")))
+                .addSelection(ComparisonFactory.equalTo(tos.getColumn("pathway_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psTo = connection.prepareStatement(toSelect.toString());
     }
 
     public void doExport(Pathway pathway, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -101,70 +88,86 @@ public class PathwayExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(pathway, projectionFilter, "pt", rs);
+                publicTransitExporter.doExport(pathway, objectId, "pt_", rs);
+                doExport(pathway, objectId, "", rs);
+            }
+        }
+    }
 
-                String isBidirectional = rs.getString("isbidirectional");
-                if (!rs.wasNull()) {
-                    Code code = new Code(isBidirectional);
-                    code.setCodeSpace(rs.getString("isbidirectional_codespace"));
-                    pathway.setIsBidirectional(code);
-                }
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("mode_", prefix + "mode_"),
+                table.getColumn("mode__codespace", prefix + "mode__codespace"),
+                table.getColumn("isbidirectional", prefix + "isbidirectional"),
+                table.getColumn("isbidirectional_codespace", prefix + "isbidirectional_codespace"),
+                table.getColumn("length", prefix + "length"),
+                table.getColumn("length_uom", prefix + "length_uom"),
+                table.getColumn("traversaltime", prefix + "traversaltime"),
+                table.getColumn("staircount", prefix + "staircount"),
+                table.getColumn("maxslope", prefix + "maxslope"),
+                table.getColumn("minwidth", prefix + "minwidth"),
+                table.getColumn("signpostedas", prefix + "signpostedas"),
+                table.getColumn("reversedsignpostedas", prefix + "reversedsignpostedas"));
 
-                String fromGmlId = rs.getString("fgmlid");
-                if (fromGmlId != null)
-                    pathway.setFrom(new StopProperty("#" + fromGmlId));
+        return select;
+    }
 
-                String toGmlId = rs.getString("tgmlid");
-                if (toGmlId != null)
-                    pathway.setTo(new StopProperty("#" + toGmlId));
+    public void doExport(Pathway pathway, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        String mode = rs.getString(prefix + "mode_");
+        if (!rs.wasNull()) {
+            Code code = new Code(mode);
+            code.setCodeSpace(rs.getString(prefix + "mode__codespace"));
+            pathway.setMode(code);
+        }
 
-                if (projectionFilter.containsProperty("mode", module)) {
-                    String mode = rs.getString("mode_");
-                    if (!rs.wasNull()) {
-                        Code code = new Code(mode);
-                        code.setCodeSpace(rs.getString("mode_codespace"));
-                        pathway.setMode(code);
-                    }
-                }
+        String isBidirectional = rs.getString(prefix + "isbidirectional");
+        if (!rs.wasNull()) {
+            Code code = new Code(isBidirectional);
+            code.setCodeSpace(rs.getString(prefix + "isbidirectional_codespace"));
+            pathway.setIsBidirectional(code);
+        }
 
-                if (projectionFilter.containsProperty("length", module)) {
-                    double lengthValue = rs.getDouble("length");
-                    if (!rs.wasNull()) {
-                        Length length = new Length(lengthValue);
-                        length.setUom(rs.getString("length_uom"));
-                        pathway.setLength(length);
-                    }
-                }
+        double lengthValue = rs.getDouble(prefix + "length");
+        if (!rs.wasNull()) {
+            Length length = new Length(lengthValue);
+            length.setUom(rs.getString(prefix + "length_uom"));
+            pathway.setLength(length);
+        }
 
-                if (projectionFilter.containsProperty("traversalTime", module)) {
-                    int traversalTime = rs.getInt("traversaltime");
-                    if (!rs.wasNull())
-                        pathway.setTraversalTime(traversalTime);
-                }
+        int traversalTime = rs.getInt(prefix + "traversaltime");
+        if (!rs.wasNull())
+            pathway.setTraversalTime(traversalTime);
 
-                if (projectionFilter.containsProperty("stairCount", module)) {
-                    int stairCount = rs.getInt("staircount");
-                    if (!rs.wasNull())
-                        pathway.setStairCount(stairCount);
-                }
+        int stairCount = rs.getInt(prefix + "staircount");
+        if (!rs.wasNull())
+            pathway.setStairCount(stairCount);
 
-                if (projectionFilter.containsProperty("maxSlope", module)) {
-                    double maxSlope = rs.getDouble("maxslope");
-                    if (!rs.wasNull())
-                        pathway.setMaxSlope(maxSlope);
-                }
+        double maxSlope = rs.getDouble(prefix + "maxslope");
+        if (!rs.wasNull())
+            pathway.setMaxSlope(maxSlope);
 
-                if (projectionFilter.containsProperty("minWidth", module)) {
-                    double minWidth = rs.getDouble("minwidth");
-                    if (!rs.wasNull())
-                        pathway.setMinWidth(minWidth);
-                }
+        double minWidth = rs.getDouble(prefix + "minwidth");
+        if (!rs.wasNull())
+            pathway.setMinWidth(minWidth);
 
-                if (projectionFilter.containsProperty("signpostedAs", module))
-                    pathway.setSignpostedAs(rs.getString("signpostedas"));
+        pathway.setSignpostedAs(rs.getString(prefix + "signpostedas"));
 
-                if (projectionFilter.containsProperty("reversedSignpostedAs", module))
-                    pathway.setSignpostedAs(rs.getString("reversedsignpostedas"));
+        pathway.setReversedSignpostedAs(rs.getString(prefix + "reversedsignpostedas"));
+
+        psFrom.setLong(1, objectId);
+        try (ResultSet fromRs = psFrom.executeQuery()) {
+            while (fromRs.next()) {
+                StopProperty fromProperty = new StopProperty();
+                fromProperty.setHref("#" + fromRs.getString("gmlid"));
+                pathway.setFrom(fromProperty);
+            }
+        }
+
+        psTo.setLong(1, objectId);
+        try (ResultSet toRs = psTo.executeQuery()) {
+            while (toRs.next()) {
+                StopProperty toProperty = new StopProperty();
+                toProperty.setHref("#" + toRs.getString("gmlid"));
+                pathway.setTo(toProperty);
             }
         }
     }
@@ -172,5 +175,7 @@ public class PathwayExporter implements PublicTransitModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psFrom.close();
+        psTo.close();
     }
 }

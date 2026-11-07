@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-package org.citydb.ade.iur.exporter.urt;
+package org.citydb.ade.iur.exporter.urg;
 
 import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
@@ -36,59 +36,39 @@ import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citygml4j.ade.iur.model.urt.FeedInfo;
+import org.citygml4j.ade.iur.model.urg.PopulationByAgeAndSex;
 import org.citygml4j.model.gml.basicTypes.Code;
 
 import java.sql.*;
 
-public class FeedInfoExporter implements PublicTransitModuleExporter {
+public class PopulationByAgeAndSexExporter implements StatisticalGridModuleExporter {
     private final PreparedStatement ps;
 
-    public FeedInfoExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.FEEDINFO);
+    public PopulationByAgeAndSexExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.POPULATIONBYAGEANDSEX);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("contactemail", "contacturl", "defaultlanguage",
-                        "defaultlanguage_codespace", "detailedinfo", "enddate", "language", "language_codespace",
-                        "publishername", "publisherurl", "startdate", "version"))
+        Select select = new Select().addProjection(table.getColumns("ageandsex", "ageandsex_codespace", "number_"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
     }
 
-    public void doExport(FeedInfo feedInfo, long objectId) throws CityGMLExportException, SQLException {
+    public void doExport(PopulationByAgeAndSex populationByAgeAndSex, long objectId) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                feedInfo.setPublisherName(rs.getString("publishername"));
-                feedInfo.setPublisherUrl(rs.getString("publisherurl"));
-
-                String language = rs.getString("language");
+                String ageAndSex = rs.getString("ageandsex");
                 if (!rs.wasNull()) {
-                    Code code = new Code(language);
-                    code.setCodeSpace(rs.getString("language_codespace"));
-                    feedInfo.setLanguage(code);
+                    Code code = new Code(ageAndSex);
+                    code.setCodeSpace(rs.getString("ageandsex_codespace"));
+                    populationByAgeAndSex.setAgeAndSex(code);
                 }
 
-                String defaultLanguage = rs.getString("defaultlanguage");
-                if (!rs.wasNull()) {
-                    Code code = new Code(defaultLanguage);
-                    code.setCodeSpace(rs.getString("defaultlanguage_codespace"));
-                    feedInfo.setDefaultLanguage(code);
-                }
-
-                Date startDate = rs.getDate("startdate");
+                int number = rs.getInt("number_");
                 if (!rs.wasNull())
-                    feedInfo.setStartDate(startDate.toLocalDate());
-
-                Date endDate = rs.getDate("enddate");
-                if (!rs.wasNull())
-                    feedInfo.setEndDate(endDate.toLocalDate());
-
-                feedInfo.setVersion(rs.getString("version"));
-                feedInfo.setContactEmail(rs.getString("contactemail"));
-                feedInfo.setContactURL(rs.getString("contacturl"));
-                feedInfo.setDetailedInfo(rs.getString("detailedinfo"));
+                    populationByAgeAndSex.setNumber(number);
             }
         }
     }

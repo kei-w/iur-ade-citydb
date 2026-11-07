@@ -30,18 +30,18 @@ package org.citydb.ade.iur.importer.urt;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Office;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class OfficeImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
 
@@ -49,10 +49,11 @@ public class OfficeImporter implements PublicTransitModuleImporter {
 
     public OfficeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.OFFICE)) + " " +
-                "(id, name, phone, url) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.OFFICE)) + " " +
+                "(id, name, url, phone) " +
                 "values (?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
@@ -60,11 +61,14 @@ public class OfficeImporter implements PublicTransitModuleImporter {
 
     public void doImport(Office office, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(office, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         ps.setString(2, office.getOfficeName());
-        ps.setString(3, office.getPhone());
-        ps.setString(4, office.getUrl());
+
+        ps.setString(3, office.getUrl());
+
+        ps.setString(4, office.getPhone());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

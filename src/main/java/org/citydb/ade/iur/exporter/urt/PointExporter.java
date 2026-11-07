@@ -30,65 +30,67 @@ package org.citydb.ade.iur.exporter.urt;
 
 import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.config.geometry.GeometryObject;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
-import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
+import org.citydb.core.operation.exporter.database.content.GMLConverter;
+import org.citydb.core.operation.exporter.database.content.SurfaceGeometryExporter;
+import org.citydb.core.operation.exporter.util.GeometrySetter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
-import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
-import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.urt.Frequency;
-import org.citygml4j.ade.iur.model.urt.TripProperty;
-import org.citygml4j.model.gml.basicTypes.Code;
+import org.citygml4j.ade.iur.model.urt.Point;
 
 import java.sql.*;
 
-public class FrequencyExporter implements PublicTransitModuleExporter {
+public class PointExporter implements PublicTransitModuleExporter {
+    private final CityGMLExportHelper helper;
     private final PreparedStatement ps;
+    private final SurfaceGeometryExporter surfaceGeometryExporter;
+    private final GMLConverter gmlConverter;
 
-    public FrequencyExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.FREQUENCY);
+    public PointExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.helper = helper;
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.POINT);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Table trip = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-
-        Select select = new Select().addProjection(table.getColumns("endtime", "exacttimes", "exacttimes_codespace",
-                        "headwaysecs", "starttime"))
-                .addProjection(trip.getColumn("gmlid", "tgmlid"))
-                .addJoin(JoinFactory.left(trip, "id", ComparisonName.EQUAL_TO, table.getColumn("trip_id")))
+        Select select = new Select().addProjection(table.getColumns("latitude", "longitude", "pointsequence", "pointdistancetraveled"))
+                .addProjection(helper.getGeometryColumn(table.getColumn("point")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
+        surfaceGeometryExporter = helper.getSurfaceGeometryExporter();
+        gmlConverter = helper.getGMLConverter();
     }
 
-    public void doExport(Frequency frequency, long objectId) throws CityGMLExportException, SQLException {
+    public void doExport(Point point, long objectId) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                Time startTime = rs.getTime("starttime");
+                double latitude = rs.getDouble("latitude");
                 if (!rs.wasNull())
-                    frequency.setStartTime(startTime.toLocalTime());
+                    point.setLatitude(latitude);
 
-                Time endTime = rs.getTime("endtime");
+                double longitude = rs.getDouble("longitude");
                 if (!rs.wasNull())
-                    frequency.setEndTime(endTime.toLocalTime());
+                    point.setLongitude(longitude);
 
-                int headwaySecs = rs.getInt("headwaysecs");
-                if (!rs.wasNull())
-                    frequency.setHeadwaySecs(headwaySecs);
-
-                String exactTimes = rs.getString("exacttimes");
+                Object pointValueObject = rs.getObject("point");
                 if (!rs.wasNull()) {
-                    Code code = new Code(exactTimes);
-                    code.setCodeSpace(rs.getString("exacttimes_codespace"));
-                    frequency.setExactTimes(code);
+                    GeometryObject pointValue = helper.getDatabaseAdapter().getGeometryConverter().getPoint(pointValueObject);
+                    if (pointValue != null)
+                        point.setPoint(gmlConverter.getPointProperty(pointValue));
                 }
 
-                String tripGmlId = rs.getString("tgmlid");
-                if (tripGmlId != null)
-                    frequency.setTrip(new TripProperty("#" + tripGmlId));
+                int pointSequence = rs.getInt("pointsequence");
+                if (!rs.wasNull())
+                    point.setPointSequence(pointSequence);
+
+                double pointDistanceTraveled = rs.getDouble("pointdistancetraveled");
+                if (!rs.wasNull())
+                    point.setPointDistanceTraveled(pointDistanceTraveled);
             }
         }
     }

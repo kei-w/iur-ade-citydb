@@ -33,33 +33,32 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
 import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
 import org.citygml4j.ade.iur.model.urt.Level;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class LevelExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
 
     public LevelExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.LEVEL);
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = publicTransitExporter.addProjection(new Select(), table, projectionFilter, "pt")
-                .addProjection(table.getColumn("index_"))
+        Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -68,10 +67,22 @@ public class LevelExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(level, projectionFilter, "pt", rs);
-                level.setIndex(rs.getDouble("index_"));
+                publicTransitExporter.doExport(level, objectId, "pt_", rs);
+                doExport(level, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("index_", prefix + "index_"));
+
+        return select;
+    }
+
+    public void doExport(Level level, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        double index = rs.getDouble(prefix + "index_");
+        if (!rs.wasNull())
+            level.setIndex(index);
     }
 
     @Override

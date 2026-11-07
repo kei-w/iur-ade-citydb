@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urg;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -37,34 +38,35 @@ import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.LandPrice;
 import org.citygml4j.ade.iur.model.urg.LandPricePerLandUseProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class LandPriceImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final LandPricePerLandUseImporter landPricePerLandUseImporter;
     private final StatisticalGridImporter statisticalGridImporter;
+    private final LandPriceToLandPricePerLandUseImporter landPriceToLandPricePerLandUseImporter;
+    private final LandPricePerLandUseImporter landPricePerLandUseImporter;
 
     private int batchCounter;
 
     public LandPriceImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDPRICE)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LANDPRICE)) + " " +
                 "(id, currencyunit, currencyunit_codespace) " +
                 "values (?, ?, ?)");
 
-        landPricePerLandUseImporter = manager.getImporter(LandPricePerLandUseImporter.class);
         statisticalGridImporter = manager.getImporter(StatisticalGridImporter.class);
+        landPriceToLandPricePerLandUseImporter = manager.getImporter(LandPriceToLandPricePerLandUseImporter.class);
+        landPricePerLandUseImporter = manager.getImporter(LandPricePerLandUseImporter.class);
     }
 
     public void doImport(LandPrice landPrice, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         statisticalGridImporter.doImport(landPrice, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (landPrice.getCurrencyUnit() != null && landPrice.getCurrencyUnit().isSetValue()) {
@@ -75,14 +77,16 @@ public class LandPriceImporter implements StatisticalGridModuleImporter {
             ps.setNull(3, Types.VARCHAR);
         }
 
-        for (LandPricePerLandUseProperty property : landPrice.getLandPrices()) {
-            if (property.isSetObject())
-                landPricePerLandUseImporter.doImport(property.getObject(), objectId);
-        }
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        for (LandPricePerLandUseProperty property : landPrice.getLandPrice()) {
+            if (property.isSetObject()) {
+                long landPriceId = landPricePerLandUseImporter.doImport(property.getObject());
+                landPriceToLandPricePerLandUseImporter.doImport(landPriceId, objectId);
+            }
+        }
     }
 
     @Override

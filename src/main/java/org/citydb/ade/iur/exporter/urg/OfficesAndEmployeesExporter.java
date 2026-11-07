@@ -33,7 +33,6 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -41,36 +40,25 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urg.OfficesAndEmployees;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class OfficesAndEmployeesExporter implements StatisticalGridModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final StatisticalGridExporter statisticalGridExporter;
+    private final PreparedStatement ps;
 
     public OfficesAndEmployeesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.OFFICESANDEMPLOYEES);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         statisticalGridExporter = manager.getExporter(StatisticalGridExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table statisticalGrid = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)));
-
-        Select select = statisticalGridExporter.addProjection(new Select(), statisticalGrid, projectionFilter, "sg")
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(statisticalGrid, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("numberOfOffices", module))
-            select.addProjection(table.getColumn("numberofoffices"));
-        if (projectionFilter.containsProperty("numberOfEmployees", module))
-            select.addProjection(table.getColumn("numberofemployees"));
+        addProjection(select, table, "");
+        statisticalGridExporter.addProjection(select, statisticalGrid, "sg_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -79,21 +67,27 @@ public class OfficesAndEmployeesExporter implements StatisticalGridModuleExporte
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                statisticalGridExporter.doExport(officesAndEmployees, projectionFilter, "sg", rs);
-
-                if (projectionFilter.containsProperty("numberOfOffices", module)) {
-                    int numberOfOffices = rs.getInt("numberofoffices");
-                    if (!rs.wasNull())
-                        officesAndEmployees.setNumberOfOffices(numberOfOffices);
-                }
-
-                if (projectionFilter.containsProperty("numberOfEmployees", module)) {
-                    int numberOfEmployees = rs.getInt("numberofemployees");
-                    if (!rs.wasNull())
-                        officesAndEmployees.setNumberOfEmployees(numberOfEmployees);
-                }
+                statisticalGridExporter.doExport(officesAndEmployees, objectId, "sg_", rs);
+                doExport(officesAndEmployees, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("numberofoffices", prefix + "numberofoffices"),
+                table.getColumn("numberofemployees", prefix + "numberofemployees"));
+
+        return select;
+    }
+
+    public void doExport(OfficesAndEmployees officesAndEmployees, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        int numberOfOffices = rs.getInt(prefix + "numberofoffices");
+        if (!rs.wasNull())
+            officesAndEmployees.setNumberOfOffices(numberOfOffices);
+
+        int numberOfEmployees = rs.getInt(prefix + "numberofemployees");
+        if (!rs.wasNull())
+            officesAndEmployees.setNumberOfEmployees(numberOfEmployees);
     }
 
     @Override

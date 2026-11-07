@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urg;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -38,49 +39,57 @@ import org.citygml4j.ade.iur.model.urg.AreaOfAnnualDiversionsProperty;
 import org.citygml4j.ade.iur.model.urg.LandUseDiversion;
 import org.citygml4j.ade.iur.model.urg.NumberOfAnnualDiversionsProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class LandUseDiversionImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final NumberOfAnnualDiversionsImporter numberOfAnnualDiversionsImporter;
-    private final AreaOfAnnualDiversionsImporter areaOfAnnualDiversionsImporter;
     private final StatisticalGridImporter statisticalGridImporter;
+    private final LandUseDiversionToNumberOfAnnualDiversionsImporter landUseDiversionToNumberOfAnnualDiversionsImporter;
+    private final NumberOfAnnualDiversionsImporter numberOfAnnualDiversionsImporter;
+    private final LandUseDiversionToAreaOfAnnualDiversionsImporter landUseDiversionToAreaOfAnnualDiversionsImporter;
+    private final AreaOfAnnualDiversionsImporter areaOfAnnualDiversionsImporter;
 
     private int batchCounter;
 
     public LandUseDiversionImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDUSEDIVERSION)) + " " +
-                "(id) values (?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LANDUSEDIVERSION)) + " " +
+                "(id) " +
+                "values (?)");
 
-        numberOfAnnualDiversionsImporter = manager.getImporter(NumberOfAnnualDiversionsImporter.class);
-        areaOfAnnualDiversionsImporter = manager.getImporter(AreaOfAnnualDiversionsImporter.class);
         statisticalGridImporter = manager.getImporter(StatisticalGridImporter.class);
+        landUseDiversionToNumberOfAnnualDiversionsImporter = manager.getImporter(LandUseDiversionToNumberOfAnnualDiversionsImporter.class);
+        numberOfAnnualDiversionsImporter = manager.getImporter(NumberOfAnnualDiversionsImporter.class);
+        landUseDiversionToAreaOfAnnualDiversionsImporter = manager.getImporter(LandUseDiversionToAreaOfAnnualDiversionsImporter.class);
+        areaOfAnnualDiversionsImporter = manager.getImporter(AreaOfAnnualDiversionsImporter.class);
     }
 
     public void doImport(LandUseDiversion landUseDiversion, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         statisticalGridImporter.doImport(landUseDiversion, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
-
-        for (NumberOfAnnualDiversionsProperty property : landUseDiversion.getNumberOfAnnualDiversions()) {
-            if (property.isSetObject())
-                numberOfAnnualDiversionsImporter.doImport(property.getObject(), objectId);
-        }
-
-        for (AreaOfAnnualDiversionsProperty property : landUseDiversion.getAreaOfAnnualDiversions()) {
-            if (property.isSetObject())
-                areaOfAnnualDiversionsImporter.doImport(property.getObject(), objectId);
-        }
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        for (NumberOfAnnualDiversionsProperty property : landUseDiversion.getNumberOfAnnualDiversion()) {
+            if (property.isSetObject()) {
+                long numberOfAnnualDiversionId = numberOfAnnualDiversionsImporter.doImport(property.getObject());
+                landUseDiversionToNumberOfAnnualDiversionsImporter.doImport(numberOfAnnualDiversionId, objectId);
+            }
+        }
+        for (AreaOfAnnualDiversionsProperty property : landUseDiversion.getAreaOfAnnualDiversion()) {
+            if (property.isSetObject()) {
+                long areaOfAnnualDiversionId = areaOfAnnualDiversionsImporter.doImport(property.getObject());
+                landUseDiversionToAreaOfAnnualDiversionsImporter.doImport(areaOfAnnualDiversionId, objectId);
+            }
+        }
     }
 
     @Override

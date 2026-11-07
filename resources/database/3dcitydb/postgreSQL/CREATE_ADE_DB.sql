@@ -3,46 +3,6 @@
 -- *********************************** Create Sequences *********************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 
-CREATE SEQUENCE ur_areaofannualdivers_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_point_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_numberofhouseholds_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_keyvaluepair_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
 CREATE SEQUENCE ur_trafficareaattribu_seq
 INCREMENT BY 1
 MINVALUE 0
@@ -54,36 +14,6 @@ OWNED BY NONE;
 
 
 CREATE SEQUENCE ur_cityfurnitureattri_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_description_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_publictransitdatat_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_numberofannualdive_seq
 INCREMENT BY 1
 MINVALUE 0
 MAXVALUE 9223372036854775807
@@ -123,16 +53,6 @@ NO CYCLE
 OWNED BY NONE;
 
 
-CREATE SEQUENCE ur_landpriceperlandus_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
 CREATE SEQUENCE ur_keyvaluepairattrib_seq
 INCREMENT BY 1
 MINVALUE 0
@@ -154,16 +74,6 @@ OWNED BY NONE;
 
 
 CREATE SEQUENCE ur_vegetationattribut_seq
-INCREMENT BY 1
-MINVALUE 0
-MAXVALUE 9223372036854775807
-START WITH 1
-CACHE 1
-NO CYCLE
-OWNED BY NONE;
-
-
-CREATE SEQUENCE ur_populationbyageand_seq
 INCREMENT BY 1
 MINVALUE 0
 MAXVALUE 9223372036854775807
@@ -263,63 +173,159 @@ NO CYCLE
 OWNED BY NONE;
 
 
+CREATE SEQUENCE ur_areaofannualdivers_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_keyvaluepair_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_landpriceperlandus_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_numberofannualdive_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_numberofhouseholds_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_populationbyageand_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_description_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_farerule_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_feedinfo_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_frequency_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_point_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_publictransitdatat_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_stoptime_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_transfer_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
+CREATE SEQUENCE ur_translation_seq
+INCREMENT BY 1
+MINVALUE 0
+MAXVALUE 9223372036854775807
+START WITH 1
+CACHE 1
+NO CYCLE
+OWNED BY NONE;
+
+
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- *********************************** Create tables ************************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
--- -------------------------------------------------------------------- 
--- ur_agency 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_agency
-(
-    id BIGINT NOT NULL,
-    address VARCHAR(1000),
-    email VARCHAR(1000),
-    fareurl VARCHAR(1000),
-    language VARCHAR(1000),
-    language_codespace VARCHAR(1000),
-    name VARCHAR(1000),
-    officialname VARCHAR(1000),
-    phone VARCHAR(1000),
-    presidentname VARCHAR(1000),
-    presidentposition VARCHAR(1000),
-    timezone VARCHAR(1000),
-    timezone_codespace VARCHAR(1000),
-    url VARCHAR(1000),
-    zipnumber VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_areaofannualdiversions 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_areaofannualdiversions
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_areaofannualdivers_seq'::regclass) NOT NULL,
-    area NUMERIC,
-    area_uom VARCHAR(1000),
-    year DATE,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_attribution 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_attribution
-(
-    id BIGINT NOT NULL,
-    agency_id BIGINT,
-    email VARCHAR(1000),
-    isauthority NUMERIC,
-    isoperator NUMERIC,
-    isproducer NUMERIC,
-    organizationname VARCHAR(1000),
-    phonenumber VARCHAR(1000),
-    route_id BIGINT,
-    trip_id BIGINT,
-    url VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
 -- -------------------------------------------------------------------- 
 -- ur_building 
 -- -------------------------------------------------------------------- 
@@ -500,37 +506,6 @@ CREATE TABLE ur_buildingriverfloodingr
 );
 
 -- -------------------------------------------------------------------- 
--- ur_calendar 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_calendar
-(
-    id BIGINT NOT NULL,
-    enddate TIMESTAMP WITH TIME ZONE,
-    friday NUMERIC,
-    monday NUMERIC,
-    saturday NUMERIC,
-    startdate TIMESTAMP WITH TIME ZONE,
-    sunday NUMERIC,
-    thursday NUMERIC,
-    tuesday NUMERIC,
-    wednesday NUMERIC,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_calendardate 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_calendardate
-(
-    id BIGINT NOT NULL,
-    calendar_id BIGINT,
-    date_ TIMESTAMP WITH TIME ZONE,
-    exceptiontype VARCHAR(1000),
-    exceptiontype_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_city_furniture 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_city_furniture
@@ -636,120 +611,6 @@ CREATE TABLE ur_cityobjectgroup_3
 );
 
 -- -------------------------------------------------------------------- 
--- ur_description 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_description
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_description_seq'::regclass) NOT NULL,
-    description VARCHAR(1000),
-    frequencyofservice INTEGER,
-    numberofcustomers INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_fareattribute 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_fareattribute
-(
-    id BIGINT NOT NULL,
-    agency_id BIGINT,
-    currencytype VARCHAR(1000),
-    currencytype_codespace VARCHAR(1000),
-    paymentmethod VARCHAR(1000),
-    paymentmethod_codespace VARCHAR(1000),
-    price NUMERIC,
-    transferduration INTEGER,
-    transfers VARCHAR(1000),
-    transfers_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_farerule 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_farerule
-(
-    id BIGINT NOT NULL,
-    containsid VARCHAR(1000),
-    containsid_codespace VARCHAR(1000),
-    destinationid VARCHAR(1000),
-    destinationid_codespace VARCHAR(1000),
-    fare_id BIGINT,
-    originid VARCHAR(1000),
-    originid_codespace VARCHAR(1000),
-    route_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_feedinfo 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_feedinfo
-(
-    id BIGINT NOT NULL,
-    contactemail VARCHAR(1000),
-    contacturl VARCHAR(1000),
-    defaultlanguage VARCHAR(1000),
-    defaultlanguage_codespace VARCHAR(1000),
-    detailedinfo VARCHAR(1000),
-    enddate TIMESTAMP WITH TIME ZONE,
-    language VARCHAR(1000),
-    language_codespace VARCHAR(1000),
-    publishername VARCHAR(1000),
-    publisherurl VARCHAR(1000),
-    startdate TIMESTAMP WITH TIME ZONE,
-    version VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_frequency 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_frequency
-(
-    id BIGINT NOT NULL,
-    endtime TIMESTAMP WITH TIME ZONE,
-    exacttimes VARCHAR(1000),
-    exacttimes_codespace VARCHAR(1000),
-    headwaysecs INTEGER,
-    starttime TIMESTAMP WITH TIME ZONE,
-    trip_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_households 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_households
-(
-    id BIGINT NOT NULL,
-    numberofmainhousehold INTEGER,
-    numberofordinaryhousehold INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_keyvaluepair 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_keyvaluepair
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_keyvaluepair_seq'::regclass) NOT NULL,
-    codevalue VARCHAR(1000),
-    codevalue_codespace VARCHAR(1000),
-    datevalue TIMESTAMP WITH TIME ZONE,
-    doublevalue NUMERIC,
-    intvalue INTEGER,
-    key VARCHAR(1000),
-    key_codespace VARCHAR(1000),
-    measuredvalue NUMERIC,
-    measuredvalue_uom VARCHAR(1000),
-    stringvalue VARCHAR(1000),
-    urivalue VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_keyvaluepairattribute
@@ -776,29 +637,6 @@ CREATE TABLE ur_land_use
 (
     id BIGINT NOT NULL,
     landusedetailattribute_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_landprice 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landprice
-(
-    id BIGINT NOT NULL,
-    currencyunit VARCHAR(1000),
-    currencyunit_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_landpriceperlanduse 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landpriceperlanduse
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_landpriceperlandus_seq'::regclass) NOT NULL,
-    landprice INTEGER,
-    landuse VARCHAR(1000),
-    landuse_codespace VARCHAR(1000),
     PRIMARY KEY (id)
 );
 
@@ -841,15 +679,6 @@ CREATE TABLE ur_landuseattribute
 );
 
 -- -------------------------------------------------------------------- 
--- ur_landusediversion 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landusediversion
-(
-    id BIGINT NOT NULL,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_largecustomerfacilitya 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_largecustomerfacilitya
@@ -878,147 +707,6 @@ CREATE TABLE ur_largecustomerfacilitya
     totalstorefloorarea_uom VARCHAR(1000),
     urbanplantype VARCHAR(1000),
     urbanplantype_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_numberofannualdiversio 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_numberofannualdiversio
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_numberofannualdive_seq'::regclass) NOT NULL,
-    count INTEGER,
-    year DATE,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_numberofhouseholds 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_numberofhouseholds
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_numberofhouseholds_seq'::regclass) NOT NULL,
-    class VARCHAR(1000),
-    class_codespace VARCHAR(1000),
-    households_numberofhous_id_1 BIGINT,
-    households_numberofhouseh_id BIGINT,
-    number_ INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_office 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_office
-(
-    id BIGINT NOT NULL,
-    name VARCHAR(1000),
-    phone VARCHAR(1000),
-    url VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_officesandemployees 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_officesandemployees
-(
-    id BIGINT NOT NULL,
-    numberofemployees INTEGER,
-    numberofoffices INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_pathway 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_pathway
-(
-    id BIGINT NOT NULL,
-    from_id BIGINT,
-    isbidirectional VARCHAR(1000),
-    isbidirectional_codespace VARCHAR(1000),
-    length NUMERIC,
-    length_uom VARCHAR(1000),
-    maxslope NUMERIC,
-    minwidth NUMERIC,
-    mode_ VARCHAR(1000),
-    mode_codespace VARCHAR(1000),
-    reversedsignpostedas VARCHAR(1000),
-    signpostedas VARCHAR(1000),
-    staircount INTEGER,
-    to_id BIGINT,
-    traversaltime INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_point 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_point
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_point_seq'::regclass) NOT NULL,
-    latitude NUMERIC,
-    longitude NUMERIC,
-    point geometry(GEOMETRYZ),
-    pointdistancetraveled NUMERIC,
-    pointsequence INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_population 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_population
-(
-    id BIGINT NOT NULL,
-    births INTEGER,
-    daytimepopulation INTEGER,
-    daytimepopulationdensity NUMERIC,
-    deaths INTEGER,
-    femalepopulation INTEGER,
-    increasement INTEGER,
-    malepopulation INTEGER,
-    movefrom INTEGER,
-    moveto INTEGER,
-    naturalincrease INTEGER,
-    socialincrease INTEGER,
-    total INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_populationbyageandsex 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_populationbyageandsex
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_populationbyageand_seq'::regclass) NOT NULL,
-    ageandsex VARCHAR(1000),
-    ageandsex_codespace VARCHAR(1000),
-    number_ INTEGER,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_publictransit 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_publictransit
-(
-    id BIGINT NOT NULL,
-    index_ NUMERIC,
-    objectclass_id INTEGER,
-    orgid VARCHAR(1000),
-    target_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_publictransitdatatype 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_publictransitdatatype
-(
-    id BIGINT NOT NULL DEFAULT nextval('ur_publictransitdatat_seq'::regclass) NOT NULL,
-    objectclass_id INTEGER,
     PRIMARY KEY (id)
 );
 
@@ -1067,113 +755,6 @@ CREATE TABLE ur_roadstructureattribute
 );
 
 -- -------------------------------------------------------------------- 
--- ur_route 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_route
-(
-    id BIGINT NOT NULL,
-    agency_id BIGINT,
-    color VARCHAR(1000),
-    continuousdropoff VARCHAR(1000),
-    continuousdropoff_codespace VARCHAR(1000),
-    continuouspickup VARCHAR(1000),
-    continuouspickup_codespace VARCHAR(1000),
-    description_id BIGINT,
-    destinationstop VARCHAR(1000),
-    lod0multicurve geometry(GEOMETRYZ),
-    longname VARCHAR(1000),
-    originstop VARCHAR(1000),
-    parentroute_id BIGINT,
-    routesortorder INTEGER,
-    shortname VARCHAR(1000),
-    textcolor VARCHAR(1000),
-    type VARCHAR(1000),
-    type_codespace VARCHAR(1000),
-    updatedate TIMESTAMP WITH TIME ZONE,
-    url VARCHAR(1000),
-    viastop VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_statisticalgrid 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_statisticalgrid
-(
-    id BIGINT NOT NULL,
-    areaclassification_codespace VARCHAR(1000),
-    areaclassificationtype VARCHAR(1000),
-    availability NUMERIC,
-    city VARCHAR(1000),
-    city_codespace VARCHAR(1000),
-    class VARCHAR(1000),
-    class_codespace VARCHAR(1000),
-    lod_1multisurface_id BIGINT,
-    lod_2multisurface_id BIGINT,
-    objectclass_id INTEGER,
-    prefecture VARCHAR(1000),
-    prefecture_codespace VARCHAR(1000),
-    surveyyear DATE,
-    urbanplantype VARCHAR(1000),
-    urbanplantype_codespace VARCHAR(1000),
-    value TEXT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_stop 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_stop
-(
-    id BIGINT NOT NULL,
-    code VARCHAR(1000),
-    code_codespace VARCHAR(1000),
-    latitude NUMERIC,
-    level_id BIGINT,
-    locationtype VARCHAR(1000),
-    locationtype_codespace VARCHAR(1000),
-    longitude NUMERIC,
-    parentstation_id BIGINT,
-    platformcode VARCHAR(1000),
-    point geometry(GEOMETRYZ),
-    timezone VARCHAR(1000),
-    timezone_codespace VARCHAR(1000),
-    ttsname VARCHAR(1000),
-    url VARCHAR(1000),
-    wheelchairboarding VARCHAR(1000),
-    wheelchairboarding_codespace VARCHAR(1000),
-    zoneid VARCHAR(1000),
-    zoneid_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_stoptime 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_stoptime
-(
-    id BIGINT NOT NULL,
-    arrivaltime TIMESTAMP WITH TIME ZONE,
-    continuousdropofft_codespace VARCHAR(1000),
-    continuousdropofftype VARCHAR(1000),
-    continuouspickupty_codespace VARCHAR(1000),
-    continuouspickuptype VARCHAR(1000),
-    departuretime TIMESTAMP WITH TIME ZONE,
-    dropofftype VARCHAR(1000),
-    dropofftype_codespace VARCHAR(1000),
-    headsign VARCHAR(1000),
-    pickuptype VARCHAR(1000),
-    pickuptype_codespace VARCHAR(1000),
-    shapedistancetraveled NUMERIC,
-    stop_id BIGINT,
-    stopsequence INTEGER,
-    timepoint VARCHAR(1000),
-    timepoint_codespace VARCHAR(1000),
-    trip_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_traffic_area 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_traffic_area
@@ -1214,50 +795,6 @@ CREATE TABLE ur_trafficvolumeattribute
 );
 
 -- -------------------------------------------------------------------- 
--- ur_transfer 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_transfer
-(
-    id BIGINT NOT NULL,
-    from_id BIGINT,
-    mintransfertime INTEGER,
-    to_id BIGINT,
-    transfertype VARCHAR(1000),
-    transfertype_codespace VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_translation 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_translation
-(
-    id BIGINT NOT NULL,
-    fieldname VARCHAR(1000),
-    fieldvalue VARCHAR(1000),
-    language VARCHAR(1000),
-    language_codespace VARCHAR(1000),
-    recordid_id BIGINT,
-    recordsubid VARCHAR(1000),
-    tablename VARCHAR(1000),
-    tablename_codespace VARCHAR(1000),
-    translation VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_translationjp 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_translationjp
-(
-    id BIGINT NOT NULL,
-    language VARCHAR(1000),
-    language_codespace VARCHAR(1000),
-    translation VARCHAR(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_transportation_complex 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_transportation_complex
@@ -1266,31 +803,6 @@ CREATE TABLE ur_transportation_complex
     roaddataqualityattribute_id BIGINT,
     roadstructureattribute_id BIGINT,
     trafficvolumeattribute_id BIGINT,
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_trip 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_trip
-(
-    id BIGINT NOT NULL,
-    bikeallowed VARCHAR(1000),
-    bikeallowed_codespace VARCHAR(1000),
-    blockid VARCHAR(1000),
-    calendar_id BIGINT,
-    calendardate_id BIGINT,
-    directionid VARCHAR(1000),
-    directionid_codespace VARCHAR(1000),
-    headsign VARCHAR(1000),
-    lod0multicurve geometry(GEOMETRYZ),
-    office_id BIGINT,
-    route_id BIGINT,
-    shape_id BIGINT,
-    shortname VARCHAR(1000),
-    symbol VARCHAR(1000),
-    wheelchairaccessib_codespace VARCHAR(1000),
-    wheelchairaccessible VARCHAR(1000),
     PRIMARY KEY (id)
 );
 
@@ -1351,66 +863,6 @@ CREATE TABLE ur_waterbodyriverflooding
     scale VARCHAR(1000),
     scale_codespace VARCHAR(1000),
     PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_populatio_to_populatio 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_populatio_to_populatio
-(
-    populationbyageandsex_id BIGINT NOT NULL,
-    population_id BIGINT NOT NULL,
-    PRIMARY KEY (populationbyageandsex_id, population_id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_landprice_to_landprice 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landprice_to_landprice
-(
-    landpriceperlanduse_id BIGINT NOT NULL,
-    landprice_id BIGINT NOT NULL,
-    PRIMARY KEY (landpriceperlanduse_id, landprice_id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_numberofa 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landusedi_to_numberofa
-(
-    numberofannualdiversio_id BIGINT NOT NULL,
-    landusediversion_id BIGINT NOT NULL,
-    PRIMARY KEY (numberofannualdiversio_id, landusediversion_id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_areaofann 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_landusedi_to_areaofann
-(
-    areaofannualdiversions_id BIGINT NOT NULL,
-    landusediversion_id BIGINT NOT NULL,
-    PRIMARY KEY (areaofannualdiversions_id, landusediversion_id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_statistic_to_keyvaluep 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_statistic_to_keyvaluep
-(
-    keyvaluepair_id BIGINT NOT NULL,
-    statisticalgrid_id BIGINT NOT NULL,
-    PRIMARY KEY (keyvaluepair_id, statisticalgrid_id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_publictra_to_point 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_publictra_to_point
-(
-    point_id BIGINT NOT NULL,
-    publictransit_id BIGINT NOT NULL,
-    PRIMARY KEY (point_id, publictransit_id)
 );
 
 -- -------------------------------------------------------------------- 
@@ -2818,38 +2270,877 @@ CREATE TABLE ur_zone_to_boundary
     PRIMARY KEY (boundary_id, zone_id)
 );
 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
--- *********************************** Create foreign keys ******************************** 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
--- -------------------------------------------------------------------- 
--- ur_agency 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_agency ADD CONSTRAINT ur_agency_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
 -- -------------------------------------------------------------------- 
 -- ur_areaofannualdiversions 
 -- -------------------------------------------------------------------- 
+CREATE TABLE ur_areaofannualdiversions
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_areaofannualdivers_seq'::regclass) NOT NULL,
+    area NUMERIC,
+    area_uom VARCHAR(1000),
+    year DATE,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgr_to_keyvaluep 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_genericgr_to_keyvaluep
+(
+    genericgridcell_id BIGINT NOT NULL,
+    keyvaluepair_id BIGINT NOT NULL,
+    PRIMARY KEY (keyvaluepair_id, genericgridcell_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgridcell 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_genericgridcell
+(
+    id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_households 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_households
+(
+    id BIGINT NOT NULL,
+    numberofmainhousehold INTEGER,
+    numberofordinaryhousehold INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_keyvaluepair 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_keyvaluepair
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_keyvaluepair_seq'::regclass) NOT NULL,
+    codevalue VARCHAR(1000),
+    codevalue_codespace VARCHAR(1000),
+    datevalue TIMESTAMP WITH TIME ZONE,
+    doublevalue NUMERIC,
+    intvalue INTEGER,
+    key VARCHAR(1000),
+    key_codespace VARCHAR(1000),
+    measuredvalue NUMERIC,
+    measuredvalue_uom VARCHAR(1000),
+    stringvalue VARCHAR(1000),
+    urivalue VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landprice
+(
+    id BIGINT NOT NULL,
+    currencyunit VARCHAR(1000),
+    currencyunit_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice_to_landprice 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landprice_to_landprice
+(
+    landprice_id BIGINT NOT NULL,
+    landpriceperlanduse_id BIGINT NOT NULL,
+    PRIMARY KEY (landpriceperlanduse_id, landprice_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landpriceperlanduse 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landpriceperlanduse
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_landpriceperlandus_seq'::regclass) NOT NULL,
+    landprice INTEGER,
+    landuse VARCHAR(1000),
+    landuse_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_areaofann 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landusedi_to_areaofann
+(
+    areaofannualdiversions_id BIGINT NOT NULL,
+    landusediversion_id BIGINT NOT NULL,
+    PRIMARY KEY (areaofannualdiversions_id, landusediversion_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_numberofa 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landusedi_to_numberofa
+(
+    landusediversion_id BIGINT NOT NULL,
+    numberofannualdiversio_id BIGINT NOT NULL,
+    PRIMARY KEY (numberofannualdiversio_id, landusediversion_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_landusediversion 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_landusediversion
+(
+    id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofannualdiversio 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_numberofannualdiversio
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_numberofannualdive_seq'::regclass) NOT NULL,
+    count INTEGER,
+    year DATE,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofhouseholds 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_numberofhouseholds
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_numberofhouseholds_seq'::regclass) NOT NULL,
+    class VARCHAR(1000),
+    class_codespace VARCHAR(1000),
+    households_numberofhouseh__2 BIGINT,
+    households_numberofhouseh_id BIGINT,
+    number_ INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_officesandemployees 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_officesandemployees
+(
+    id BIGINT NOT NULL,
+    numberofemployees INTEGER,
+    numberofoffices INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_populatio_to_populatio 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_populatio_to_populatio
+(
+    population_id BIGINT NOT NULL,
+    populationbyageandsex_id BIGINT NOT NULL,
+    PRIMARY KEY (populationbyageandsex_id, population_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_population 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_population
+(
+    id BIGINT NOT NULL,
+    births INTEGER,
+    daytimepopulation INTEGER,
+    daytimepopulationdensity NUMERIC,
+    deaths INTEGER,
+    femalepopulation INTEGER,
+    increasement INTEGER,
+    malepopulation INTEGER,
+    movefrom INTEGER,
+    moveto INTEGER,
+    naturalincrease INTEGER,
+    socialincrease INTEGER,
+    total INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_populationbyageandsex 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_populationbyageandsex
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_populationbyageand_seq'::regclass) NOT NULL,
+    ageandsex VARCHAR(1000),
+    ageandsex_codespace VARCHAR(1000),
+    number_ INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitaccessibi 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_publictransitaccessibi
+(
+    id BIGINT NOT NULL,
+    availability NUMERIC,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_statisticalgrid 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_statisticalgrid
+(
+    id BIGINT NOT NULL,
+    areaclassification_codespace VARCHAR(1000),
+    areaclassificationtype VARCHAR(1000),
+    city VARCHAR(1000),
+    city_codespace VARCHAR(1000),
+    class VARCHAR(1000),
+    class_codespace VARCHAR(1000),
+    lod_1multisurface_id BIGINT,
+    lod_2multisurface_id BIGINT,
+    objectclass_id INTEGER,
+    prefecture VARCHAR(1000),
+    prefecture_codespace VARCHAR(1000),
+    surveyyear DATE,
+    urbanplantype VARCHAR(1000),
+    urbanplantype_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_agency 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_agency
+(
+    id BIGINT NOT NULL,
+    address VARCHAR(1000),
+    email VARCHAR(1000),
+    fareurl VARCHAR(1000),
+    language VARCHAR(1000),
+    language_codespace VARCHAR(1000),
+    name VARCHAR(1000),
+    officialname VARCHAR(1000),
+    phone VARCHAR(1000),
+    presidentname VARCHAR(1000),
+    presidentposition VARCHAR(1000),
+    timezone VARCHAR(1000),
+    timezone_codespace VARCHAR(1000),
+    url VARCHAR(1000),
+    zipnumber VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_agency 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_attributi_to_agency
+(
+    agency_id BIGINT NOT NULL,
+    attribution_id BIGINT NOT NULL,
+    PRIMARY KEY (agency_id, attribution_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_route 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_attributi_to_route
+(
+    attribution_id BIGINT NOT NULL,
+    route_id BIGINT NOT NULL,
+    PRIMARY KEY (route_id, attribution_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_trip 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_attributi_to_trip
+(
+    attribution_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (trip_id, attribution_id)
+);
+
 -- -------------------------------------------------------------------- 
 -- ur_attribution 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
+CREATE TABLE ur_attribution
+(
+    id BIGINT NOT NULL,
+    email VARCHAR(1000),
+    isauthority NUMERIC,
+    isoperator NUMERIC,
+    isproducer NUMERIC,
+    organizationname VARCHAR(1000),
+    phonenumber VARCHAR(1000),
+    url VARCHAR(1000),
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_route_fk FOREIGN KEY (route_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
+-- -------------------------------------------------------------------- 
+-- ur_calendar 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_calendar
+(
+    id BIGINT NOT NULL,
+    enddate TIMESTAMP WITH TIME ZONE,
+    friday NUMERIC,
+    monday NUMERIC,
+    saturday NUMERIC,
+    startdate TIMESTAMP WITH TIME ZONE,
+    sunday NUMERIC,
+    thursday NUMERIC,
+    tuesday NUMERIC,
+    wednesday NUMERIC,
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_agency_fk FOREIGN KEY (agency_id)
-REFERENCES ur_agency (id)
-ON DELETE SET NULL;
+-- -------------------------------------------------------------------- 
+-- ur_calendard_to_calendar 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_calendard_to_calendar
+(
+    calendar_id BIGINT NOT NULL,
+    calendardate_id BIGINT NOT NULL,
+    PRIMARY KEY (calendar_id, calendardate_id)
+);
 
-ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_trip_fk FOREIGN KEY (trip_id)
-REFERENCES ur_trip (id)
-ON DELETE SET NULL;
+-- -------------------------------------------------------------------- 
+-- ur_calendardate 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_calendardate
+(
+    id BIGINT NOT NULL,
+    date_ TIMESTAMP WITH TIME ZONE,
+    exceptiontype VARCHAR(1000),
+    exceptiontype_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
 
+-- -------------------------------------------------------------------- 
+-- ur_description 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_description
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_description_seq'::regclass) NOT NULL,
+    description VARCHAR(1000),
+    frequencyofservice INTEGER,
+    numberofcustomers INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattri_to_agency 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_fareattri_to_agency
+(
+    agency_id BIGINT NOT NULL,
+    fareattribute_id BIGINT NOT NULL,
+    PRIMARY KEY (agency_id, fareattribute_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_fareattribute
+(
+    id BIGINT NOT NULL,
+    currencytype VARCHAR(1000),
+    currencytype_codespace VARCHAR(1000),
+    paymentmethod VARCHAR(1000),
+    paymentmethod_codespace VARCHAR(1000),
+    price NUMERIC,
+    transferduration INTEGER,
+    transfers VARCHAR(1000),
+    transfers_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_farerule
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_farerule_seq'::regclass) NOT NULL,
+    containsid VARCHAR(1000),
+    containsid_codespace VARCHAR(1000),
+    destinationid VARCHAR(1000),
+    destinationid_codespace VARCHAR(1000),
+    originid VARCHAR(1000),
+    originid_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_fareattri 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_farerule_to_fareattri
+(
+    fareattribute_id BIGINT NOT NULL,
+    farerule_id BIGINT NOT NULL,
+    PRIMARY KEY (fareattribute_id, farerule_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_route 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_farerule_to_route
+(
+    farerule_id BIGINT NOT NULL,
+    route_id BIGINT NOT NULL,
+    PRIMARY KEY (route_id, farerule_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_feedinfo 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_feedinfo
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_feedinfo_seq'::regclass) NOT NULL,
+    contactemail VARCHAR(1000),
+    contacturl VARCHAR(1000),
+    defaultlanguage VARCHAR(1000),
+    defaultlanguage_codespace VARCHAR(1000),
+    detailedinfo VARCHAR(1000),
+    enddate TIMESTAMP WITH TIME ZONE,
+    language VARCHAR(1000),
+    language_codespace VARCHAR(1000),
+    publishername VARCHAR(1000),
+    publisherurl VARCHAR(1000),
+    startdate TIMESTAMP WITH TIME ZONE,
+    version VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_frequency
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_frequency_seq'::regclass) NOT NULL,
+    endtime TIMESTAMP WITH TIME ZONE,
+    exacttimes VARCHAR(1000),
+    exacttimes_codespace VARCHAR(1000),
+    headwaysecs INTEGER,
+    starttime TIMESTAMP WITH TIME ZONE,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency_to_trip 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_frequency_to_trip
+(
+    frequency_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (trip_id, frequency_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_level 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_level
+(
+    id BIGINT NOT NULL,
+    index_ NUMERIC,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_office 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_office
+(
+    id BIGINT NOT NULL,
+    name VARCHAR(1000),
+    phone VARCHAR(1000),
+    url VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_pathway
+(
+    id BIGINT NOT NULL,
+    isbidirectional VARCHAR(1000),
+    isbidirectional_codespace VARCHAR(1000),
+    length NUMERIC,
+    length_uom VARCHAR(1000),
+    maxslope NUMERIC,
+    minwidth NUMERIC,
+    mode_ VARCHAR(1000),
+    mode__codespace VARCHAR(1000),
+    reversedsignpostedas VARCHAR(1000),
+    signpostedas VARCHAR(1000),
+    staircount INTEGER,
+    traversaltime INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_pathway_to_stop
+(
+    pathway_id BIGINT NOT NULL,
+    stop_id BIGINT NOT NULL,
+    PRIMARY KEY (stop_id, pathway_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop_2 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_pathway_to_stop_2
+(
+    pathway_id BIGINT NOT NULL,
+    stop_id BIGINT NOT NULL,
+    PRIMARY KEY (stop_id, pathway_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_point 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_point
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_point_seq'::regclass) NOT NULL,
+    latitude NUMERIC,
+    longitude NUMERIC,
+    point geometry(GEOMETRYZ),
+    pointdistancetraveled NUMERIC,
+    pointsequence INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_publictra_to_cityobjec 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_publictra_to_cityobjec
+(
+    cityobject_id BIGINT NOT NULL,
+    publictransit_id BIGINT NOT NULL,
+    PRIMARY KEY (cityobject_id, publictransit_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransit 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_publictransit
+(
+    id BIGINT NOT NULL,
+    objectclass_id INTEGER,
+    orgid VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitdatatype 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_publictransitdatatype
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_publictransitdatat_seq'::regclass) NOT NULL,
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_route 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_route
+(
+    id BIGINT NOT NULL,
+    color VARCHAR(1000),
+    continuousdropoff VARCHAR(1000),
+    continuousdropoff_codespace VARCHAR(1000),
+    continuouspickup VARCHAR(1000),
+    continuouspickup_codespace VARCHAR(1000),
+    description_id BIGINT,
+    destinationstop VARCHAR(1000),
+    lod0multicurve geometry(GEOMETRYZ),
+    longname VARCHAR(1000),
+    originstop VARCHAR(1000),
+    routesortorder INTEGER,
+    shortname VARCHAR(1000),
+    textcolor VARCHAR(1000),
+    type VARCHAR(1000),
+    type_codespace VARCHAR(1000),
+    updatedate TIMESTAMP WITH TIME ZONE,
+    url VARCHAR(1000),
+    viastop VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_agency 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_route_to_agency
+(
+    agency_id BIGINT NOT NULL,
+    route_id BIGINT NOT NULL,
+    PRIMARY KEY (agency_id, route_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_route 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_route_to_route
+(
+    route_id BIGINT NOT NULL,
+    route_id_2 BIGINT NOT NULL,
+    PRIMARY KEY (route_id_2, route_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_shape 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_shape
+(
+    id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_shape_to_point 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_shape_to_point
+(
+    point_id BIGINT NOT NULL,
+    shape_id BIGINT NOT NULL,
+    PRIMARY KEY (point_id, shape_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stop 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stop
+(
+    id BIGINT NOT NULL,
+    code VARCHAR(1000),
+    code_codespace VARCHAR(1000),
+    latitude NUMERIC,
+    locationtype VARCHAR(1000),
+    locationtype_codespace VARCHAR(1000),
+    longitude NUMERIC,
+    platformcode VARCHAR(1000),
+    point geometry(GEOMETRYZ),
+    timezone VARCHAR(1000),
+    timezone_codespace VARCHAR(1000),
+    ttsname VARCHAR(1000),
+    url VARCHAR(1000),
+    wheelchairboarding VARCHAR(1000),
+    wheelchairboarding_codespace VARCHAR(1000),
+    zoneid VARCHAR(1000),
+    zoneid_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_level 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stop_to_level
+(
+    level__id BIGINT NOT NULL,
+    stop_id BIGINT NOT NULL,
+    PRIMARY KEY (level__id, stop_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_stop 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stop_to_stop
+(
+    stop_id BIGINT NOT NULL,
+    stop_id_2 BIGINT NOT NULL,
+    PRIMARY KEY (stop_id_2, stop_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stoptime
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_stoptime_seq'::regclass) NOT NULL,
+    arrivaltime TIMESTAMP WITH TIME ZONE,
+    continuousdropofft_codespace VARCHAR(1000),
+    continuousdropofftype VARCHAR(1000),
+    continuouspickupty_codespace VARCHAR(1000),
+    continuouspickuptype VARCHAR(1000),
+    departuretime TIMESTAMP WITH TIME ZONE,
+    dropofftype VARCHAR(1000),
+    dropofftype_codespace VARCHAR(1000),
+    headsign VARCHAR(1000),
+    pickuptype VARCHAR(1000),
+    pickuptype_codespace VARCHAR(1000),
+    shapedistancetraveled NUMERIC,
+    stopsequence INTEGER,
+    timepoint VARCHAR(1000),
+    timepoint_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_stop 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stoptime_to_stop
+(
+    stop_id BIGINT NOT NULL,
+    stoptime_id BIGINT NOT NULL,
+    PRIMARY KEY (stop_id, stoptime_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_trip 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_stoptime_to_trip
+(
+    stoptime_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (trip_id, stoptime_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_transfer
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_transfer_seq'::regclass) NOT NULL,
+    mintransfertime INTEGER,
+    transfertype VARCHAR(1000),
+    transfertype_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_transfer_to_stop
+(
+    stop_id BIGINT NOT NULL,
+    transfer_id BIGINT NOT NULL,
+    PRIMARY KEY (stop_id, transfer_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop_2 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_transfer_to_stop_2
+(
+    stop_id BIGINT NOT NULL,
+    transfer_id BIGINT NOT NULL,
+    PRIMARY KEY (stop_id, transfer_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_translati_to_publictra 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_translati_to_publictra
+(
+    publictransit_id BIGINT NOT NULL,
+    translation_id BIGINT NOT NULL,
+    PRIMARY KEY (publictransit_id, translation_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_translation 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_translation
+(
+    id BIGINT NOT NULL DEFAULT nextval('ur_translation_seq'::regclass) NOT NULL,
+    fieldname VARCHAR(1000),
+    fieldvalue VARCHAR(1000),
+    language VARCHAR(1000),
+    language_codespace VARCHAR(1000),
+    recordsubid VARCHAR(1000),
+    tablename VARCHAR(1000),
+    tablename_codespace VARCHAR(1000),
+    translation VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_translationjp 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_translationjp
+(
+    id BIGINT NOT NULL,
+    language VARCHAR(1000),
+    language_codespace VARCHAR(1000),
+    translation VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip
+(
+    id BIGINT NOT NULL,
+    bikeallowed VARCHAR(1000),
+    bikeallowed_codespace VARCHAR(1000),
+    blockid VARCHAR(1000),
+    directionid VARCHAR(1000),
+    directionid_codespace VARCHAR(1000),
+    headsign VARCHAR(1000),
+    lod0multicurve geometry(GEOMETRYZ),
+    shortname VARCHAR(1000),
+    symbol VARCHAR(1000),
+    wheelchairaccessib_codespace VARCHAR(1000),
+    wheelchairaccessible VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendar 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip_to_calendar
+(
+    calendar_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (calendar_id, trip_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendard 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip_to_calendard
+(
+    calendardate_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (calendardate_id, trip_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_office 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip_to_office
+(
+    office_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (office_id, trip_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_route 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip_to_route
+(
+    route_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (route_id, trip_id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_shape 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_trip_to_shape
+(
+    shape_id BIGINT NOT NULL,
+    trip_id BIGINT NOT NULL,
+    PRIMARY KEY (shape_id, trip_id)
+);
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+-- *********************************** Create foreign keys ******************************** 
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- -------------------------------------------------------------------- 
 -- ur_building 
 -- -------------------------------------------------------------------- 
@@ -2928,24 +3219,6 @@ REFERENCES ur_buildingfloodingriskat (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
--- ur_calendar 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_calendar ADD CONSTRAINT ur_calendar_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_calendardate 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_calendardate ADD CONSTRAINT ur_calendardate_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_calendardate ADD CONSTRAINT ur_calendardat_calendar_fk FOREIGN KEY (calendar_id)
-REFERENCES ur_calendar (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
 -- ur_city_furniture 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furniture_fk FOREIGN KEY (id)
@@ -3020,60 +3293,6 @@ REFERENCES cityobjectgroup (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
--- ur_fareattribute 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_fareattribute ADD CONSTRAINT ur_fareattribute_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_fareattribute ADD CONSTRAINT ur_fareattribute_agency_fk FOREIGN KEY (agency_id)
-REFERENCES ur_agency (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_farerule 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_route_fk FOREIGN KEY (route_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_fare_fk FOREIGN KEY (fare_id)
-REFERENCES ur_fareattribute (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_feedinfo 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_feedinfo ADD CONSTRAINT ur_feedinfo_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_frequency 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_frequency ADD CONSTRAINT ur_frequency_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_frequency ADD CONSTRAINT ur_frequency_trip_fk FOREIGN KEY (trip_id)
-REFERENCES ur_trip (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_households 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_households ADD CONSTRAINT ur_households_fk FOREIGN KEY (id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_keyvaluepair 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
 -- -------------------------------------------------------------------- 
@@ -3088,102 +3307,11 @@ REFERENCES ur_landuseattribute (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
--- ur_landprice 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landprice ADD CONSTRAINT ur_landprice_fk FOREIGN KEY (id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_landpriceperlanduse 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_landusediversion 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusediversion ADD CONSTRAINT ur_landusediversion_fk FOREIGN KEY (id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
 -- ur_largecustomerfacilitya 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_largecustomerfacilitya ADD CONSTRAINT ur_largecustomerfacilit_fk FOREIGN KEY (id)
 REFERENCES ur_buildingattribute (id)
 ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_numberofannualdiversio 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_numberofhouseholds 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_numberofhouseholds ADD CONSTRAINT ur_number_househ_number_fk FOREIGN KEY (households_numberofhouseh_id)
-REFERENCES ur_households (id);
-
-ALTER TABLE ur_numberofhouseholds ADD CONSTRAINT ur_number_house_numbe_fk_1 FOREIGN KEY (households_numberofhous_id_1)
-REFERENCES ur_households (id);
-
--- -------------------------------------------------------------------- 
--- ur_office 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_office ADD CONSTRAINT ur_office_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_officesandemployees 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_officesandemployees ADD CONSTRAINT ur_officesandemployees_fk FOREIGN KEY (id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_pathway 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_pathway ADD CONSTRAINT ur_pathway_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_pathway ADD CONSTRAINT ur_pathway_from_fk FOREIGN KEY (from_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_pathway ADD CONSTRAINT ur_pathway_to_fk FOREIGN KEY (to_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_point 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_population 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_population ADD CONSTRAINT ur_population_fk FOREIGN KEY (id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_populationbyageandsex 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_publictransit 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictransit ADD CONSTRAINT ur_publictran_objectcla_fk FOREIGN KEY (objectclass_id)
-REFERENCES objectclass (id);
-
-ALTER TABLE ur_publictransit ADD CONSTRAINT ur_publictransit_fk FOREIGN KEY (id)
-REFERENCES cityobject (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_publictransit ADD CONSTRAINT ur_publictransit_target_fk FOREIGN KEY (target_id)
-REFERENCES cityobject (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_publictransitdatatype 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictransitdatatype ADD CONSTRAINT ur_publictra_objectcl_fk_1 FOREIGN KEY (objectclass_id)
-REFERENCES objectclass (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_roadattribute 
@@ -3206,71 +3334,6 @@ REFERENCES ur_roadattribute (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
--- ur_route 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_route ADD CONSTRAINT ur_route_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_route ADD CONSTRAINT ur_route_parentroute_fk FOREIGN KEY (parentroute_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_route ADD CONSTRAINT ur_route_description_fk FOREIGN KEY (description_id)
-REFERENCES ur_description (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_route ADD CONSTRAINT ur_route_agency_fk FOREIGN KEY (agency_id)
-REFERENCES ur_agency (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_statisticalgrid 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisticalgrid_fk FOREIGN KEY (id)
-REFERENCES cityobject (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statistica_objectcla_fk FOREIGN KEY (objectclass_id)
-REFERENCES objectclass (id);
-
-ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisti_lod_1multis_fk FOREIGN KEY (lod_1multisurface_id)
-REFERENCES surface_geometry (id);
-
-ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisti_lod_2multis_fk FOREIGN KEY (lod_2multisurface_id)
-REFERENCES surface_geometry (id);
-
--- -------------------------------------------------------------------- 
--- ur_stop 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_stop ADD CONSTRAINT ur_stop_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_stop ADD CONSTRAINT ur_stop_parentstation_fk FOREIGN KEY (parentstation_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_stop ADD CONSTRAINT ur_stop_level_fk FOREIGN KEY (level_id)
-REFERENCES ur_publictransit (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_stoptime 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_stop_fk FOREIGN KEY (stop_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_trip_fk FOREIGN KEY (trip_id)
-REFERENCES ur_trip (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
 -- ur_traffic_area 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_traffic_area ADD CONSTRAINT ur_traffic_area_fk FOREIGN KEY (id)
@@ -3286,39 +3349,6 @@ ON DELETE SET NULL;
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_trafficvolumeattribute ADD CONSTRAINT ur_trafficvolumeattribu_fk FOREIGN KEY (id)
 REFERENCES ur_roadattribute (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_transfer 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_transfer ADD CONSTRAINT ur_transfer_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_transfer ADD CONSTRAINT ur_transfer_from_fk FOREIGN KEY (from_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transfer ADD CONSTRAINT ur_transfer_to_fk FOREIGN KEY (to_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_translation 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_translation ADD CONSTRAINT ur_translation_fk FOREIGN KEY (id)
-REFERENCES ur_publictransitdatatype (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_translation ADD CONSTRAINT ur_translation_recordid_fk FOREIGN KEY (recordid_id)
-REFERENCES ur_publictransit (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
--- ur_translationjp 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_translationjp ADD CONSTRAINT ur_translationjp_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -3341,33 +3371,6 @@ REFERENCES ur_roaddataqualityattribu (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
--- ur_trip 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_fk FOREIGN KEY (id)
-REFERENCES ur_publictransit (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_shape_fk FOREIGN KEY (shape_id)
-REFERENCES ur_publictransit (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_route_fk FOREIGN KEY (route_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_calendar_fk FOREIGN KEY (calendar_id)
-REFERENCES ur_calendar (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_calendardate_fk FOREIGN KEY (calendardate_id)
-REFERENCES ur_calendardate (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_office_fk FOREIGN KEY (office_id)
-REFERENCES ur_office (id)
-ON DELETE SET NULL;
-
--- -------------------------------------------------------------------- 
 -- ur_waterbody 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_fk FOREIGN KEY (id)
@@ -3385,72 +3388,6 @@ REFERENCES objectclass (id);
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_waterbodyriverflooding ADD CONSTRAINT ur_waterbodyriverfloodi_fk FOREIGN KEY (id)
 REFERENCES ur_waterbodyattribute (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_populatio_to_populatio 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_populatio_to_populatio ADD CONSTRAINT ur_populatio_populationb_fk FOREIGN KEY (populationbyageandsex_id)
-REFERENCES ur_populationbyageandsex (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_populatio_to_populatio ADD CONSTRAINT ur_populatio_population__fk FOREIGN KEY (population_id)
-REFERENCES ur_population (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_landprice_to_landprice 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landprice_to_landprice ADD CONSTRAINT ur_landprice_landpricepe_fk FOREIGN KEY (landpriceperlanduse_id)
-REFERENCES ur_landpriceperlanduse (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_landprice_to_landprice ADD CONSTRAINT ur_landprice_landprice_i_fk FOREIGN KEY (landprice_id)
-REFERENCES ur_landprice (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_numberofa 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusedi_to_numberofa ADD CONSTRAINT ur_landusedi_numberofann_fk FOREIGN KEY (numberofannualdiversio_id)
-REFERENCES ur_numberofannualdiversio (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_landusedi_to_numberofa ADD CONSTRAINT ur_landusedi_landusedive_fk FOREIGN KEY (landusediversion_id)
-REFERENCES ur_landusediversion (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_areaofann 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_landusedi_to_areaofann ADD CONSTRAINT ur_landusedi_areaofannua_fk FOREIGN KEY (areaofannualdiversions_id)
-REFERENCES ur_areaofannualdiversions (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_landusedi_to_areaofann ADD CONSTRAINT ur_landusedi_landusedive_fk_3 FOREIGN KEY (landusediversion_id)
-REFERENCES ur_landusediversion (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_statistic_to_keyvaluep 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_statistic_to_keyvaluep ADD CONSTRAINT ur_statistic_keyvaluepai_fk FOREIGN KEY (keyvaluepair_id)
-REFERENCES ur_keyvaluepair (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_statistic_to_keyvaluep ADD CONSTRAINT ur_statistic_statistical_fk FOREIGN KEY (statisticalgrid_id)
-REFERENCES ur_statisticalgrid (id)
-ON DELETE CASCADE;
-
--- -------------------------------------------------------------------- 
--- ur_publictra_to_point 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_publictra_to_point ADD CONSTRAINT ur_publictra_point_id_fk FOREIGN KEY (point_id)
-REFERENCES ur_point (id)
-ON DELETE CASCADE;
-
-ALTER TABLE ur_publictra_to_point ADD CONSTRAINT ur_publictra_publictrans_fk FOREIGN KEY (publictransit_id)
-REFERENCES ur_publictransit (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -4272,33 +4209,535 @@ ALTER TABLE ur_zone_to_boundary ADD CONSTRAINT ur_zone_to_b_zone_id_fk FOREIGN K
 REFERENCES ur_zone (id)
 ON DELETE CASCADE;
 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
--- *********************************** Create Indexes ************************************* 
--- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- -------------------------------------------------------------------- 
--- ur_areaofannualdiversions 
+-- ur_genericgr_to_keyvaluep 
 -- -------------------------------------------------------------------- 
+ALTER TABLE ur_genericgr_to_keyvaluep ADD CONSTRAINT ur_genericgr_genericgrid_fk FOREIGN KEY (genericgridcell_id)
+REFERENCES ur_genericgridcell (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_genericgr_to_keyvaluep ADD CONSTRAINT ur_genericgr_keyvaluepai_fk FOREIGN KEY (keyvaluepair_id)
+REFERENCES ur_keyvaluepair (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_genericgridcell 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_genericgridcell ADD CONSTRAINT ur_genericgridcell_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_households 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_households ADD CONSTRAINT ur_households_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landprice ADD CONSTRAINT ur_landprice_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_landprice_to_landprice 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landprice_to_landprice ADD CONSTRAINT ur_landprice_landprice_i_fk FOREIGN KEY (landprice_id)
+REFERENCES ur_landprice (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_landprice_to_landprice ADD CONSTRAINT ur_landprice_landpricepe_fk FOREIGN KEY (landpriceperlanduse_id)
+REFERENCES ur_landpriceperlanduse (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_areaofann 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusedi_to_areaofann ADD CONSTRAINT ur_landusedi_areaofannua_fk FOREIGN KEY (areaofannualdiversions_id)
+REFERENCES ur_areaofannualdiversions (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_landusedi_to_areaofann ADD CONSTRAINT ur_landusedi_landusedive_fk FOREIGN KEY (landusediversion_id)
+REFERENCES ur_landusediversion (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusedi_to_numberofa 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusedi_to_numberofa ADD CONSTRAINT ur_landusedi_landusedive_fk_2 FOREIGN KEY (landusediversion_id)
+REFERENCES ur_landusediversion (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_landusedi_to_numberofa ADD CONSTRAINT ur_landusedi_numberofann_fk FOREIGN KEY (numberofannualdiversio_id)
+REFERENCES ur_numberofannualdiversio (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_landusediversion 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_landusediversion ADD CONSTRAINT ur_landusediversion_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofhouseholds 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_numberofhouseholds ADD CONSTRAINT ur_numberofh_households__fk FOREIGN KEY (households_numberofhouseh__2)
+REFERENCES ur_households (id);
+
+ALTER TABLE ur_numberofhouseholds ADD CONSTRAINT ur_numberofh_households__fk_2 FOREIGN KEY (households_numberofhouseh_id)
+REFERENCES ur_households (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_officesandemployees 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_officesandemployees ADD CONSTRAINT ur_officesandemployees_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_populatio_to_populatio 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_populatio_to_populatio ADD CONSTRAINT ur_populatio_population__fk FOREIGN KEY (population_id)
+REFERENCES ur_population (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_populatio_to_populatio ADD CONSTRAINT ur_populatio_populationb_fk FOREIGN KEY (populationbyageandsex_id)
+REFERENCES ur_populationbyageandsex (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_population 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_population ADD CONSTRAINT ur_population_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitaccessibi 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransitaccessibi ADD CONSTRAINT ur_publictransitaccessibi_fk FOREIGN KEY (id)
+REFERENCES ur_statisticalgrid (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_statisticalgrid 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisticalg_objectclass_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statisticalgrid_fk FOREIGN KEY (id)
+REFERENCES cityobject (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statistic_lod_1multis_fk FOREIGN KEY (lod_1multisurface_id)
+REFERENCES surface_geometry (id);
+
+ALTER TABLE ur_statisticalgrid ADD CONSTRAINT ur_statistic_lod_2multis_fk FOREIGN KEY (lod_2multisurface_id)
+REFERENCES surface_geometry (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_agency ADD CONSTRAINT ur_agency_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_attributi_to_agency ADD CONSTRAINT ur_attributi_agency_id_fk FOREIGN KEY (agency_id)
+REFERENCES ur_agency (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_attributi_to_agency ADD CONSTRAINT ur_attributi_attribution_fk FOREIGN KEY (attribution_id)
+REFERENCES ur_attribution (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_attributi_to_route ADD CONSTRAINT ur_attributi_attribution_fk_2 FOREIGN KEY (attribution_id)
+REFERENCES ur_attribution (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_attributi_to_route ADD CONSTRAINT ur_attributi_route_id_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_attributi_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_attributi_to_trip ADD CONSTRAINT ur_attributi_attribution_fk_3 FOREIGN KEY (attribution_id)
+REFERENCES ur_attribution (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_attributi_to_trip ADD CONSTRAINT ur_attributi_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
 -- -------------------------------------------------------------------- 
 -- ur_attribution 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_attribution_agency_fkx ON ur_attribution
-    USING btree
-    (
-      agency_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
+ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
 
-CREATE INDEX ur_attribution_route_fkx ON ur_attribution
-    USING btree
-    (
-      route_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
+-- -------------------------------------------------------------------- 
+-- ur_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendar ADD CONSTRAINT ur_calendar_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
 
-CREATE INDEX ur_attribution_trip_fkx ON ur_attribution
-    USING btree
-    (
-      trip_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
+-- -------------------------------------------------------------------- 
+-- ur_calendard_to_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendard_to_calendar ADD CONSTRAINT ur_calendard_calendar_id_fk FOREIGN KEY (calendar_id)
+REFERENCES ur_calendar (id)
+ON DELETE CASCADE;
 
+ALTER TABLE ur_calendard_to_calendar ADD CONSTRAINT ur_calendard_calendardat_fk FOREIGN KEY (calendardate_id)
+REFERENCES ur_calendardate (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_calendardate 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_calendardate ADD CONSTRAINT ur_calendardate_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattri_to_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_fareattri_to_agency ADD CONSTRAINT ur_fareattri_agency_id_fk FOREIGN KEY (agency_id)
+REFERENCES ur_agency (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_fareattri_to_agency ADD CONSTRAINT ur_fareattri_fareattribu_fk FOREIGN KEY (fareattribute_id)
+REFERENCES ur_fareattribute (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_fareattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_fareattribute ADD CONSTRAINT ur_fareattribute_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_fareattri 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_farerule_to_fareattri ADD CONSTRAINT ur_farerule__fareattribu_fk FOREIGN KEY (fareattribute_id)
+REFERENCES ur_fareattribute (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_farerule_to_fareattri ADD CONSTRAINT ur_farerule__farerule_id_fk FOREIGN KEY (farerule_id)
+REFERENCES ur_farerule (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_farerule_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_farerule_to_route ADD CONSTRAINT ur_farerule__farerule_id_fk_2 FOREIGN KEY (farerule_id)
+REFERENCES ur_farerule (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_farerule_to_route ADD CONSTRAINT ur_farerule__route_id_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_frequency_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_frequency_to_trip ADD CONSTRAINT ur_frequency_frequency_i_fk FOREIGN KEY (frequency_id)
+REFERENCES ur_frequency (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_frequency_to_trip ADD CONSTRAINT ur_frequency_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_level 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_level ADD CONSTRAINT ur_level_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_office 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_office ADD CONSTRAINT ur_office_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway ADD CONSTRAINT ur_pathway_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway_to_stop ADD CONSTRAINT ur_pathway_t_pathway_id_fk FOREIGN KEY (pathway_id)
+REFERENCES ur_pathway (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_pathway_to_stop ADD CONSTRAINT ur_pathway_t_stop_id_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_pathway_to_stop_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pathway_to_stop_2 ADD CONSTRAINT ur_pathway_t_pathway_id_fk_2 FOREIGN KEY (pathway_id)
+REFERENCES ur_pathway (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_pathway_to_stop_2 ADD CONSTRAINT ur_pathway_t_stop_id_fk_2 FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictra_to_cityobjec 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictra_to_cityobjec ADD CONSTRAINT ur_publictra_cityobject__fk FOREIGN KEY (cityobject_id)
+REFERENCES cityobject (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_publictra_to_cityobjec ADD CONSTRAINT ur_publictra_publictrans_fk FOREIGN KEY (publictransit_id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransit 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransit ADD CONSTRAINT ur_publictransi_objectclass_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_publictransit ADD CONSTRAINT ur_publictransit_fk FOREIGN KEY (id)
+REFERENCES cityobject (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitdatatype 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_publictransitdatatype ADD CONSTRAINT ur_publictransi_objectclass__2 FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route ADD CONSTRAINT ur_route_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_route ADD CONSTRAINT ur_route_description_fk FOREIGN KEY (description_id)
+REFERENCES ur_description (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_agency 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route_to_agency ADD CONSTRAINT ur_route_to__agency_id_fk FOREIGN KEY (agency_id)
+REFERENCES ur_agency (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_route_to_agency ADD CONSTRAINT ur_route_to__route_id_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_route_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_route_to_route ADD CONSTRAINT ur_route_to__route_id_fk_2 FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_route_to_route ADD CONSTRAINT ur_route_to__route_id_2_fk FOREIGN KEY (route_id_2)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_shape ADD CONSTRAINT ur_shape_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_shape_to_point 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_shape_to_point ADD CONSTRAINT ur_shape_to__point_id_fk FOREIGN KEY (point_id)
+REFERENCES ur_point (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_shape_to_point ADD CONSTRAINT ur_shape_to__shape_id_fk FOREIGN KEY (shape_id)
+REFERENCES ur_shape (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop ADD CONSTRAINT ur_stop_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_level 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop_to_level ADD CONSTRAINT ur_stop_to_l_level__id_fk FOREIGN KEY (level__id)
+REFERENCES ur_level (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_stop_to_level ADD CONSTRAINT ur_stop_to_l_stop_id_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_stop_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stop_to_stop ADD CONSTRAINT ur_stop_to_s_stop_id_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_stop_to_stop ADD CONSTRAINT ur_stop_to_s_stop_id_2_fk FOREIGN KEY (stop_id_2)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stoptime_to_stop ADD CONSTRAINT ur_stoptime__stop_id_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_stoptime_to_stop ADD CONSTRAINT ur_stoptime__stoptime_id_fk FOREIGN KEY (stoptime_id)
+REFERENCES ur_stoptime (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_stoptime_to_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_stoptime_to_trip ADD CONSTRAINT ur_stoptime__stoptime_id_fk_2 FOREIGN KEY (stoptime_id)
+REFERENCES ur_stoptime (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_stoptime_to_trip ADD CONSTRAINT ur_stoptime__trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_transfer_to_stop ADD CONSTRAINT ur_transfer__stop_id_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_transfer_to_stop ADD CONSTRAINT ur_transfer__transfer_id_fk FOREIGN KEY (transfer_id)
+REFERENCES ur_transfer (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_transfer_to_stop_2 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_transfer_to_stop_2 ADD CONSTRAINT ur_transfer__stop_id_fk_2 FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_transfer_to_stop_2 ADD CONSTRAINT ur_transfer__transfer_id_fk_2 FOREIGN KEY (transfer_id)
+REFERENCES ur_transfer (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_translati_to_publictra 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_translati_to_publictra ADD CONSTRAINT ur_translati_publictrans_fk FOREIGN KEY (publictransit_id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_translati_to_publictra ADD CONSTRAINT ur_translati_translation_fk FOREIGN KEY (translation_id)
+REFERENCES ur_translation (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_translationjp 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_translationjp ADD CONSTRAINT ur_translationjp_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_fk FOREIGN KEY (id)
+REFERENCES ur_publictransit (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendar 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_calendar ADD CONSTRAINT ur_trip_to_c_calendar_id_fk FOREIGN KEY (calendar_id)
+REFERENCES ur_calendar (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_trip_to_calendar ADD CONSTRAINT ur_trip_to_c_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_calendard 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_calendard ADD CONSTRAINT ur_trip_to_c_calendardat_fk FOREIGN KEY (calendardate_id)
+REFERENCES ur_calendardate (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_trip_to_calendard ADD CONSTRAINT ur_trip_to_c_trip_id_fk_2 FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_office 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_office ADD CONSTRAINT ur_trip_to_o_office_id_fk FOREIGN KEY (office_id)
+REFERENCES ur_office (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_trip_to_office ADD CONSTRAINT ur_trip_to_o_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_route 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_route ADD CONSTRAINT ur_trip_to_r_route_id_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_trip_to_route ADD CONSTRAINT ur_trip_to_r_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- -------------------------------------------------------------------- 
+-- ur_trip_to_shape 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_trip_to_shape ADD CONSTRAINT ur_trip_to_s_shape_id_fk FOREIGN KEY (shape_id)
+REFERENCES ur_shape (id)
+ON DELETE CASCADE;
+
+ALTER TABLE ur_trip_to_shape ADD CONSTRAINT ur_trip_to_s_trip_id_fk FOREIGN KEY (trip_id)
+REFERENCES ur_trip (id)
+ON DELETE CASCADE;
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+-- *********************************** Create Indexes ************************************* 
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- -------------------------------------------------------------------- 
 -- ur_building 
 -- -------------------------------------------------------------------- 
@@ -4354,15 +4793,6 @@ CREATE INDEX ur_buildingf_objectcla_fkx ON ur_buildingfloodingriskat
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
--- ur_calendardate 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_calendarda_calendar_fkx ON ur_calendardate
-    USING btree
-    (
-      calendar_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
 -- ur_city_furniture 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_city_furnit_cityf_fkx_1 ON ur_city_furniture
@@ -4396,42 +4826,6 @@ CREATE INDEX ur_cityobjec_vegetatio_fkx ON ur_cityobject
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
--- ur_fareattribute 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_fareattribut_agency_fkx ON ur_fareattribute
-    USING btree
-    (
-      agency_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_farerule 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_farerule_fare_fkx ON ur_farerule
-    USING btree
-    (
-      fare_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_farerule_route_fkx ON ur_farerule
-    USING btree
-    (
-      route_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_frequency 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_frequency_trip_fkx ON ur_frequency
-    USING btree
-    (
-      trip_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_keyvaluepair 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
 -- -------------------------------------------------------------------- 
@@ -4444,78 +4838,6 @@ CREATE INDEX ur_land_use_landusedet_fkx ON ur_land_use
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
--- ur_landpriceperlanduse 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_numberofannualdiversio 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_numberofhouseholds 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_numbe_house_numbe_fkx_1 ON ur_numberofhouseholds
-    USING btree
-    (
-      households_numberofhous_id_1 ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_number_househ_numbe_fkx ON ur_numberofhouseholds
-    USING btree
-    (
-      households_numberofhouseh_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_pathway 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_pathway_from_fkx ON ur_pathway
-    USING btree
-    (
-      from_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_pathway_to_fkx ON ur_pathway
-    USING btree
-    (
-      to_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_point 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_point_point_spx ON ur_point
-    USING gist
-    (
-      point
-    );
-
--- -------------------------------------------------------------------- 
--- ur_populationbyageandsex 
--- -------------------------------------------------------------------- 
--- -------------------------------------------------------------------- 
--- ur_publictransit 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_publictra_objectcla_fkx ON ur_publictransit
-    USING btree
-    (
-      objectclass_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_publictransi_target_fkx ON ur_publictransit
-    USING btree
-    (
-      target_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_publictransitdatatype 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_publictr_objectcl_fkx_1 ON ur_publictransitdatatype
-    USING btree
-    (
-      objectclass_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
 -- ur_roadattribute 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_roadattri_objectcla_fkx ON ur_roadattribute
@@ -4525,120 +4847,12 @@ CREATE INDEX ur_roadattri_objectcla_fkx ON ur_roadattribute
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
--- ur_route 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_route_agency_fkx ON ur_route
-    USING btree
-    (
-      agency_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_route_description_fkx ON ur_route
-    USING btree
-    (
-      description_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_route_lod0multicurv_spx ON ur_route
-    USING gist
-    (
-      lod0multicurve
-    );
-
-CREATE INDEX ur_route_parentroute_fkx ON ur_route
-    USING btree
-    (
-      parentroute_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_statisticalgrid 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_statist_lod_1multis_fkx ON ur_statisticalgrid
-    USING btree
-    (
-      lod_1multisurface_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_statist_lod_2multis_fkx ON ur_statisticalgrid
-    USING btree
-    (
-      lod_2multisurface_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_statistic_objectcla_fkx ON ur_statisticalgrid
-    USING btree
-    (
-      objectclass_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_stop 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_stop_level_fkx ON ur_stop
-    USING btree
-    (
-      level_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_stop_parentstation_fkx ON ur_stop
-    USING btree
-    (
-      parentstation_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_stop_point_spx ON ur_stop
-    USING gist
-    (
-      point
-    );
-
--- -------------------------------------------------------------------- 
--- ur_stoptime 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_stoptime_stop_fkx ON ur_stoptime
-    USING btree
-    (
-      stop_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_stoptime_trip_fkx ON ur_stoptime
-    USING btree
-    (
-      trip_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
 -- ur_traffic_area 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_traffic_area_traffi_fkx ON ur_traffic_area
     USING btree
     (
       trafficareastructureattri_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_transfer 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_transfer_from_fkx ON ur_transfer
-    USING btree
-    (
-      from_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_transfer_to_fkx ON ur_transfer
-    USING btree
-    (
-      to_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_translation 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_translatio_recordid_fkx ON ur_translation
-    USING btree
-    (
-      recordid_id ASC NULLS LAST
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
@@ -4663,141 +4877,12 @@ CREATE INDEX ur_transp_comple_traff_fkx ON ur_transportation_complex
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
--- ur_trip 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_trip_calendar_fkx ON ur_trip
-    USING btree
-    (
-      calendar_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_trip_calendardate_fkx ON ur_trip
-    USING btree
-    (
-      calendardate_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_trip_lod0multicurve_spx ON ur_trip
-    USING gist
-    (
-      lod0multicurve
-    );
-
-CREATE INDEX ur_trip_office_fkx ON ur_trip
-    USING btree
-    (
-      office_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_trip_route_fkx ON ur_trip
-    USING btree
-    (
-      route_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_trip_shape_fkx ON ur_trip
-    USING btree
-    (
-      shape_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
 -- ur_waterbodyattribute 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_waterbody_objectcla_fkx ON ur_waterbodyattribute
     USING btree
     (
       objectclass_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_populatio_to_populatio 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_populatio_population_fkx ON ur_populatio_to_populatio
-    USING btree
-    (
-      populationbyageandsex_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_populatio_population_fkx_2 ON ur_populatio_to_populatio
-    USING btree
-    (
-      population_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_landprice_to_landprice 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_landprice_landpricep_fkx ON ur_landprice_to_landprice
-    USING btree
-    (
-      landpriceperlanduse_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_landprice_landprice__fkx ON ur_landprice_to_landprice
-    USING btree
-    (
-      landprice_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_numberofa 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_landusedi_numberofan_fkx ON ur_landusedi_to_numberofa
-    USING btree
-    (
-      numberofannualdiversio_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_landusedi_landusediv_fkx ON ur_landusedi_to_numberofa
-    USING btree
-    (
-      landusediversion_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_landusedi_to_areaofann 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_landusedi_areaofannu_fkx ON ur_landusedi_to_areaofann
-    USING btree
-    (
-      areaofannualdiversions_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_landusedi_landusediv_fkx_3 ON ur_landusedi_to_areaofann
-    USING btree
-    (
-      landusediversion_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_statistic_to_keyvaluep 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_statistic_keyvaluepa_fkx ON ur_statistic_to_keyvaluep
-    USING btree
-    (
-      keyvaluepair_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_statistic_statistica_fkx ON ur_statistic_to_keyvaluep
-    USING btree
-    (
-      statisticalgrid_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
--- -------------------------------------------------------------------- 
--- ur_publictra_to_point 
--- -------------------------------------------------------------------- 
-CREATE INDEX ur_publictra_point_id_fkx ON ur_publictra_to_point
-    USING btree
-    (
-      point_id ASC NULLS LAST
-    )   WITH (FILLFACTOR = 90);
-
-CREATE INDEX ur_publictra_publictran_fkx ON ur_publictra_to_point
-    USING btree
-    (
-      publictransit_id ASC NULLS LAST
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 
@@ -5093,4 +5178,100 @@ CREATE INDEX ur_zone_objectclas_fkx ON ur_zone
     (
       objectclass_id ASC NULLS LAST
     )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_numberofhouseholds 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_numberofh_households_fkx ON ur_numberofhouseholds
+    USING btree
+    (
+      households_numberofhouseh__2 ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+CREATE INDEX ur_numberofh_households_fkx_2 ON ur_numberofhouseholds
+    USING btree
+    (
+      households_numberofhouseh_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_statisticalgrid 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_statistic_lod_1multi_fkx ON ur_statisticalgrid
+    USING btree
+    (
+      lod_1multisurface_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+CREATE INDEX ur_statistic_lod_2multi_fkx ON ur_statisticalgrid
+    USING btree
+    (
+      lod_2multisurface_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+CREATE INDEX ur_statistic_objectclas_fkx ON ur_statisticalgrid
+    USING btree
+    (
+      objectclass_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_point 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_point_point_spx ON ur_point
+    USING gist
+    (
+      point
+    );
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransit 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_publictra_objectclas_fkx ON ur_publictransit
+    USING btree
+    (
+      objectclass_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_publictransitdatatype 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_publictra_objectclas_fkx_2 ON ur_publictransitdatatype
+    USING btree
+    (
+      objectclass_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+-- -------------------------------------------------------------------- 
+-- ur_route 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_route_descriptio_fkx ON ur_route
+    USING btree
+    (
+      description_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+CREATE INDEX ur_route_lod0multic_spx ON ur_route
+    USING gist
+    (
+      lod0multicurve
+    );
+
+-- -------------------------------------------------------------------- 
+-- ur_stop 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_stop_point_spx ON ur_stop
+    USING gist
+    (
+      point
+    );
+
+-- -------------------------------------------------------------------- 
+-- ur_trip 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_trip_lod0multic_spx ON ur_trip
+    USING gist
+    (
+      lod0multicurve
+    );
 

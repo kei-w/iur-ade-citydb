@@ -30,19 +30,18 @@ package org.citydb.ade.iur.importer.urt;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.TranslationJP;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class TranslationJPImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
 
@@ -50,9 +49,10 @@ public class TranslationJPImporter implements PublicTransitModuleImporter {
 
     public TranslationJPImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSLATIONJP)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.TRANSLATIONJP)) + " " +
                 "(id, language, language_codespace, translation) " +
                 "values (?, ?, ?, ?)");
 
@@ -61,6 +61,7 @@ public class TranslationJPImporter implements PublicTransitModuleImporter {
 
     public void doImport(TranslationJP translationJP, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(translationJP, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (translationJP.getLanguage() != null && translationJP.getLanguage().isSetValue()) {

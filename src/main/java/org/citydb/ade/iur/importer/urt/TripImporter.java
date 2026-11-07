@@ -37,20 +37,32 @@ import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citydb.core.operation.importer.util.GeometryConverter;
-import org.citygml4j.ade.iur.model.urt.*;
+import org.citygml4j.ade.iur.model.urt.Calendar;
+import org.citygml4j.ade.iur.model.urt.CalendarDate;
+import org.citygml4j.ade.iur.model.urt.CalendarDateProperty;
+import org.citygml4j.ade.iur.model.urt.CalendarProperty;
+import org.citygml4j.ade.iur.model.urt.Office;
+import org.citygml4j.ade.iur.model.urt.OfficeProperty;
+import org.citygml4j.ade.iur.model.urt.Route;
+import org.citygml4j.ade.iur.model.urt.RouteProperty;
+import org.citygml4j.ade.iur.model.urt.Shape;
+import org.citygml4j.ade.iur.model.urt.ShapeProperty;
+import org.citygml4j.ade.iur.model.urt.Trip;
+import org.citygml4j.model.gml.geometry.AbstractGeometry;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class TripImporter implements PublicTransitModuleImporter {
     private final Connection connection;
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
     private final PublicTransitImporter publicTransitImporter;
+    private final TripToRouteImporter tripToRouteImporter;
+    private final TripToCalendarImporter tripToCalendarImporter;
+    private final TripToCalendarDateImporter tripToCalendarDateImporter;
+    private final TripToOfficeImporter tripToOfficeImporter;
+    private final TripToShapeImporter tripToShapeImporter;
     private final GeometryConverter geometryConverter;
 
     private int batchCounter;
@@ -61,167 +73,138 @@ public class TripImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRIP)) + " " +
-                "(id, bikeallowed, bikeallowed_codespace, blockid, directionid, directionid_codespace, headsign, " +
-                "lod0multicurve, shortname, symbol, wheelchairaccessible, wheelchairaccessib_codespace, " +
-                "calendar_id, calendardate_id, office_id, route_id, shape_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.TRIP)) + " " +
+                "(id, headsign, shortname, directionid, directionid_codespace, blockid, wheelchairaccessible," +
+                "wheelchairaccessib_codespace, bikeallowed, bikeallowed_codespace, symbol, lod0multicurve) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
+        tripToRouteImporter = manager.getImporter(TripToRouteImporter.class);
+        tripToCalendarImporter = manager.getImporter(TripToCalendarImporter.class);
+        tripToCalendarDateImporter = manager.getImporter(TripToCalendarDateImporter.class);
+        tripToOfficeImporter = manager.getImporter(TripToOfficeImporter.class);
+        tripToShapeImporter = manager.getImporter(TripToShapeImporter.class);
         geometryConverter = helper.getGeometryConverter();
     }
 
     public void doImport(Trip trip, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(trip, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (trip.getBikeAllowed() != null && trip.getBikeAllowed().isSetValue()) {
-            ps.setString(2, trip.getBikeAllowed().getValue());
-            ps.setString(3, trip.getBikeAllowed().getCodeSpace());
-        } else {
-            ps.setNull(2, Types.VARCHAR);
-            ps.setNull(3, Types.VARCHAR);
-        }
+        ps.setString(2, trip.getHeadsign());
 
-        ps.setString(4, trip.getBlockId());
+        ps.setString(3, trip.getShortName());
 
         if (trip.getDirectionId() != null && trip.getDirectionId().isSetValue()) {
-            ps.setString(5, trip.getDirectionId().getValue());
-            ps.setString(6, trip.getDirectionId().getCodeSpace());
+            ps.setString(4, trip.getDirectionId().getValue());
+            ps.setString(5, trip.getDirectionId().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
-        ps.setString(7, trip.getHeadsign());
-
-        GeometryObject multiCurve = geometryConverter.getMultiCurve(trip.getLod0MultiCurve());
-        if (multiCurve != null) {
-            ps.setObject(8, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(multiCurve, connection));
-            trip.setLod0MultiCurve(null);
-        } else
-            ps.setNull(8, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
-                    helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
-
-        ps.setString(9, trip.getShortName());
-        ps.setString(10, trip.getSymbol());
+        ps.setString(6, trip.getBlockId());
 
         if (trip.getWheelchairAccessible() != null && trip.getWheelchairAccessible().isSetValue()) {
-            ps.setString(11, trip.getWheelchairAccessible().getValue());
-            ps.setString(12, trip.getWheelchairAccessible().getCodeSpace());
+            ps.setString(7, trip.getWheelchairAccessible().getValue());
+            ps.setString(8, trip.getWheelchairAccessible().getCodeSpace());
         } else {
-            ps.setNull(11, Types.VARCHAR);
-            ps.setNull(12, Types.VARCHAR);
+            ps.setNull(7, Types.VARCHAR);
+            ps.setNull(8, Types.VARCHAR);
         }
 
-        long calendarId = 0;
-        if (trip.getCalendar() != null) {
-            Calendar calendar = trip.getCalendar().getObject();
-            if (calendar != null) {
-                calendarId = helper.importObject(calendar);
-                trip.getCalendar().unsetObject();
-            } else {
-                String href = trip.getCalendar().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "calendar_id");
-                }
-            }
+        if (trip.getBikeAllowed() != null && trip.getBikeAllowed().isSetValue()) {
+            ps.setString(9, trip.getBikeAllowed().getValue());
+            ps.setString(10, trip.getBikeAllowed().getCodeSpace());
+        } else {
+            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(10, Types.VARCHAR);
         }
 
-        if (calendarId != 0)
-            ps.setLong(13, calendarId);
+        ps.setString(11, trip.getSymbol());
+
+        GeometryObject lod0MultiCurve = null;
+        if (trip.getLod0MultiCurve() != null) {
+            lod0MultiCurve = geometryConverter.getMultiCurve(trip.getLod0MultiCurve());
+            trip.getLod0MultiCurve().unsetMultiCurve();
+        }
+
+        if (lod0MultiCurve != null)
+            ps.setObject(12, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(lod0MultiCurve, connection));
         else
-            ps.setNull(13, Types.NULL);
-
-        long calendarDateId = 0;
-        if (trip.getCalendarDate() != null) {
-            CalendarDate calendarDate = trip.getCalendarDate().getObject();
-            if (calendarDate != null) {
-                calendarDateId = helper.importObject(calendarDate);
-                trip.getCalendarDate().unsetObject();
-            } else {
-                String href = trip.getCalendarDate().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "calendardate_id");
-                }
-            }
-        }
-
-        if (calendarDateId != 0)
-            ps.setLong(14, calendarDateId);
-        else
-            ps.setNull(14, Types.NULL);
-
-        long officeId = 0;
-        if (trip.getOffice() != null) {
-            Office office = trip.getOffice().getObject();
-            if (office != null) {
-                officeId = helper.importObject(office);
-                trip.getOffice().unsetObject();
-            } else {
-                String href = trip.getOffice().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "office_id");
-                }
-            }
-        }
-
-        if (officeId != 0)
-            ps.setLong(15, officeId);
-        else
-            ps.setNull(15, Types.NULL);
-
-        long routeId = 0;
-        if (trip.getRoute() != null) {
-            Route route = trip.getRoute().getObject();
-            if (route != null) {
-                routeId = helper.importObject(route);
-                trip.getRoute().unsetObject();
-            } else {
-                String href = trip.getRoute().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "route_id");
-                }
-            }
-        }
-
-        if (routeId != 0)
-            ps.setLong(16, routeId);
-        else
-            ps.setNull(16, Types.NULL);
-
-        long shapeId = 0;
-        if (trip.getShape() != null) {
-            Shape shape = trip.getShape().getObject();
-            if (shape != null) {
-                shapeId = helper.importObject(shape);
-                trip.getShape().unsetObject();
-            } else {
-                String href = trip.getShape().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.TRIP),
-                            objectId, href, "shape_id");
-                }
-            }
-        }
-
-        if (shapeId != 0)
-            ps.setLong(17, shapeId);
-        else
-            ps.setNull(17, Types.NULL);
+            ps.setNull(12, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+                    helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        if (trip.getRoute() != null) {
+            RouteProperty property = trip.getRoute();
+            Route cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                tripToRouteImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRIP_TO_ROUTE), objectId, "trip_id", href, "route_id");
+            }
+        }
+        if (trip.getCalendar() != null) {
+            CalendarProperty property = trip.getCalendar();
+            Calendar cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                tripToCalendarImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRIP_TO_CALENDAR), objectId, "trip_id", href, "calendar_id");
+            }
+        }
+        if (trip.getCalendarDate() != null) {
+            CalendarDateProperty property = trip.getCalendarDate();
+            CalendarDate cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                tripToCalendarDateImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRIP_TO_CALENDARD), objectId, "trip_id", href, "calendardate_id");
+            }
+        }
+        if (trip.getOffice() != null) {
+            OfficeProperty property = trip.getOffice();
+            Office cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                tripToOfficeImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRIP_TO_OFFICE), objectId, "trip_id", href, "office_id");
+            }
+        }
+        if (trip.getShape() != null) {
+            ShapeProperty property = trip.getShape();
+            Shape cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                tripToShapeImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.TRIP_TO_SHAPE), objectId, "trip_id", href, "shape_id");
+            }
+        }
     }
 
     @Override

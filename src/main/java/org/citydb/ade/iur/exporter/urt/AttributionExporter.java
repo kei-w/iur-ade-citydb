@@ -34,72 +34,60 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urt.AgencyProperty;
 import org.citygml4j.ade.iur.model.urt.Attribution;
 import org.citygml4j.ade.iur.model.urt.RouteProperty;
 import org.citygml4j.ade.iur.model.urt.TripProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class AttributionExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psAttributionAgency;
+    private final PreparedStatement psAttributionRoute;
+    private final PreparedStatement psTrip;
 
     public AttributionExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.ATTRIBUTION);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumn("organizationname"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
-        if (projectionFilter.containsProperty("isProducer", module))
-            select.addProjection(table.getColumn("isproducer"));
-        if (projectionFilter.containsProperty("isOperator", module))
-            select.addProjection(table.getColumn("isoperator"));
-        if (projectionFilter.containsProperty("isAuthority", module))
-            select.addProjection(table.getColumn("isauthority"));
-        if (projectionFilter.containsProperty("url", module))
-            select.addProjection(table.getColumn("url"));
-        if (projectionFilter.containsProperty("email", module))
-            select.addProjection(table.getColumn("email"));
-        if (projectionFilter.containsProperty("phoneNumber", module))
-            select.addProjection(table.getColumn("phonenumber"));
-        if (projectionFilter.containsProperty("agency", module)) {
-            Table parent = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(parent.getColumn("gmlid", "agmlid"))
-                    .addJoin(JoinFactory.left(parent, "id", ComparisonName.EQUAL_TO, table.getColumn("agency_id")));
-        }
-        if (projectionFilter.containsProperty("route", module)) {
-            Table parent = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(parent.getColumn("gmlid", "rgmlid"))
-                    .addJoin(JoinFactory.left(parent, "id", ComparisonName.EQUAL_TO, table.getColumn("route_id")));
-        }
-        if (projectionFilter.containsProperty("trip", module)) {
-            Table parent = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(parent.getColumn("gmlid", "tgmlid"))
-                    .addJoin(JoinFactory.left(parent, "id", ComparisonName.EQUAL_TO, table.getColumn("trip_id")));
-        }
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
+
+        Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table attributionAgencys = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ATTRIBUTI_TO_AGENCY)));
+        Select attributionAgencySelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, attributionAgencys.getColumn("agency_id")))
+                .addSelection(ComparisonFactory.equalTo(attributionAgencys.getColumn("attribution_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psAttributionAgency = connection.prepareStatement(attributionAgencySelect.toString());
+        Table attributionRoutes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ATTRIBUTI_TO_ROUTE)));
+        Select attributionRouteSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, attributionRoutes.getColumn("route_id")))
+                .addSelection(ComparisonFactory.equalTo(attributionRoutes.getColumn("attribution_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psAttributionRoute = connection.prepareStatement(attributionRouteSelect.toString());
+        Table trips = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ATTRIBUTI_TO_TRIP)));
+        Select tripSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, trips.getColumn("trip_id")))
+                .addSelection(ComparisonFactory.equalTo(trips.getColumn("attribution_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psTrip = connection.prepareStatement(tripSelect.toString());
     }
 
     public void doExport(Attribution attribution, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -107,54 +95,69 @@ public class AttributionExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(attribution, projectionFilter, "pt", rs);
+                publicTransitExporter.doExport(attribution, objectId, "pt_", rs);
+                doExport(attribution, objectId, "", rs);
+            }
+        }
+    }
 
-                attribution.setOrganizationName(rs.getString("organizationname"));
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("organizationname", prefix + "organizationname"),
+                table.getColumn("isproducer", prefix + "isproducer"),
+                table.getColumn("isoperator", prefix + "isoperator"),
+                table.getColumn("isauthority", prefix + "isauthority"),
+                table.getColumn("url", prefix + "url"),
+                table.getColumn("email", prefix + "email"),
+                table.getColumn("phonenumber", prefix + "phonenumber"));
 
-                if (projectionFilter.containsProperty("isProducer", module)) {
-                    boolean isProducer = rs.getBoolean("isproducer");
-                    if (!rs.wasNull())
-                        attribution.setIsProducer(isProducer);
-                }
+        return select;
+    }
 
-                if (projectionFilter.containsProperty("isOperator", module)) {
-                    boolean isOperator = rs.getBoolean("isoperator");
-                    if (!rs.wasNull())
-                        attribution.setIsOperator(isOperator);
-                }
+    public void doExport(Attribution attribution, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        attribution.setOrganizationName(rs.getString(prefix + "organizationname"));
 
-                if (projectionFilter.containsProperty("isAuthority", module)) {
-                    boolean isAuthority = rs.getBoolean("isauthority");
-                    if (!rs.wasNull())
-                        attribution.setIsAuthority(isAuthority);
-                }
+        boolean isProducer = rs.getBoolean(prefix + "isproducer");
+        if (!rs.wasNull())
+            attribution.setIsProducer(isProducer);
 
-                if (projectionFilter.containsProperty("url", module))
-                    attribution.setUrl(rs.getString("url"));
+        boolean isOperator = rs.getBoolean(prefix + "isoperator");
+        if (!rs.wasNull())
+            attribution.setIsOperator(isOperator);
 
-                if (projectionFilter.containsProperty("email", module))
-                    attribution.setEmail(rs.getString("email"));
+        boolean isAuthority = rs.getBoolean(prefix + "isauthority");
+        if (!rs.wasNull())
+            attribution.setIsAuthority(isAuthority);
 
-                if (projectionFilter.containsProperty("phoneNumber", module))
-                    attribution.setPhoneNumber(rs.getString("phonenumber"));
+        attribution.setUrl(rs.getString(prefix + "url"));
 
-                if (projectionFilter.containsProperty("agency", module)) {
-                    String gmlId = rs.getString("agmlid");
-                    if (gmlId != null)
-                        attribution.setAgency(new AgencyProperty("#" + gmlId));
-                }
+        attribution.setEmail(rs.getString(prefix + "email"));
 
-                if (projectionFilter.containsProperty("route", module)) {
-                    String gmlId = rs.getString("rgmlid");
-                    if (gmlId != null)
-                        attribution.setRoute(new RouteProperty("#" + gmlId));
-                }
+        attribution.setPhoneNumber(rs.getString(prefix + "phonenumber"));
 
-                if (projectionFilter.containsProperty("trip", module)) {
-                    String gmlId = rs.getString("tgmlid");
-                    if (gmlId != null)
-                        attribution.setTrip(new TripProperty("#" + gmlId));
-                }
+        psAttributionAgency.setLong(1, objectId);
+        try (ResultSet agencyRs = psAttributionAgency.executeQuery()) {
+            while (agencyRs.next()) {
+                AgencyProperty agencyProperty = new AgencyProperty();
+                agencyProperty.setHref("#" + agencyRs.getString("gmlid"));
+                attribution.setAgency(agencyProperty);
+            }
+        }
+
+        psAttributionRoute.setLong(1, objectId);
+        try (ResultSet routeRs = psAttributionRoute.executeQuery()) {
+            while (routeRs.next()) {
+                RouteProperty routeProperty = new RouteProperty();
+                routeProperty.setHref("#" + routeRs.getString("gmlid"));
+                attribution.setRoute(routeProperty);
+            }
+        }
+
+        psTrip.setLong(1, objectId);
+        try (ResultSet tripRs = psTrip.executeQuery()) {
+            while (tripRs.next()) {
+                TripProperty tripProperty = new TripProperty();
+                tripProperty.setHref("#" + tripRs.getString("gmlid"));
+                attribution.setTrip(tripProperty);
             }
         }
     }
@@ -162,5 +165,8 @@ public class AttributionExporter implements PublicTransitModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psAttributionAgency.close();
+        psAttributionRoute.close();
+        psTrip.close();
     }
 }

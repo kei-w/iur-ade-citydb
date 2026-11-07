@@ -44,6 +44,7 @@ import org.citygml4j.ade.iur.model.urt.*;
 import org.citygml4j.model.gml.base.AbstractGML;
 import org.citygml4j.model.module.citygml.CityGMLVersion;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
+import org.citygml4j.ade.iur.model.module.PublicTransitModule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,65 +58,12 @@ public class ObjectMapper implements ADEObjectMapper {
             int objectClassId = type.getObjectClassId();
 
             switch (type.getPath()) {
-                case "Population":
-                    objectClassIds.put(Population.class, objectClassId);
-                    break;
-                case "PublicTransitAccessibility":
-                    objectClassIds.put(PublicTransitAccessibility.class, objectClassId);
-                    break;
-                case "LandPrice":
-                    objectClassIds.put(LandPrice.class, objectClassId);
-                    break;
-                case "Households":
-                    objectClassIds.put(Households.class, objectClassId);
-                    break;
-                case "OfficesAndEmployees":
-                    objectClassIds.put(OfficesAndEmployees.class, objectClassId);
-                    break;
-                case "GenericGridCell":
-                    objectClassIds.put(GenericGridCell.class, objectClassId);
-                    break;
-                case "Route":
-                    objectClassIds.put(Route.class, objectClassId);
+
+                case "Administration":
+                    objectClassIds.put(Administration.class, objectClassId);
                     break;
                 case "Agency":
                     objectClassIds.put(Agency.class, objectClassId);
-                    break;
-                case "Stop":
-                    objectClassIds.put(Stop.class, objectClassId);
-                    break;
-                case "Level":
-                    objectClassIds.put(Level.class, objectClassId);
-                    break;
-                case "Trip":
-                    objectClassIds.put(Trip.class, objectClassId);
-                    break;
-                case "Calendar":
-                    objectClassIds.put(Calendar.class, objectClassId);
-                    break;
-                case "CalendarDate":
-                    objectClassIds.put(CalendarDate.class, objectClassId);
-                    break;
-                case "Office":
-                    objectClassIds.put(Office.class, objectClassId);
-                    break;
-                case "Shape":
-                    objectClassIds.put(Shape.class, objectClassId);
-                    break;
-                case "FareAttribute":
-                    objectClassIds.put(FareAttribute.class, objectClassId);
-                    break;
-                case "Pathway":
-                    objectClassIds.put(Pathway.class, objectClassId);
-                    break;
-                case "TranslationJP":
-                    objectClassIds.put(TranslationJP.class, objectClassId);
-                    break;
-                case "Attribution":
-                    objectClassIds.put(Attribution.class, objectClassId);
-                    break;
-                case "Administration":
-                    objectClassIds.put(Administration.class, objectClassId);
                     break;
                 case "Agreement":
                     objectClassIds.put(Agreement.class, objectClassId);
@@ -126,8 +74,17 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "AreaClassification":
                     objectClassIds.put(AreaClassification.class, objectClassId);
                     break;
+                case "Attribution":
+                    objectClassIds.put(Attribution.class, objectClassId);
+                    break;
                 case "Boundary":
                     objectClassIds.put(Boundary.class, objectClassId);
+                    break;
+                case "Calendar":
+                    objectClassIds.put(Calendar.class, objectClassId);
+                    break;
+                case "CalendarDate":
+                    objectClassIds.put(CalendarDate.class, objectClassId);
                     break;
                 case "CensusBlock":
                     objectClassIds.put(CensusBlock.class, objectClassId);
@@ -201,6 +158,9 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "ExceptionalFloorAreaRateDistrict":
                     objectClassIds.put(ExceptionalFloorAreaRateDistrict.class, objectClassId);
                     break;
+                case "FareAttribute":
+                    objectClassIds.put(FareAttribute.class, objectClassId);
+                    break;
                 case "FirePreventionDistrict":
                     objectClassIds.put(FirePreventionDistrict.class, objectClassId);
                     break;
@@ -209,6 +169,9 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "FloodPreventionFacility":
                     objectClassIds.put(FloodPreventionFacility.class, objectClassId);
+                    break;
+                case "GenericGridCell":
+                    objectClassIds.put(GenericGridCell.class, objectClassId);
                     break;
                 case "GlobalHubCityDevelopmentProject":
                     objectClassIds.put(GlobalHubCityDevelopmentProject.class, objectClassId);
@@ -228,6 +191,9 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "HistoricSceneryMaintenanceAndImprovementDistrictPlan":
                     objectClassIds.put(HistoricSceneryMaintenanceAndImprovementDistrictPlan.class, objectClassId);
                     break;
+                case "Households":
+                    objectClassIds.put(Households.class, objectClassId);
+                    break;
                 case "HousingControlArea":
                     objectClassIds.put(HousingControlArea.class, objectClassId);
                     break;
@@ -236,6 +202,9 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "IndustrialParkDevelopmentProject":
                     objectClassIds.put(IndustrialParkDevelopmentProject.class, objectClassId);
+                    break;
+                case "LandPrice":
+                    objectClassIds.put(LandPrice.class, objectClassId);
                     break;
                 case "LandReadjustmentProject":
                     objectClassIds.put(LandReadjustmentProject.class, objectClassId);
@@ -249,11 +218,14 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "LandUseDiversion":
                     if (type.getSchema().matchesNamespaceURI(UrbanFunctionModule.v2_0.getNamespaceURI()))
                         objectClassIds.put(org.citygml4j.ade.iur.model.urf.LandUseDiversion.class, objectClassId);
-                    else if (type.getSchema().matchesNamespaceURI(StatisticalGridModule.v1_4.getNamespaceURI()))
-                        objectClassIds.put(LandUseDiversion.class, objectClassId);
+                    else if (type.getSchema().matchesNamespaceURI(StatisticalGridModule.v2_0.getNamespaceURI()))
+                        objectClassIds.put(org.citygml4j.ade.iur.model.urg.LandUseDiversion.class, objectClassId);
                     break;
                 case "LandscapeZone":
                     objectClassIds.put(LandscapeZone.class, objectClassId);
+                    break;
+                case "Level":
+                    objectClassIds.put(Level.class, objectClassId);
                     break;
                 case "MarketsSlaughterhousesCrematoria":
                     objectClassIds.put(MarketsSlaughterhousesCrematoria.class, objectClassId);
@@ -267,14 +239,26 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "NewUrbanInfrastructureProject":
                     objectClassIds.put(NewUrbanInfrastructureProject.class, objectClassId);
                     break;
+                case "Office":
+                    objectClassIds.put(Office.class, objectClassId);
+                    break;
+                case "OfficesAndEmployees":
+                    objectClassIds.put(OfficesAndEmployees.class, objectClassId);
+                    break;
                 case "OpenSpaceForPublicUse":
                     objectClassIds.put(OpenSpaceForPublicUse.class, objectClassId);
                     break;
                 case "ParkingPlaceDevelopmentZone":
                     objectClassIds.put(ParkingPlaceDevelopmentZone.class, objectClassId);
                     break;
+                case "Pathway":
+                    objectClassIds.put(Pathway.class, objectClassId);
+                    break;
                 case "Pollution":
                     objectClassIds.put(Pollution.class, objectClassId);
+                    break;
+                case "Population":
+                    objectClassIds.put(Population.class, objectClassId);
                     break;
                 case "PortZone":
                     objectClassIds.put(PortZone.class, objectClassId);
@@ -290,6 +274,9 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "PromotionDistrict":
                     objectClassIds.put(PromotionDistrict.class, objectClassId);
+                    break;
+                case "PublicTransitAccessibility":
+                    objectClassIds.put(PublicTransitAccessibility.class, objectClassId);
                     break;
                 case "PublicTransitFacility":
                     objectClassIds.put(PublicTransitFacility.class, objectClassId);
@@ -320,6 +307,9 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "RoadsideDistrictPlan":
                     objectClassIds.put(RoadsideDistrictPlan.class, objectClassId);
+                    break;
+                case "Route":
+                    objectClassIds.put(Route.class, objectClassId);
                     break;
                 case "RuralDistrictFacility":
                     objectClassIds.put(RuralDistrictFacility.class, objectClassId);
@@ -360,6 +350,9 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "SedimentDisasterProneArea":
                     objectClassIds.put(SedimentDisasterProneArea.class, objectClassId);
                     break;
+                case "Shape":
+                    objectClassIds.put(Shape.class, objectClassId);
+                    break;
                 case "SnowProtectionFacility":
                     objectClassIds.put(SnowProtectionFacility.class, objectClassId);
                     break;
@@ -396,6 +389,9 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "SpecifiedUrgentUrbanRenewalArea":
                     objectClassIds.put(SpecifiedUrgentUrbanRenewalArea.class, objectClassId);
                     break;
+                case "Stop":
+                    objectClassIds.put(Stop.class, objectClassId);
+                    break;
                 case "SupplyFacility":
                     objectClassIds.put(SupplyFacility.class, objectClassId);
                     break;
@@ -411,11 +407,17 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "TrafficFacility":
                     objectClassIds.put(TrafficFacility.class, objectClassId);
                     break;
+                case "TranslationJP":
+                    objectClassIds.put(TranslationJP.class, objectClassId);
+                    break;
                 case "TreatmentFacility":
                     objectClassIds.put(TreatmentFacility.class, objectClassId);
                     break;
                 case "TreePlantingDistrict":
                     objectClassIds.put(TreePlantingDistrict.class, objectClassId);
+                    break;
+                case "Trip":
+                    objectClassIds.put(Trip.class, objectClassId);
                     break;
                 case "UnusedLandUsePromotionArea":
                     objectClassIds.put(UnusedLandUsePromotionArea.class, objectClassId);
@@ -472,24 +474,6 @@ public class ObjectMapper implements ADEObjectMapper {
             int typeClassId = type.getObjectClassId();
 
             switch (type.getPath()) {
-                case "FeedInfo":
-                    typeClassIds.put(FeedInfo.class, typeClassId);
-                    break;
-                case "Translation":
-                    typeClassIds.put(Translation.class, typeClassId);
-                    break;
-                case "Transfer":
-                    typeClassIds.put(Transfer.class, typeClassId);
-                    break;
-                case "Frequency":
-                    typeClassIds.put(Frequency.class, typeClassId);
-                    break;
-                case "StopTime":
-                    typeClassIds.put(StopTime.class, typeClassId);
-                    break;
-                case "FareRule":
-                    typeClassIds.put(FareRule.class, typeClassId);
-                    break;
                 case "BuildingAttribute":
                     typeClassIds.put(BuildingAttribute.class, typeClassId);
                     break;
@@ -586,6 +570,27 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "WaterBodyInlandFloodingRiskAttribute":
                     typeClassIds.put(WaterBodyInlandFloodingRiskAttribute.class, typeClassId);
                     break;
+                case "PublicTransitDataType":
+                    typeClassIds.put(PublicTransitDataType.class, typeClassId);
+                    break;
+                case "FeedInfo":
+                    typeClassIds.put(FeedInfo.class, typeClassId);
+                    break;
+                case "Translation":
+                    typeClassIds.put(Translation.class, typeClassId);
+                    break;
+                case "Transfer":
+                    typeClassIds.put(Transfer.class, typeClassId);
+                    break;
+                case "Frequency":
+                    typeClassIds.put(Frequency.class, typeClassId);
+                    break;
+                case "StopTime":
+                    typeClassIds.put(StopTime.class, typeClassId);
+                    break;
+                case "FareRule":
+                    typeClassIds.put(FareRule.class, typeClassId);
+                    break;
                 case "UrbanRoadAttribute":
                     typeClassIds.put(UrbanRoadAttribute.class, typeClassId);
                     break;
@@ -611,7 +616,31 @@ public class ObjectMapper implements ADEObjectMapper {
                     typeClassIds.put(SewerSystemAttribute.class, typeClassId);
                     break;
                 case "NumberOfHouseholds":
-                    typeClassIds.put(org.citygml4j.ade.iur.model.urf.NumberOfHouseholds.class, typeClassId);
+                    if (type.getSchema().matchesNamespaceURI(UrbanFunctionModule.v2_0.getNamespaceURI()))
+                        typeClassIds.put(org.citygml4j.ade.iur.model.urf.NumberOfHouseholds.class, typeClassId);
+                    else if (type.getSchema().matchesNamespaceURI(StatisticalGridModule.v2_0.getNamespaceURI()))
+                        typeClassIds.put(org.citygml4j.ade.iur.model.urg.NumberOfHouseholds.class, typeClassId);
+                    break;
+                case "PopulationByAgeAndSex":
+                    typeClassIds.put(PopulationByAgeAndSex.class, typeClassId);
+                    break;
+                case "LandPricePerLandUse":
+                    typeClassIds.put(LandPricePerLandUse.class, typeClassId);
+                    break;
+                case "NumberOfAnnualDiversions":
+                    typeClassIds.put(NumberOfAnnualDiversions.class, typeClassId);
+                    break;
+                case "AreaOfAnnualDiversions":
+                    typeClassIds.put(AreaOfAnnualDiversions.class, typeClassId);
+                    break;
+                case "KeyValuePair":
+                    typeClassIds.put(KeyValuePair.class, typeClassId);
+                    break;
+                case "Description":
+                    typeClassIds.put(Description.class, typeClassId);
+                    break;
+                case "Point":
+                    typeClassIds.put(Point.class, typeClassId);
                     break;
             }
         }

@@ -33,7 +33,6 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -44,28 +43,23 @@ import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
 import org.citygml4j.ade.iur.model.urt.TranslationJP;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class TranslationJPExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
 
     public TranslationJPExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.TRANSLATIONJP);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumns("language", "language_codespace", "translation"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -74,18 +68,29 @@ public class TranslationJPExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(translationJP, projectionFilter, "pt", rs);
-
-                String language = rs.getString("language");
-                if (!rs.wasNull()) {
-                    Code code = new Code(language);
-                    code.setCodeSpace(rs.getString("language_codespace"));
-                    translationJP.setLanguage(code);
-                }
-
-                translationJP.setTranslation(rs.getString("translation"));
+                publicTransitExporter.doExport(translationJP, objectId, "pt_", rs);
+                doExport(translationJP, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("language", prefix + "language"),
+                table.getColumn("language_codespace", prefix + "language_codespace"),
+                table.getColumn("translation", prefix + "translation"));
+
+        return select;
+    }
+
+    public void doExport(TranslationJP translationJP, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        String language = rs.getString(prefix + "language");
+        if (!rs.wasNull()) {
+            Code code = new Code(language);
+            code.setCodeSpace(rs.getString(prefix + "language_codespace"));
+            translationJP.setLanguage(code);
+        }
+
+        translationJP.setTranslation(rs.getString(prefix + "translation"));
     }
 
     @Override
