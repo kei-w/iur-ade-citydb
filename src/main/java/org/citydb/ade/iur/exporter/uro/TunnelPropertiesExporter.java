@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -59,6 +60,10 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psTunDisasterRiskAttribute;
+    private final PreparedStatement psTunDmAttribute;
+    private final PreparedStatement psTunFacilityAttribute;
+    private final PreparedStatement psTunKeyValuePairAttribute;
 
     public TunnelPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.TUNNEL);
@@ -71,6 +76,26 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table tunDisasterRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TUNNEL_TO_DISASTERR)));
+        Select tunDisasterRiskAttributeSelect = new Select().addProjection(tunDisasterRiskAttributes.getColumn("disasterriskattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tunDisasterRiskAttributes.getColumn("tunnel_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tunDisasterRiskAttributes.getColumn("disasterriskattribute_id")));
+        psTunDisasterRiskAttribute = connection.prepareStatement(tunDisasterRiskAttributeSelect.toString());
+        Table tunDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TUNNEL_TO_DMATTRIBU)));
+        Select tunDmAttributeSelect = new Select().addProjection(tunDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tunDmAttributes.getColumn("tunnel_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tunDmAttributes.getColumn("dmattribute_id")));
+        psTunDmAttribute = connection.prepareStatement(tunDmAttributeSelect.toString());
+        Table tunFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TUNNEL_TO_FACILITYA)));
+        Select tunFacilityAttributeSelect = new Select().addProjection(tunFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tunFacilityAttributes.getColumn("tunnel_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tunFacilityAttributes.getColumn("facilityattribute_id")));
+        psTunFacilityAttribute = connection.prepareStatement(tunFacilityAttributeSelect.toString());
+        Table tunKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TUNNEL_TO_KEYVALUEP)));
+        Select tunKeyValuePairAttributeSelect = new Select().addProjection(tunKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tunKeyValuePairAttributes.getColumn("tunnel_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tunKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psTunKeyValuePairAttribute = connection.prepareStatement(tunKeyValuePairAttributeSelect.toString());
         constructionBaseAttributeExporter = manager.getExporter(ConstructionBaseAttributeExporter.class);
         tunnelStructureAttributeExporter = manager.getExporter(TunnelStructureAttributeExporter.class);
         tunnelFunctionalAttributeExporter = manager.getExporter(TunnelFunctionalAttributeExporter.class);
@@ -126,16 +151,28 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("tunDisasterRiskAttribute", module)) {
-                    for (DisasterRiskAttribute tunDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "tunnel_tundisasterriskatt_id")) {
-                        TunDisasterRiskAttributePropertyElement property = new TunDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(tunDisasterRiskAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    psTunDisasterRiskAttribute.setLong(1, parentId);
+                    try (ResultSet tunDisasterRiskAttributeRs = psTunDisasterRiskAttribute.executeQuery()) {
+                        while (tunDisasterRiskAttributeRs.next()) {
+                            DisasterRiskAttribute tunDisasterRiskAttribute = disasterRiskAttributeExporter.doExport(tunDisasterRiskAttributeRs.getLong("disasterriskattribute_id"));
+                            if (tunDisasterRiskAttribute != null) {
+                                TunDisasterRiskAttributePropertyElement property = new TunDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(tunDisasterRiskAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("tunDmAttribute", module)) {
-                    for (DmAttribute tunDmAttribute : dmAttributeExporter.doExport(parentId, "tunnel_tundmattribute_id")) {
-                        TunDmAttributePropertyElement property = new TunDmAttributePropertyElement(new DmAttributeProperty(tunDmAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    psTunDmAttribute.setLong(1, parentId);
+                    try (ResultSet tunDmAttributeRs = psTunDmAttribute.executeQuery()) {
+                        while (tunDmAttributeRs.next()) {
+                            DmAttribute tunDmAttribute = dmAttributeExporter.doExport(tunDmAttributeRs.getLong("dmattribute_id"));
+                            if (tunDmAttribute != null) {
+                                TunDmAttributePropertyElement property = new TunDmAttributePropertyElement(new DmAttributeProperty(tunDmAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                            }
+                        }
                     }
                 }
 
@@ -167,16 +204,28 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("tunFacilityAttribute", module)) {
-                    for (FacilityAttribute tunFacilityAttribute : facilityAttributeExporter.doExport(parentId, "tunnel_tunfacilityattribu_id")) {
-                        TunFacilityAttributePropertyElement property = new TunFacilityAttributePropertyElement(new FacilityAttributeProperty(tunFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    psTunFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet tunFacilityAttributeRs = psTunFacilityAttribute.executeQuery()) {
+                        while (tunFacilityAttributeRs.next()) {
+                            FacilityAttribute tunFacilityAttribute = facilityAttributeExporter.doExport(tunFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (tunFacilityAttribute != null) {
+                                TunFacilityAttributePropertyElement property = new TunFacilityAttributePropertyElement(new FacilityAttributeProperty(tunFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("tunKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute tunKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "tunnel_tunkeyvaluepairatt_id")) {
-                        TunKeyValuePairAttributePropertyElement property = new TunKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(tunKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    psTunKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet tunKeyValuePairAttributeRs = psTunKeyValuePairAttribute.executeQuery()) {
+                        while (tunKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute tunKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(tunKeyValuePairAttribute, tunKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            TunKeyValuePairAttributePropertyElement property = new TunKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(tunKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                        }
                     }
                 }
             }
@@ -186,5 +235,9 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psTunDisasterRiskAttribute.close();
+        psTunDmAttribute.close();
+        psTunFacilityAttribute.close();
+        psTunKeyValuePairAttribute.close();
     }
 }

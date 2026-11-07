@@ -46,7 +46,9 @@ public class ParkFacilityLongevityPlanAttributeImporter implements UrbanObjectMo
     private final PreparedStatement ps;
     private final NumberOfFacilitiesImporter numberOfFacilitiesImporter;
     private final RepairsBeforeParkHealthAssessmentImporter repairsBeforeParkHealthAssessmentImporter;
+    private final ParkFacilityLongevityPlanAttributeToParkHealthAssessmentImporter parkFacilityLongevityPlanAttributeToParkHealthAssessmentImporter;
     private final ParkHealthAssessmentImporter parkHealthAssessmentImporter;
+    private final ParkFacilityLongevityPlanAttributeToLongevityMeasuresImporter parkFacilityLongevityPlanAttributeToLongevityMeasuresImporter;
     private final LongevityMeasuresImporter longevityMeasuresImporter;
 
     private int batchCounter;
@@ -66,7 +68,9 @@ public class ParkFacilityLongevityPlanAttributeImporter implements UrbanObjectMo
 
         numberOfFacilitiesImporter = manager.getImporter(NumberOfFacilitiesImporter.class);
         repairsBeforeParkHealthAssessmentImporter = manager.getImporter(RepairsBeforeParkHealthAssessmentImporter.class);
+        parkFacilityLongevityPlanAttributeToParkHealthAssessmentImporter = manager.getImporter(ParkFacilityLongevityPlanAttributeToParkHealthAssessmentImporter.class);
         parkHealthAssessmentImporter = manager.getImporter(ParkHealthAssessmentImporter.class);
+        parkFacilityLongevityPlanAttributeToLongevityMeasuresImporter = manager.getImporter(ParkFacilityLongevityPlanAttributeToLongevityMeasuresImporter.class);
         longevityMeasuresImporter = manager.getImporter(LongevityMeasuresImporter.class);
     }
 
@@ -174,12 +178,16 @@ public class ParkFacilityLongevityPlanAttributeImporter implements UrbanObjectMo
             helper.executeBatch(schemaMapper.getTableName(ADETable.PARKFACILITYLONGEVITYP));
 
         for (ParkHealthAssessmentProperty property : parkFacilityLongevityPlanAttribute.getParkHealthAssessment()) {
-            if (property.isSetObject())
-                parkHealthAssessmentImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long parkHealthAssessmentId = parkHealthAssessmentImporter.doImport(property.getObject());
+                parkFacilityLongevityPlanAttributeToParkHealthAssessmentImporter.doImport(parkHealthAssessmentId, objectId);
+            }
         }
         for (LongevityMeasuresProperty property : parkFacilityLongevityPlanAttribute.getLongevityMeasures()) {
-            if (property.isSetObject())
-                longevityMeasuresImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long longevityMeasuresId = longevityMeasuresImporter.doImport(property.getObject());
+                parkFacilityLongevityPlanAttributeToLongevityMeasuresImporter.doImport(longevityMeasuresId, objectId);
+            }
         }
     }
 

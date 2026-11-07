@@ -53,33 +53,31 @@ public class LongevityMeasuresImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LONGEVITYMEASURES)) + " " +
-                "(id, parkfacility_longevitymea_id, fiscalyearforcountermeasures, countermeasurescost_id," +
-                "description) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, fiscalyearforcountermeasures, countermeasurescost_id, description) " +
+                "values (?, ?, ?, ?)");
 
         countermeasuresCostImporter = manager.getImporter(CountermeasuresCostImporter.class);
     }
 
-    public long doImport(LongevityMeasures longevityMeasures, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(LongevityMeasures longevityMeasures) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.LONGEVITYMEASURES_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (longevityMeasures.getFiscalYearForCountermeasures() != null)
-            ps.setDate(3, Date.valueOf(LocalDate.of(longevityMeasures.getFiscalYearForCountermeasures().getValue(), 1, 1)));
+            ps.setDate(2, Date.valueOf(LocalDate.of(longevityMeasures.getFiscalYearForCountermeasures().getValue(), 1, 1)));
         else
-            ps.setNull(3, Types.DATE);
+            ps.setNull(2, Types.DATE);
 
         long countermeasuresCostId = 0;
         if (longevityMeasures.getCountermeasuresCost() != null && longevityMeasures.getCountermeasuresCost().isSetObject())
             countermeasuresCostId = countermeasuresCostImporter.doImport(longevityMeasures.getCountermeasuresCost().getObject());
 
         if (countermeasuresCostId != 0)
-            ps.setLong(4, countermeasuresCostId);
+            ps.setLong(3, countermeasuresCostId);
         else
-            ps.setNull(4, Types.NULL);
+            ps.setNull(3, Types.NULL);
 
-        ps.setString(5, longevityMeasures.getDescription());
+        ps.setString(4, longevityMeasures.getDescription());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

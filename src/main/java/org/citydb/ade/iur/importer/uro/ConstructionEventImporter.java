@@ -51,29 +51,28 @@ public class ConstructionEventImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CONSTRUCTIONEVENT)) + " " +
-                "(id, construction_construction_id, event, event_codespace, dateofevent, description) " +
-                "values (?, ?, ?, ?, ?, ?)");
+                "(id, event, event_codespace, dateofevent, description) " +
+                "values (?, ?, ?, ?, ?)");
     }
 
-    public long doImport(ConstructionEvent constructionEvent, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(ConstructionEvent constructionEvent) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.CONSTRUCTIONEVENT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (constructionEvent.getEvent() != null && constructionEvent.getEvent().isSetValue()) {
-            ps.setString(3, constructionEvent.getEvent().getValue());
-            ps.setString(4, constructionEvent.getEvent().getCodeSpace());
+            ps.setString(2, constructionEvent.getEvent().getValue());
+            ps.setString(3, constructionEvent.getEvent().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (constructionEvent.getDateOfEvent() != null)
-            ps.setDate(5, Date.valueOf(constructionEvent.getDateOfEvent()));
+            ps.setDate(4, Date.valueOf(constructionEvent.getDateOfEvent()));
         else
-            ps.setNull(5, Types.DATE);
+            ps.setNull(4, Types.DATE);
 
-        ps.setString(6, constructionEvent.getDescription());
+        ps.setString(5, constructionEvent.getDescription());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -55,6 +56,9 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
     private final CityFurnitureDetailAttributeExporter cityFurnitureDetailAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psFrnFacilityAttribute;
+    private final PreparedStatement psFrnDmAttribute;
+    private final PreparedStatement psFrnKeyValuePairAttribute;
 
     public CityFurniturePropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CITY_FURNITURE);
@@ -66,6 +70,21 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table frnFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITY_FURN_TO_FACILITYA)));
+        Select frnFacilityAttributeSelect = new Select().addProjection(frnFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(frnFacilityAttributes.getColumn("city_furniture_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(frnFacilityAttributes.getColumn("facilityattribute_id")));
+        psFrnFacilityAttribute = connection.prepareStatement(frnFacilityAttributeSelect.toString());
+        Table frnDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITY_FURN_TO_DMATTRIBU)));
+        Select frnDmAttributeSelect = new Select().addProjection(frnDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(frnDmAttributes.getColumn("city_furniture_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(frnDmAttributes.getColumn("dmattribute_id")));
+        psFrnDmAttribute = connection.prepareStatement(frnDmAttributeSelect.toString());
+        Table frnKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITY_FURN_TO_KEYVALUEP)));
+        Select frnKeyValuePairAttributeSelect = new Select().addProjection(frnKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(frnKeyValuePairAttributes.getColumn("city_furniture_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(frnKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psFrnKeyValuePairAttribute = connection.prepareStatement(frnKeyValuePairAttributeSelect.toString());
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
@@ -99,16 +118,28 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
                 }
 
                 if (projectionFilter.containsProperty("frnFacilityAttribute", module)) {
-                    for (FacilityAttribute frnFacilityAttribute : facilityAttributeExporter.doExport(parentId, "city_furniture_frnfacilit_id")) {
-                        FrnFacilityAttributePropertyElement property = new FrnFacilityAttributePropertyElement(new FacilityAttributeProperty(frnFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfCityFurniture(property);
+                    psFrnFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet frnFacilityAttributeRs = psFrnFacilityAttribute.executeQuery()) {
+                        while (frnFacilityAttributeRs.next()) {
+                            FacilityAttribute frnFacilityAttribute = facilityAttributeExporter.doExport(frnFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (frnFacilityAttribute != null) {
+                                FrnFacilityAttributePropertyElement property = new FrnFacilityAttributePropertyElement(new FacilityAttributeProperty(frnFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfCityFurniture(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("frnDmAttribute", module)) {
-                    for (DmAttribute frnDmAttribute : dmAttributeExporter.doExport(parentId, "city_furniture_frndmattri_id")) {
-                        FrnDmAttributePropertyElement property = new FrnDmAttributePropertyElement(new DmAttributeProperty(frnDmAttribute));
-                        parent.addGenericApplicationPropertyOfCityFurniture(property);
+                    psFrnDmAttribute.setLong(1, parentId);
+                    try (ResultSet frnDmAttributeRs = psFrnDmAttribute.executeQuery()) {
+                        while (frnDmAttributeRs.next()) {
+                            DmAttribute frnDmAttribute = dmAttributeExporter.doExport(frnDmAttributeRs.getLong("dmattribute_id"));
+                            if (frnDmAttribute != null) {
+                                FrnDmAttributePropertyElement property = new FrnDmAttributePropertyElement(new DmAttributeProperty(frnDmAttribute));
+                                parent.addGenericApplicationPropertyOfCityFurniture(property);
+                            }
+                        }
                     }
                 }
 
@@ -131,9 +162,15 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
                 }
 
                 if (projectionFilter.containsProperty("frnKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute frnKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "city_furniture_frnkeyvalu_id")) {
-                        FrnKeyValuePairAttributePropertyElement property = new FrnKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(frnKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfCityFurniture(property);
+                    psFrnKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet frnKeyValuePairAttributeRs = psFrnKeyValuePairAttribute.executeQuery()) {
+                        while (frnKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute frnKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(frnKeyValuePairAttribute, frnKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            FrnKeyValuePairAttributePropertyElement property = new FrnKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(frnKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfCityFurniture(property);
+                        }
                     }
                 }
             }
@@ -143,5 +180,8 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psFrnFacilityAttribute.close();
+        psFrnDmAttribute.close();
+        psFrnKeyValuePairAttribute.close();
     }
 }

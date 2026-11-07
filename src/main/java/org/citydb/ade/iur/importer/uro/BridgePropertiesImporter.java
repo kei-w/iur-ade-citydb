@@ -49,13 +49,17 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final BridgeToFacilityAttributeImporter bridgeToFacilityAttributeImporter;
     private final BridgeStructureAttributeImporter bridgeStructureAttributeImporter;
     private final BridgeFunctionalAttributeImporter bridgeFunctionalAttributeImporter;
     private final ConstructionRiskAssessmentAttributeImporter constructionRiskAssessmentAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final BridgeToDisasterRiskAttributeImporter bridgeToDisasterRiskAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final BridgeToDmAttributeImporter bridgeToDmAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final BridgeToKeyValuePairAttributeImporter bridgeToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -74,13 +78,17 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        bridgeToFacilityAttributeImporter = manager.getImporter(BridgeToFacilityAttributeImporter.class);
         bridgeStructureAttributeImporter = manager.getImporter(BridgeStructureAttributeImporter.class);
         bridgeFunctionalAttributeImporter = manager.getImporter(BridgeFunctionalAttributeImporter.class);
         constructionRiskAssessmentAttributeImporter = manager.getImporter(ConstructionRiskAssessmentAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        bridgeToDisasterRiskAttributeImporter = manager.getImporter(BridgeToDisasterRiskAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        bridgeToDmAttributeImporter = manager.getImporter(BridgeToDmAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        bridgeToKeyValuePairAttributeImporter = manager.getImporter(BridgeToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractBridge parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -190,29 +198,37 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(BridFacilityAttributePropertyElement.class)) {
             for (BridFacilityAttributePropertyElement property : properties.getAll(BridFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_bridfacilityattrib_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bridFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    bridgeToFacilityAttributeImporter.doImport(bridFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(BridDisasterRiskAttributePropertyElement.class)) {
             for (BridDisasterRiskAttributePropertyElement property : properties.getAll(BridDisasterRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_briddisasterriskat_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bridDisasterRiskAttributeId = disasterRiskAttributeImporter.doImport(property.getValue().getObject());
+                    bridgeToDisasterRiskAttributeImporter.doImport(bridDisasterRiskAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(BridDmAttributePropertyElement.class)) {
             for (BridDmAttributePropertyElement property : properties.getAll(BridDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_briddmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bridDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    bridgeToDmAttributeImporter.doImport(bridDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(BridKeyValuePairAttributePropertyElement.class)) {
             for (BridKeyValuePairAttributePropertyElement property : properties.getAll(BridKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_bridkeyvaluepairat_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bridKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    bridgeToKeyValuePairAttributeImporter.doImport(bridKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

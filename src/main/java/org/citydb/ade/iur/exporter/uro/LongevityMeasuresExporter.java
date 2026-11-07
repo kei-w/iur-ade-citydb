@@ -34,7 +34,6 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.CountermeasuresCost;
@@ -42,13 +41,11 @@ import org.citygml4j.ade.iur.model.uro.CountermeasuresCostProperty;
 import org.citygml4j.ade.iur.model.uro.LongevityMeasures;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.sql.*;
 
 public class LongevityMeasuresExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
     private final CountermeasuresCostExporter countermeasuresCostExporter;
 
     public LongevityMeasuresExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
@@ -56,21 +53,17 @@ public class LongevityMeasuresExporter implements UrbanObjectModuleExporter {
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("fiscalyearforcountermeasures", "countermeasurescost_id", "description"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("parkfacility_longevitymea_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
         countermeasuresCostExporter = manager.getExporter(CountermeasuresCostExporter.class);
     }
 
-    public List<LongevityMeasures> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(LongevityMeasures longevityMeasures, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<LongevityMeasures> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                LongevityMeasures longevityMeasures = new LongevityMeasures();
+            if (rs.next()) {
                 Date fiscalYearForCountermeasures = rs.getDate("fiscalyearforcountermeasures");
                 if (!rs.wasNull())
                     longevityMeasures.setFiscalYearForCountermeasures(Year.of(fiscalYearForCountermeasures.toLocalDate().getYear()));
@@ -83,16 +76,12 @@ public class LongevityMeasuresExporter implements UrbanObjectModuleExporter {
                 }
 
                 longevityMeasures.setDescription(rs.getString("description"));
-
-                result.add(longevityMeasures);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

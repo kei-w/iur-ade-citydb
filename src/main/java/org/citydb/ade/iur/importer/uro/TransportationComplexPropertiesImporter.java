@@ -48,9 +48,12 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final TransportationComplexToFacilityAttributeImporter transportationComplexToFacilityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final TransportationComplexToDmAttributeImporter transportationComplexToDmAttributeImporter;
     private final TrafficObjectUsecaseAttributeImporter trafficObjectUsecaseAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final TransportationComplexToKeyValuePairAttributeImporter transportationComplexToKeyValuePairAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final TrafficVolumeAttributeImporter trafficVolumeAttributeImporter;
     private final RoadStructureAttributeImporter roadStructureAttributeImporter;
@@ -75,9 +78,12 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        transportationComplexToFacilityAttributeImporter = manager.getImporter(TransportationComplexToFacilityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        transportationComplexToDmAttributeImporter = manager.getImporter(TransportationComplexToDmAttributeImporter.class);
         trafficObjectUsecaseAttributeImporter = manager.getImporter(TrafficObjectUsecaseAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        transportationComplexToKeyValuePairAttributeImporter = manager.getImporter(TransportationComplexToKeyValuePairAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         trafficVolumeAttributeImporter = manager.getImporter(TrafficVolumeAttributeImporter.class);
         roadStructureAttributeImporter = manager.getImporter(RoadStructureAttributeImporter.class);
@@ -236,22 +242,28 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
 
         if (properties.contains(TranFacilityAttributePropertyElement.class)) {
             for (TranFacilityAttributePropertyElement property : properties.getAll(TranFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_tranfaci_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tranFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    transportationComplexToFacilityAttributeImporter.doImport(tranFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(TranDmAttributePropertyElement.class)) {
             for (TranDmAttributePropertyElement property : properties.getAll(TranDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_trandmat_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tranDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    transportationComplexToDmAttributeImporter.doImport(tranDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(TranKeyValuePairAttributePropertyElement.class)) {
             for (TranKeyValuePairAttributePropertyElement property : properties.getAll(TranKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_trankeyv_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tranKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    transportationComplexToKeyValuePairAttributeImporter.doImport(tranKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

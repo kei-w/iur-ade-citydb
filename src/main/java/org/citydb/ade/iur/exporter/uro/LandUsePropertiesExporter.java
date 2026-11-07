@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -56,6 +57,9 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
     private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psLuseFacilityAttribute;
+    private final PreparedStatement psLuseDmAttribute;
+    private final PreparedStatement psLuseKeyValuePairAttribute;
 
     public LandUsePropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LAND_USE);
@@ -67,6 +71,21 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table luseFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LAND_USE_TO_FACILITYA)));
+        Select luseFacilityAttributeSelect = new Select().addProjection(luseFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(luseFacilityAttributes.getColumn("land_use_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(luseFacilityAttributes.getColumn("facilityattribute_id")));
+        psLuseFacilityAttribute = connection.prepareStatement(luseFacilityAttributeSelect.toString());
+        Table luseDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LAND_USE_TO_DMATTRIBU)));
+        Select luseDmAttributeSelect = new Select().addProjection(luseDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(luseDmAttributes.getColumn("land_use_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(luseDmAttributes.getColumn("dmattribute_id")));
+        psLuseDmAttribute = connection.prepareStatement(luseDmAttributeSelect.toString());
+        Table luseKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LAND_USE_TO_KEYVALUEP)));
+        Select luseKeyValuePairAttributeSelect = new Select().addProjection(luseKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(luseKeyValuePairAttributes.getColumn("land_use_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(luseKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psLuseKeyValuePairAttribute = connection.prepareStatement(luseKeyValuePairAttributeSelect.toString());
         ifcAttributeExporter = manager.getExporter(IfcAttributeExporter.class);
         landUseDetailAttributeExporter = manager.getExporter(LandUseDetailAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
@@ -119,16 +138,28 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("luseFacilityAttribute", module)) {
-                    for (FacilityAttribute luseFacilityAttribute : facilityAttributeExporter.doExport(parentId, "land_use_lusefacilityattr_id")) {
-                        LuseFacilityAttributePropertyElement property = new LuseFacilityAttributePropertyElement(new FacilityAttributeProperty(luseFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    psLuseFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet luseFacilityAttributeRs = psLuseFacilityAttribute.executeQuery()) {
+                        while (luseFacilityAttributeRs.next()) {
+                            FacilityAttribute luseFacilityAttribute = facilityAttributeExporter.doExport(luseFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (luseFacilityAttribute != null) {
+                                LuseFacilityAttributePropertyElement property = new LuseFacilityAttributePropertyElement(new FacilityAttributeProperty(luseFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfLandUse(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("luseDmAttribute", module)) {
-                    for (DmAttribute luseDmAttribute : dmAttributeExporter.doExport(parentId, "land_use_lusedmattribute_id")) {
-                        LuseDmAttributePropertyElement property = new LuseDmAttributePropertyElement(new DmAttributeProperty(luseDmAttribute));
-                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    psLuseDmAttribute.setLong(1, parentId);
+                    try (ResultSet luseDmAttributeRs = psLuseDmAttribute.executeQuery()) {
+                        while (luseDmAttributeRs.next()) {
+                            DmAttribute luseDmAttribute = dmAttributeExporter.doExport(luseDmAttributeRs.getLong("dmattribute_id"));
+                            if (luseDmAttribute != null) {
+                                LuseDmAttributePropertyElement property = new LuseDmAttributePropertyElement(new DmAttributeProperty(luseDmAttribute));
+                                parent.addGenericApplicationPropertyOfLandUse(property);
+                            }
+                        }
                     }
                 }
 
@@ -142,9 +173,15 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("luseKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute luseKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "land_use_lusekeyvaluepair_id")) {
-                        LuseKeyValuePairAttributePropertyElement property = new LuseKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(luseKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    psLuseKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet luseKeyValuePairAttributeRs = psLuseKeyValuePairAttribute.executeQuery()) {
+                        while (luseKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute luseKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(luseKeyValuePairAttribute, luseKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            LuseKeyValuePairAttributePropertyElement property = new LuseKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(luseKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfLandUse(property);
+                        }
                     }
                 }
             }
@@ -154,5 +191,8 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psLuseFacilityAttribute.close();
+        psLuseDmAttribute.close();
+        psLuseKeyValuePairAttribute.close();
     }
 }

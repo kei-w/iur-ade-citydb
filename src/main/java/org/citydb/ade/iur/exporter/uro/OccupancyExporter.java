@@ -34,39 +34,31 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.Occupancy;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class OccupancyExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public OccupancyExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.OCCUPANCY);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("interval", "interval_codespace", "numberofoccupants", "occupanttype", "occupanttype_codespace"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("construction_occupancy_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<Occupancy> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(Occupancy occupancy, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<Occupancy> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Occupancy occupancy = new Occupancy();
+            if (rs.next()) {
                 String interval = rs.getString("interval");
                 if (!rs.wasNull()) {
                     Code code = new Code(interval);
@@ -84,16 +76,12 @@ public class OccupancyExporter implements UrbanObjectModuleExporter {
                     code.setCodeSpace(rs.getString("occupanttype_codespace"));
                     occupancy.setOccupantType(code);
                 }
-
-                result.add(occupancy);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

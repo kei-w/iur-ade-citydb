@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -59,6 +60,10 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
     private final DmAttributeExporter dmAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psBridFacilityAttribute;
+    private final PreparedStatement psBridDisasterRiskAttribute;
+    private final PreparedStatement psBridDmAttribute;
+    private final PreparedStatement psBridKeyValuePairAttribute;
 
     public BridgePropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BRIDGE);
@@ -71,6 +76,26 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table bridFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BRIDGE_TO_FACILITYA)));
+        Select bridFacilityAttributeSelect = new Select().addProjection(bridFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bridFacilityAttributes.getColumn("bridge_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bridFacilityAttributes.getColumn("facilityattribute_id")));
+        psBridFacilityAttribute = connection.prepareStatement(bridFacilityAttributeSelect.toString());
+        Table bridDisasterRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BRIDGE_TO_DISASTERR)));
+        Select bridDisasterRiskAttributeSelect = new Select().addProjection(bridDisasterRiskAttributes.getColumn("disasterriskattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bridDisasterRiskAttributes.getColumn("bridge_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bridDisasterRiskAttributes.getColumn("disasterriskattribute_id")));
+        psBridDisasterRiskAttribute = connection.prepareStatement(bridDisasterRiskAttributeSelect.toString());
+        Table bridDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BRIDGE_TO_DMATTRIBU)));
+        Select bridDmAttributeSelect = new Select().addProjection(bridDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bridDmAttributes.getColumn("bridge_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bridDmAttributes.getColumn("dmattribute_id")));
+        psBridDmAttribute = connection.prepareStatement(bridDmAttributeSelect.toString());
+        Table bridKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BRIDGE_TO_KEYVALUEP)));
+        Select bridKeyValuePairAttributeSelect = new Select().addProjection(bridKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bridKeyValuePairAttributes.getColumn("bridge_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bridKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psBridKeyValuePairAttribute = connection.prepareStatement(bridKeyValuePairAttributeSelect.toString());
         constructionBaseAttributeExporter = manager.getExporter(ConstructionBaseAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
@@ -117,9 +142,15 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("bridFacilityAttribute", module)) {
-                    for (FacilityAttribute bridFacilityAttribute : facilityAttributeExporter.doExport(parentId, "bridge_bridfacilityattrib_id")) {
-                        BridFacilityAttributePropertyElement property = new BridFacilityAttributePropertyElement(new FacilityAttributeProperty(bridFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    psBridFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet bridFacilityAttributeRs = psBridFacilityAttribute.executeQuery()) {
+                        while (bridFacilityAttributeRs.next()) {
+                            FacilityAttribute bridFacilityAttribute = facilityAttributeExporter.doExport(bridFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (bridFacilityAttribute != null) {
+                                BridFacilityAttributePropertyElement property = new BridFacilityAttributePropertyElement(new FacilityAttributeProperty(bridFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                            }
+                        }
                     }
                 }
 
@@ -151,16 +182,28 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("bridDisasterRiskAttribute", module)) {
-                    for (DisasterRiskAttribute bridDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "bridge_briddisasterriskat_id")) {
-                        BridDisasterRiskAttributePropertyElement property = new BridDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(bridDisasterRiskAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    psBridDisasterRiskAttribute.setLong(1, parentId);
+                    try (ResultSet bridDisasterRiskAttributeRs = psBridDisasterRiskAttribute.executeQuery()) {
+                        while (bridDisasterRiskAttributeRs.next()) {
+                            DisasterRiskAttribute bridDisasterRiskAttribute = disasterRiskAttributeExporter.doExport(bridDisasterRiskAttributeRs.getLong("disasterriskattribute_id"));
+                            if (bridDisasterRiskAttribute != null) {
+                                BridDisasterRiskAttributePropertyElement property = new BridDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(bridDisasterRiskAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("bridDmAttribute", module)) {
-                    for (DmAttribute bridDmAttribute : dmAttributeExporter.doExport(parentId, "bridge_briddmattribute_id")) {
-                        BridDmAttributePropertyElement property = new BridDmAttributePropertyElement(new DmAttributeProperty(bridDmAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    psBridDmAttribute.setLong(1, parentId);
+                    try (ResultSet bridDmAttributeRs = psBridDmAttribute.executeQuery()) {
+                        while (bridDmAttributeRs.next()) {
+                            DmAttribute bridDmAttribute = dmAttributeExporter.doExport(bridDmAttributeRs.getLong("dmattribute_id"));
+                            if (bridDmAttribute != null) {
+                                BridDmAttributePropertyElement property = new BridDmAttributePropertyElement(new DmAttributeProperty(bridDmAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                            }
+                        }
                     }
                 }
 
@@ -174,9 +217,15 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("bridKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute bridKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "bridge_bridkeyvaluepairat_id")) {
-                        BridKeyValuePairAttributePropertyElement property = new BridKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(bridKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    psBridKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet bridKeyValuePairAttributeRs = psBridKeyValuePairAttribute.executeQuery()) {
+                        while (bridKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute bridKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(bridKeyValuePairAttribute, bridKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            BridKeyValuePairAttributePropertyElement property = new BridKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(bridKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                        }
                     }
                 }
             }
@@ -186,5 +235,9 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psBridFacilityAttribute.close();
+        psBridDisasterRiskAttribute.close();
+        psBridDmAttribute.close();
+        psBridKeyValuePairAttribute.close();
     }
 }

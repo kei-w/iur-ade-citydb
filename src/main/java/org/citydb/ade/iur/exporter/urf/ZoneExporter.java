@@ -34,85 +34,96 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.UrbanFunctionModule;
-import org.citygml4j.ade.iur.model.urf.TargetProperty;
+import org.citygml4j.ade.iur.model.urf.Boundary;
+import org.citygml4j.ade.iur.model.urf.BoundaryProperty;
+import org.citygml4j.ade.iur.model.urf.UrbanParkAttribute;
+import org.citygml4j.ade.iur.model.urf.UrbanParkAttributeProperty;
 import org.citygml4j.ade.iur.model.urf.Zone;
 
 import java.sql.*;
 
 public class ZoneExporter implements UrbanFunctionModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final UrbanFunctionExporter urbanFunctionExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psBoundary;
+    private final BoundaryExporter boundaryExporter;
+    private final UrbanParkAttributeExporter urbanParkAttributeExporter;
+    private final AttributeValueSplitter valueSplitter;
 
     public ZoneExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.ZONE);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = UrbanFunctionModule.v1_4.getNamespaceURI();
-
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
+        boundaryExporter = manager.getExporter(BoundaryExporter.class);
+        urbanParkAttributeExporter = manager.getExporter(UrbanParkAttributeExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table urbanFunction = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION)));
-
-        Select select = new Select().addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        urbanFunctionExporter.addProjection(select, urbanFunction, projectionFilter, "uf");
-        if (projectionFilter.containsProperty("finalPublicationDate", module))
-            select.addProjection(table.getColumn("finalpublicationdate"));
-        if (projectionFilter.containsProperty("areaApplied", module))
-            select.addProjection(table.getColumn("areaapplied"));
-        if (projectionFilter.containsProperty("target", module)) {
-            Table targets = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_CITYOBJEC)));
-            Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(cityObject.getColumn("gmlid"))
-                    .addJoin(JoinFactory.left(targets, "urbanfunction_id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(cityObject, "id", ComparisonName.EQUAL_TO, targets.getColumn("cityobject_id")));
-        }
+        addProjection(select, table, "");
+        urbanFunctionExporter.addProjection(select, urbanFunction, "uf_");
         ps = connection.prepareStatement(select.toString());
+
+        Table boundarys = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ZONE_TO_BOUNDARY)));
+        Select boundarySelect = new Select().addProjection(boundarys.getColumn("boundary_id"))
+                .addSelection(ComparisonFactory.equalTo(boundarys.getColumn("zone_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(boundarys.getColumn("boundary_id")));
+        psBoundary = connection.prepareStatement(boundarySelect.toString());
     }
 
     public void doExport(Zone zone, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    urbanFunctionExporter.doExport(zone, projectionFilter, "uf", rs);
-
-                    if (projectionFilter.containsProperty("finalPublicationDate", module)) {
-                        Date finalPublicationDate = rs.getDate("finalpublicationdate");
-                        if (!rs.wasNull())
-                            zone.setFinalPublicationDate(finalPublicationDate.toLocalDate());
-                    }
-
-                    if (projectionFilter.containsProperty("areaApplied", module))
-                        zone.setAreaApplied(rs.getString("areaapplied"));
-
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("target", module)) {
-                    String gmlId = rs.getString("gmlid");
-                    if (gmlId != null)
-                        zone.getTargets().add(new TargetProperty("#" + gmlId));
-                }
+            if (rs.next()) {
+                urbanFunctionExporter.doExport(zone, objectId, "uf_", rs);
+                doExport(zone, objectId, "", rs);
             }
+        }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("location", prefix + "location"),
+                table.getColumn("urbanparkattribute_id", prefix + "urbanparkattribute_id"));
+
+        return select;
+    }
+
+    public void doExport(Zone zone, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        psBoundary.setLong(1, objectId);
+        try (ResultSet boundaryRs = psBoundary.executeQuery()) {
+            while (boundaryRs.next()) {
+                Boundary boundary = new Boundary();
+                boundaryExporter.doExport(boundary, boundaryRs.getLong("boundary_id"));
+                zone.getBoundary().add(new BoundaryProperty(boundary));
+            }
+        }
+
+        zone.setLocationDescription(rs.getString(prefix + "location"));
+
+        long urbanParkAttributeId = rs.getLong(prefix + "urbanparkattribute_id");
+        if (urbanParkAttributeId != 0) {
+            UrbanParkAttribute urbanParkAttribute = new UrbanParkAttribute();
+            urbanParkAttributeExporter.doExport(urbanParkAttribute, urbanParkAttributeId);
+            zone.setUrbanParkAttribute(new UrbanParkAttributeProperty(urbanParkAttribute));
         }
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psBoundary.close();
     }
 }

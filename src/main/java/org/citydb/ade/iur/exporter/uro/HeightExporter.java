@@ -34,7 +34,6 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.Height;
@@ -42,13 +41,10 @@ import org.citygml4j.ade.iur.model.uro.HeightStatusValue;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class HeightExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public HeightExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.HEIGHT);
@@ -56,20 +52,16 @@ public class HeightExporter implements UrbanObjectModuleExporter {
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("highreference", "highreference_codespace", "lowreference", "lowreference_codespace", "status",
                         "value", "value_uom"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("construction_height_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<Height> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(Height height, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<Height> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Height height = new Height();
+            if (rs.next()) {
                 String highReference = rs.getString("highreference");
                 if (!rs.wasNull()) {
                     Code code = new Code(highReference);
@@ -94,16 +86,12 @@ public class HeightExporter implements UrbanObjectModuleExporter {
                     length.setUom(rs.getString("value_uom"));
                     height.setValue(length);
                 }
-
-                result.add(height);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

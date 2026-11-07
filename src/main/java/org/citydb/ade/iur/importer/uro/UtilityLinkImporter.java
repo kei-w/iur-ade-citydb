@@ -46,6 +46,7 @@ public class UtilityLinkImporter implements UrbanObjectModuleImporter {
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UtilityNetworkElementImporter utilityNetworkElementImporter;
+    private final UtilityLinkToLengthAttributeImporter utilityLinkToLengthAttributeImporter;
     private final LengthAttributeImporter lengthAttributeImporter;
 
     private int batchCounter;
@@ -62,6 +63,7 @@ public class UtilityLinkImporter implements UrbanObjectModuleImporter {
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         utilityNetworkElementImporter = manager.getImporter(UtilityNetworkElementImporter.class);
+        utilityLinkToLengthAttributeImporter = manager.getImporter(UtilityLinkToLengthAttributeImporter.class);
         lengthAttributeImporter = manager.getImporter(LengthAttributeImporter.class);
     }
 
@@ -146,8 +148,10 @@ public class UtilityLinkImporter implements UrbanObjectModuleImporter {
             helper.executeBatch(objectType);
 
         for (LengthAttributeProperty property : utilityLink.getLengthAttribute()) {
-            if (property.isSetObject())
-                lengthAttributeImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long lengthAttributeId = lengthAttributeImporter.doImport(property.getObject());
+                utilityLinkToLengthAttributeImporter.doImport(lengthAttributeId, objectId);
+            }
         }
     }
 
