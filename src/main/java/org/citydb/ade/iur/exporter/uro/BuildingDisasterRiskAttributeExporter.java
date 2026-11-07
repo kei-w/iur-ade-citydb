@@ -35,6 +35,7 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -70,7 +71,8 @@ public class BuildingDisasterRiskAttributeExporter implements UrbanObjectModuleE
                 .addProjection(riverFlooding.getColumns("admintype", "admintype_codespace", "duration", "duration_uom", "scale", "scale_codespace"))
                 .addJoin(JoinFactory.left(flooding, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.left(riverFlooding, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_buildingdisaster_id"), new PlaceHolder<>()));
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_buildingdisaster_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(table.getColumn("id")));
         ps = connection.prepareStatement(select.toString());
     }
 

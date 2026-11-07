@@ -17,6 +17,7 @@ Change Log
 
 #### Fixes
 * The `urf` and `urg` CityObjectGroup property exporters used the `uro` namespace for projection filtering.
+* Repeated ADE properties (disaster risks, key-value pairs) are exported in import order (`ORDER BY id`).
 
 ### 2.1.0 - 2024-09-19
 

@@ -34,6 +34,7 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
@@ -54,7 +55,8 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace",
                         "datevalue", "doublevalue", "intvalue", "measuredvalue", "measuredvalue_uom", "stringvalue", "urivalue"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_keyvaluepairattr_id"), new PlaceHolder<>()));
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_keyvaluepairattr_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(table.getColumn("id")));
         ps = connection.prepareStatement(select.toString());
     }
 
