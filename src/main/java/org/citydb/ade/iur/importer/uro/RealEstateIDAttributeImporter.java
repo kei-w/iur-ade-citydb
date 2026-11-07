@@ -29,6 +29,7 @@
 package org.citydb.ade.iur.importer.uro;
 
 import org.citydb.ade.iur.importer.ImportManager;
+import org.citydb.ade.iur.schema.ADESequence;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
@@ -42,7 +43,6 @@ public class RealEstateIDAttributeImporter implements UrbanObjectModuleImporter 
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final BuildingAttributeImporter buildingAttributeImporter;
     private final AttributeValueJoiner valueJoiner;
 
     private int batchCounter;
@@ -56,13 +56,11 @@ public class RealEstateIDAttributeImporter implements UrbanObjectModuleImporter 
                 "(id, matchingscore, numberofbuildingunitownershi, numberofrealestateidofland, " +
                 "realestateidofbuilding, realestateidofbuildingunitow, realestateidofland) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
-
-        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         valueJoiner = helper.getAttributeValueJoiner();
     }
 
     public long doImport(RealEstateIDAttribute realEstateIDAttribute) throws CityGMLImportException, SQLException {
-        long objectId = buildingAttributeImporter.doImport(realEstateIDAttribute);
+        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.REALESTATEIDATTRIB_SEQ));
         ps.setLong(1, objectId);
 
         if (realEstateIDAttribute.getMatchingScore() != null)

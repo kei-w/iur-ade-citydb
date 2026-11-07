@@ -1,4 +1,4 @@
--- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2026-11-07 12:19:38 
+-- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2026-11-07 13:00:51 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- *********************************** Create Sequences *********************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -41,6 +41,8 @@ CREATE SEQUENCE ur_constructionriskas_seq INCREMENT BY 1 START WITH 1 MINVALUE 1
 
 CREATE SEQUENCE ur_trafficareaattribu_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
+CREATE SEQUENCE ur_realestateidattrib_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
 CREATE SEQUENCE ur_facilityattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_bridgestructureatt_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
@@ -57,9 +59,9 @@ CREATE SEQUENCE ur_longevitymeasures_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 
 
 CREATE SEQUENCE ur_occupancy_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
-CREATE SEQUENCE ur_countermeasurescos_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
-
 CREATE SEQUENCE ur_height_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_countermeasurescos_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_roomattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -81,17 +83,21 @@ CREATE SEQUENCE ur_railwayrouteattrib_seq INCREMENT BY 1 START WITH 1 MINVALUE 1
 
 CREATE SEQUENCE ur_numberofannualdive_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
+CREATE SEQUENCE ur_ifccoordinaterefer_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
 CREATE SEQUENCE ur_transitioncurvetyp_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_crs_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_tunnelstructureatt_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
-CREATE SEQUENCE ur_waterwaydetailattr_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
-
 CREATE SEQUENCE ur_lengthattribute_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
+CREATE SEQUENCE ur_waterwaydetailattr_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
 CREATE SEQUENCE ur_context_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_pointcloudspecattr_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_constructionstruct_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -117,9 +123,9 @@ CREATE SEQUENCE ur_ifcaxis2placement3_seq INCREMENT BY 1 START WITH 1 MINVALUE 1
 
 CREATE SEQUENCE ur_verticalcurvetype_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
-CREATE SEQUENCE ur_constructionbaseat_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
-
 CREATE SEQUENCE ur_facilitytypeattrib_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
+
+CREATE SEQUENCE ur_constructionbaseat_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
 CREATE SEQUENCE ur_waterbodydetailatt_seq INCREMENT BY 1 START WITH 1 MINVALUE 1 CACHE 10000;
 
@@ -560,6 +566,7 @@ CREATE TABLE ur_cityfurnitureattribute
 CREATE TABLE ur_cityobject
 (
     id NUMBER(38) NOT NULL,
+    pointcloud_id NUMBER(38),
     vegdataqualityattribute_id NUMBER(38),
     vegfacilityidattribute_id NUMBER(38),
     vegfacilitytypeattribute_id NUMBER(38),
@@ -619,6 +626,8 @@ CREATE TABLE ur_cityobjectgroup_3
 CREATE TABLE ur_construction
 (
     id NUMBER(38) NOT NULL,
+    class VARCHAR2(1000),
+    class_codespace VARCHAR2(1000),
     conditionofconstruction VARCHAR2(1000),
     consbaseattribute_id NUMBER(38),
     consdataqualityattribute_id NUMBER(38),
@@ -626,6 +635,8 @@ CREATE TABLE ur_construction
     consstructureattribute_id NUMBER(38),
     dateofconstruction TIMESTAMP,
     dateofdemolition TIMESTAMP,
+    function VARCHAR2(1000),
+    function_codespace VARCHAR2(1000),
     lod0geometry_brep_id NUMBER(38),
     lod0geometry_other_geom MDSYS.SDO_GEOMETRY,
     lod1geometry_brep_id NUMBER(38),
@@ -636,6 +647,8 @@ CREATE TABLE ur_construction
     lod3geometry_other_geom MDSYS.SDO_GEOMETRY,
     lod4geometry_brep_id NUMBER(38),
     lod4geometry_other_geom MDSYS.SDO_GEOMETRY,
+    usage VARCHAR2(1000),
+    usage_codespace VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -645,7 +658,7 @@ CREATE TABLE ur_construction
 CREATE TABLE ur_constructionbaseattrib
 (
     id NUMBER(38) NOT NULL,
-    administorator VARCHAR2(1000),
+    administrator VARCHAR2(1000),
     adminoffice VARCHAR2(1000),
     admintype VARCHAR2(1000),
     admintype_codespace VARCHAR2(1000),
@@ -1506,6 +1519,21 @@ CREATE TABLE ur_ifcclassificationrefer
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_ifccoordinatereferen_1 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_ifccoordinatereferen_1
+(
+    id NUMBER(38) NOT NULL,
+    context_id NUMBER(38),
+    ifccoordinater_geodeticdatum VARCHAR2(1000),
+    ifccoordinater_verticaldatum VARCHAR2(1000),
+    ifccoordinateref_description VARCHAR2(1000),
+    ifccoordinatereferences_name VARCHAR2(1000),
+    objectclass_id INTEGER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_ifccoordinatereference 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_ifccoordinatereference
@@ -1560,6 +1588,15 @@ CREATE TABLE ur_ifcgeometricrepresenta
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_ifcgroup 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_ifcgroup
+(
+    id NUMBER(38) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_ifcmapconversion 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_ifcmapconversion
@@ -1576,6 +1613,17 @@ CREATE TABLE ur_ifcmapconversion
     targetcrs_id NUMBER(38),
     xaxisabscissa NUMBER,
     xaxisordinate NUMBER,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_ifcobjectdefinition 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_ifcobjectdefinition
+(
+    id NUMBER(38) NOT NULL,
+    objectclass_id INTEGER,
+    objecttype VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -1749,7 +1797,6 @@ CREATE TABLE ur_ifcroot
     globalid VARCHAR2(1000),
     name VARCHAR2(1000),
     objectclass_id INTEGER,
-    objecttype VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -1957,6 +2004,7 @@ CREATE TABLE ur_indoortactiletileattri
     endnode VARCHAR2(1000),
     floorid VARCHAR2(1000),
     roof VARCHAR2(1000),
+    roof_codespace VARCHAR2(1000),
     startnode VARCHAR2(1000),
     PRIMARY KEY (id)
 );
@@ -2385,21 +2433,6 @@ CREATE TABLE ur_opening
 );
 
 -- -------------------------------------------------------------------- 
--- ur_otherconstruction 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_otherconstruction
-(
-    id NUMBER(38) NOT NULL,
-    class VARCHAR2(1000),
-    class_codespace VARCHAR2(1000),
-    function VARCHAR2(1000),
-    function_codespace VARCHAR2(1000),
-    usage VARCHAR2(1000),
-    usage_codespace VARCHAR2(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
 -- ur_parkfacilitylongevityp 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_parkfacilitylongevityp
@@ -2502,6 +2535,57 @@ CREATE TABLE ur_point
 );
 
 -- -------------------------------------------------------------------- 
+-- ur_pointcloud 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_pointcloud
+(
+    id NUMBER(38) NOT NULL,
+    mimetype VARCHAR2(1000),
+    mimetype_codespace VARCHAR2(1000),
+    pointcloudspecattribute_id NUMBER(38),
+    pointfile VARCHAR2(1000),
+    pointfilesrsname VARCHAR2(1000),
+    points MDSYS.SDO_GEOMETRY,
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_pointcloudspecattribut 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_pointcloudspecattribut
+(
+    id NUMBER(38) NOT NULL,
+    class VARCHAR2(1000),
+    class_codespace VARCHAR2(1000),
+    customclassificati_codespace VARCHAR2(1000),
+    customclassificationtype VARCHAR2(1000),
+    function VARCHAR2(1000),
+    function_codespace VARCHAR2(1000),
+    isintensity NUMBER,
+    isreturninfo NUMBER,
+    isstandardclassification NUMBER,
+    pointcloudassociat_codespace VARCHAR2(1000),
+    pointcloudassociationmethod VARCHAR2(1000),
+    pointsubsamplingin_codespace VARCHAR2(1000),
+    pointsubsamplinginfo VARCHAR2(1000),
+    spectralbandset VARCHAR2(1000),
+    spectralbandset_codespace VARCHAR2(1000),
+    srcfilteringcriter_codespace VARCHAR2(1000),
+    srcfilteringcriteria VARCHAR2(1000),
+    srcgridinterval NUMBER,
+    srcgridinterval_uom VARCHAR2(1000),
+    srcrequiredhorizontalacc_uom VARCHAR2(1000),
+    srcrequiredhorizontalaccurac NUMBER,
+    srcrequiredpointdensity NUMBER,
+    srcrequiredpointdensity_uom VARCHAR2(1000),
+    srcrequiredverticalaccur_uom VARCHAR2(1000),
+    srcrequiredverticalaccuracy NUMBER,
+    srcscale VARCHAR2(1000),
+    srcscale_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
 -- ur_pollution 
 -- -------------------------------------------------------------------- 
 CREATE TABLE ur_pollution
@@ -2580,8 +2664,8 @@ CREATE TABLE ur_portenvironmentalimpro
     note VARCHAR2(1000),
     subsidy INTEGER,
     totalcost INTEGER,
-    totalfoorarea NUMBER,
-    totalfoorarea_uom VARCHAR2(1000),
+    totalfloorarea NUMBER,
+    totalfloorarea_uom VARCHAR2(1000),
     usage VARCHAR2(1000),
     PRIMARY KEY (id)
 );
@@ -3866,12 +3950,12 @@ REFERENCES ur_landusediversion (id);
 ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_fk FOREIGN KEY (id)
 REFERENCES ur_publictransit (id);
 
-ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_route_fk FOREIGN KEY (route_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_agency_fk FOREIGN KEY (agency_id)
 REFERENCES ur_agency (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_route_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_attribution ADD CONSTRAINT ur_attribution_trip_fk FOREIGN KEY (trip_id)
@@ -3907,16 +3991,16 @@ ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridbaseattri_fk FOREIGN KEY (bri
 REFERENCES ur_constructionbaseattrib (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_briddataquali_fk FOREIGN KEY (briddataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridfacilityi_fk FOREIGN KEY (bridfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridfacilityt_fk FOREIGN KEY (bridfacilitytypeattribute_id)
 REFERENCES ur_facilitytypeattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridstructure_fk FOREIGN KEY (bridstructureattribute_id)
-REFERENCES ur_bridgestructureattribu (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridfunctiona_fk FOREIGN KEY (bridfunctionalattribute_id)
@@ -3927,8 +4011,8 @@ ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridriskasses_fk FOREIGN KEY (bri
 REFERENCES ur_constructionriskassess (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_briddataquali_fk FOREIGN KEY (briddataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
+ALTER TABLE ur_bridge ADD CONSTRAINT ur_bridge_bridstructure_fk FOREIGN KEY (bridstructureattribute_id)
+REFERENCES ur_bridgestructureattribu (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -3937,28 +4021,16 @@ ON DELETE SET NULL;
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_fk FOREIGN KEY (id)
 REFERENCES building (id);
 
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgdataqua_fk FOREIGN KEY (bldgdataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgfacilit_fk FOREIGN KEY (bldgfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgfacil_fk_1 FOREIGN KEY (bldgfacilitytypeattribute_id)
 REFERENCES ur_facilitytypeattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgdataqua_fk FOREIGN KEY (bldgdataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingida_fk FOREIGN KEY (buildingidattribute_id)
-REFERENCES ur_buildingidattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdet_fk FOREIGN KEY (buildingdetailattribute_id)
-REFERENCES ur_buildingdetailattribut (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_building ADD CONSTRAINT ur_building_largecustom_fk FOREIGN KEY (largecustomerfacilityattr_id)
-REFERENCES ur_largecustomerfacilitya (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgrealest_fk FOREIGN KEY (bldgrealestateidattribute_id)
@@ -3969,12 +4041,24 @@ ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgusecase_fk FOREIGN KEY (b
 REFERENCES ur_buildingusecaseattribu (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdet_fk FOREIGN KEY (buildingdetailattribute_id)
+REFERENCES ur_buildingdetailattribut (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingida_fk FOREIGN KEY (buildingidattribute_id)
+REFERENCES ur_buildingidattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_ifcbuilding_fk FOREIGN KEY (ifcbuildingattribute_id)
 REFERENCES ur_ifcattribute (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_building ADD CONSTRAINT ur_building_indoorbuild_fk FOREIGN KEY (indoorbuildingattribute_id)
 REFERENCES ur_indoorattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_largecustom_fk FOREIGN KEY (largecustomerfacilityattr_id)
+REFERENCES ur_largecustomerfacilitya (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -4076,6 +4160,14 @@ REFERENCES ur_urbanfunction (id);
 ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furniture_fk FOREIGN KEY (id)
 REFERENCES city_furniture (id);
 
+ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_cityfur_fk FOREIGN KEY (cityfurnituredetailattrib_id)
+REFERENCES ur_cityfurnitureattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_frndata_fk FOREIGN KEY (frndataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_frnfaci_fk FOREIGN KEY (frnfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
@@ -4084,19 +4176,15 @@ ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnit_frnfac_fk_1 FOREIGN 
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_frndata_fk FOREIGN KEY (frndataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_city_furniture ADD CONSTRAINT ur_city_furnitu_cityfur_fk FOREIGN KEY (cityfurnituredetailattrib_id)
-REFERENCES ur_cityfurnitureattribute (id)
-ON DELETE SET NULL;
-
 -- -------------------------------------------------------------------- 
 -- ur_cityobject 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_fk FOREIGN KEY (id)
 REFERENCES cityobject (id);
+
+ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_vegdataqu_fk FOREIGN KEY (vegdataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
 
 ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_vegfacili_fk FOREIGN KEY (vegfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
@@ -4106,8 +4194,8 @@ ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobjec_vegfacil_fk_1 FOREIGN KEY 
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_vegdataqu_fk FOREIGN KEY (vegdataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
+ALTER TABLE ur_cityobject ADD CONSTRAINT ur_cityobject_pointclou_fk FOREIGN KEY (pointcloud_id)
+REFERENCES ur_pointcloud (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -4148,20 +4236,20 @@ REFERENCES cityobjectgroup (id);
 ALTER TABLE ur_construction ADD CONSTRAINT ur_construction_fk FOREIGN KEY (id)
 REFERENCES cityobject (id);
 
-ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consbasea_fk FOREIGN KEY (consbaseattribute_id)
-REFERENCES ur_constructionbaseattrib (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consfacil_fk FOREIGN KEY (consfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consdataq_fk FOREIGN KEY (consdataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
+ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consbasea_fk FOREIGN KEY (consbaseattribute_id)
+REFERENCES ur_constructionbaseattrib (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consstruc_fk FOREIGN KEY (consstructureattribute_id)
 REFERENCES ur_constructionstructurea (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_construction ADD CONSTRAINT ur_constructi_consdataq_fk FOREIGN KEY (consdataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_construction ADD CONSTRAINT ur_constru_lod0geo_brep_fk FOREIGN KEY (lod0geometry_brep_id)
@@ -4273,11 +4361,11 @@ REFERENCES ur_urbanfunction (id);
 ALTER TABLE ur_disasterriskattribute ADD CONSTRAINT ur_disasterri_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
 
-ALTER TABLE ur_disasterriskattribute ADD CONSTRAINT ur_disast_bridge_briddi_fk FOREIGN KEY (bridge_briddisasterriskat_id)
-REFERENCES ur_bridge (id);
-
 ALTER TABLE ur_disasterriskattribute ADD CONSTRAINT ur_disast_buildi_bldgdi_fk FOREIGN KEY (building_bldgdisasterrisk_id)
 REFERENCES ur_building (id);
+
+ALTER TABLE ur_disasterriskattribute ADD CONSTRAINT ur_disast_bridge_briddi_fk FOREIGN KEY (bridge_briddisasterriskat_id)
+REFERENCES ur_bridge (id);
 
 ALTER TABLE ur_disasterriskattribute ADD CONSTRAINT ur_disast_tunnel_tundis_fk FOREIGN KEY (tunnel_tundisasterriskatt_id)
 REFERENCES ur_tunnel (id);
@@ -4300,20 +4388,27 @@ REFERENCES surface_geometry (id);
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattribut_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
 
-ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_bridge_briddm_fk FOREIGN KEY (bridge_briddmattribute_id)
-REFERENCES ur_bridge (id);
+ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattribut_dmelement_fk FOREIGN KEY (dmelement_id)
+REFERENCES ur_dmelement (id)
+ON DELETE SET NULL;
 
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_buildi_bldgdm_fk FOREIGN KEY (building_bldgdmattribute_id)
 REFERENCES ur_building (id);
 
-ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmatt_land_use_lused_fk FOREIGN KEY (land_use_lusedmattribute_id)
-REFERENCES ur_land_use (id);
+ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_bridge_briddm_fk FOREIGN KEY (bridge_briddmattribute_id)
+REFERENCES ur_bridge (id);
 
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmatt_city_furn_frnd_fk FOREIGN KEY (city_furniture_frndmattri_id)
 REFERENCES ur_city_furniture (id);
 
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmatt_reli_comp_demd_fk FOREIGN KEY (relief_component_demdmatt_id)
 REFERENCES ur_relief_component (id);
+
+ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_waterb_wtrdma_fk FOREIGN KEY (waterbody_wtrdmattribute_id)
+REFERENCES ur_waterbody (id);
+
+ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmatt_land_use_lused_fk FOREIGN KEY (land_use_lusedmattribute_id)
+REFERENCES ur_land_use (id);
 
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmatt_tran_comp_tran_fk FOREIGN KEY (transpor_complex_trandmat_id)
 REFERENCES ur_transportation_complex (id);
@@ -4324,15 +4419,8 @@ REFERENCES ur_tunnel (id);
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_cityob_vegdma_fk FOREIGN KEY (cityobject_vegdmattribute_id)
 REFERENCES ur_cityobject (id);
 
-ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_waterb_wtrdma_fk FOREIGN KEY (waterbody_wtrdmattribute_id)
-REFERENCES ur_waterbody (id);
-
 ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattr_constr_consdm_fk FOREIGN KEY (construction_consdmattrib_id)
 REFERENCES ur_construction (id);
-
-ALTER TABLE ur_dmattribute ADD CONSTRAINT ur_dmattribut_dmelement_fk FOREIGN KEY (dmelement_id)
-REFERENCES ur_dmelement (id)
-ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
 -- ur_dmgeometricattribute 
@@ -4361,17 +4449,20 @@ REFERENCES ur_constructionstructurea (id);
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facilityat_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
 
-ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_bridge_bridfa_fk FOREIGN KEY (bridge_bridfacilityattrib_id)
-REFERENCES ur_bridge (id);
-
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_buildi_bldgfa_fk FOREIGN KEY (building_bldgfacilityattr_id)
 REFERENCES ur_building (id);
 
-ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facil_land_use_lusef_fk FOREIGN KEY (land_use_lusefacilityattr_id)
-REFERENCES ur_land_use (id);
+ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_bridge_bridfa_fk FOREIGN KEY (bridge_bridfacilityattrib_id)
+REFERENCES ur_bridge (id);
 
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facil_city_furn_frnf_fk FOREIGN KEY (city_furniture_frnfacilit_id)
 REFERENCES ur_city_furniture (id);
+
+ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_waterb_wtrfac_fk FOREIGN KEY (waterbody_wtrfacilityattr_id)
+REFERENCES ur_waterbody (id);
+
+ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facil_land_use_lusef_fk FOREIGN KEY (land_use_lusefacilityattr_id)
+REFERENCES ur_land_use (id);
 
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facil_tran_comp_tran_fk FOREIGN KEY (transpor_complex_tranfaci_id)
 REFERENCES ur_transportation_complex (id);
@@ -4381,9 +4472,6 @@ REFERENCES ur_tunnel (id);
 
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_cityob_vegfac_fk FOREIGN KEY (cityobject_vegfacilityatt_id)
 REFERENCES ur_cityobject (id);
-
-ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_waterb_wtrfac_fk FOREIGN KEY (waterbody_wtrfacilityattr_id)
-REFERENCES ur_waterbody (id);
 
 ALTER TABLE ur_facilityattribute ADD CONSTRAINT ur_facili_const_consf_fk_1 FOREIGN KEY (construction_consfacility_id)
 REFERENCES ur_construction (id);
@@ -4410,12 +4498,12 @@ ON DELETE SET NULL;
 ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_fk FOREIGN KEY (id)
 REFERENCES ur_publictransitdatatype (id);
 
-ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_route_fk FOREIGN KEY (route_id)
-REFERENCES ur_route (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_fare_fk FOREIGN KEY (fare_id)
 REFERENCES ur_fareattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_farerule ADD CONSTRAINT ur_farerule_route_fk FOREIGN KEY (route_id)
+REFERENCES ur_route (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -4521,6 +4609,16 @@ REFERENCES ur_ifcclassification (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
+-- ur_ifccoordinatereferen_1 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifccoordinatereferen_1 ADD CONSTRAINT ur_ifccoordin_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_ifccoordinatereferen_1 ADD CONSTRAINT ur_ifccoordinat_context_fk FOREIGN KEY (context_id)
+REFERENCES ur_ifcgeometricrepresenta (id)
+ON DELETE SET NULL;
+
+-- -------------------------------------------------------------------- 
 -- ur_ifccoordinatereference 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifccoordinatereference ADD CONSTRAINT ur_ifccoordinatereferen_fk FOREIGN KEY (id)
@@ -4548,18 +4646,33 @@ ALTER TABLE ur_ifcgeometricrepresenta ADD CONSTRAINT ur_ifcgeometr_objectcla_fk 
 REFERENCES objectclass (id);
 
 -- -------------------------------------------------------------------- 
+-- ur_ifcgroup 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifcgroup ADD CONSTRAINT ur_ifcgroup_fk FOREIGN KEY (id)
+REFERENCES ur_ifcobjectdefinition (id);
+
+-- -------------------------------------------------------------------- 
 -- ur_ifcmapconversion 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifcmapconversion ADD CONSTRAINT ur_ifcmapconversion_fk FOREIGN KEY (id)
 REFERENCES ur_ifcattribute (id);
 
+ALTER TABLE ur_ifcmapconversion ADD CONSTRAINT ur_ifcmapconv_sourcecrs_fk FOREIGN KEY (sourcecrs_id)
+REFERENCES ur_crs (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_ifcmapconversion ADD CONSTRAINT ur_ifcmapconv_targetcrs_fk FOREIGN KEY (targetcrs_id)
 REFERENCES ur_ifccoordinatereference (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_ifcmapconversion ADD CONSTRAINT ur_ifcmapconv_sourcecrs_fk FOREIGN KEY (sourcecrs_id)
-REFERENCES ur_crs (id)
-ON DELETE SET NULL;
+-- -------------------------------------------------------------------- 
+-- ur_ifcobjectdefinition 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifcobjectdefinition ADD CONSTRAINT ur_ifcobjectd_objectcla_fk FOREIGN KEY (objectclass_id)
+REFERENCES objectclass (id);
+
+ALTER TABLE ur_ifcobjectdefinition ADD CONSTRAINT ur_ifcobjectdefinition_fk FOREIGN KEY (id)
+REFERENCES ur_ifcroot (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcopeningelement 
@@ -4570,17 +4683,17 @@ REFERENCES ur_ifcelement (id);
 -- -------------------------------------------------------------------- 
 -- ur_ifcproduct 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_ifcproduct ADD CONSTRAINT ur_ifcproduct_fk FOREIGN KEY (id)
-REFERENCES ur_ifcroot (id);
-
 ALTER TABLE ur_ifcproduct ADD CONSTRAINT ur_ifcproduct_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
+
+ALTER TABLE ur_ifcproduct ADD CONSTRAINT ur_ifcproduct_fk FOREIGN KEY (id)
+REFERENCES ur_ifcobjectdefinition (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcproject 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifcproject ADD CONSTRAINT ur_ifcproject_fk FOREIGN KEY (id)
-REFERENCES ur_ifcroot (id);
+REFERENCES ur_ifcobjectdefinition (id);
 
 ALTER TABLE ur_ifcproject ADD CONSTRAINT ur_ifcproject_represent_fk FOREIGN KEY (representationcontexts_id)
 REFERENCES ur_ifcgeometricrepresenta (id)
@@ -4738,20 +4851,23 @@ REFERENCES ur_statisticalgrid (id);
 -- -------------------------------------------------------------------- 
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_bridge_bridke_fk FOREIGN KEY (bridge_bridkeyvaluepairat_id)
-REFERENCES ur_bridge (id);
-
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_buildi_bldgke_fk FOREIGN KEY (building_bldgkeyvaluepair_id)
 REFERENCES ur_building (id);
 
-ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyva_land_use_lusek_fk FOREIGN KEY (land_use_lusekeyvaluepair_id)
-REFERENCES ur_land_use (id);
+ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_bridge_bridke_fk FOREIGN KEY (bridge_bridkeyvaluepairat_id)
+REFERENCES ur_bridge (id);
 
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyva_city_furn_frnk_fk FOREIGN KEY (city_furniture_frnkeyvalu_id)
 REFERENCES ur_city_furniture (id);
 
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyva_reli_feat_demk_fk FOREIGN KEY (relief_feature_demkeyvalu_id)
 REFERENCES ur_relief_feature (id);
+
+ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_waterb_wtrkey_fk FOREIGN KEY (waterbody_wtrkeyvaluepair_id)
+REFERENCES ur_waterbody (id);
+
+ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyva_land_use_lusek_fk FOREIGN KEY (land_use_lusekeyvaluepair_id)
+REFERENCES ur_land_use (id);
 
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyva_tran_comp_tran_fk FOREIGN KEY (transpor_complex_trankeyv_id)
 REFERENCES ur_transportation_complex (id);
@@ -4762,9 +4878,6 @@ REFERENCES ur_tunnel (id);
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_cityob_vegkey_fk FOREIGN KEY (cityobject_vegkeyvaluepai_id)
 REFERENCES ur_cityobject (id);
 
-ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_waterb_wtrkey_fk FOREIGN KEY (waterbody_wtrkeyvaluepair_id)
-REFERENCES ur_waterbody (id);
-
 ALTER TABLE ur_keyvaluepairattribute ADD CONSTRAINT ur_keyval_constr_conske_fk FOREIGN KEY (construction_conskeyvalue_id)
 REFERENCES ur_construction (id);
 
@@ -4774,24 +4887,24 @@ REFERENCES ur_construction (id);
 ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_fk FOREIGN KEY (id)
 REFERENCES land_use (id);
 
-ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusefacilit_fk FOREIGN KEY (lusefacilityidattribute_id)
-REFERENCES ur_facilityidattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusefacil_fk_1 FOREIGN KEY (lusefacilitytypeattribute_id)
-REFERENCES ur_facilitytypeattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusedataqua_fk FOREIGN KEY (lusedataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_ifclandusea_fk FOREIGN KEY (ifclanduseattribute_id)
 REFERENCES ur_ifcattribute (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_landusedeta_fk FOREIGN KEY (landusedetailattribute_id)
 REFERENCES ur_landuseattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusedataqua_fk FOREIGN KEY (lusedataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusefacilit_fk FOREIGN KEY (lusefacilityidattribute_id)
+REFERENCES ur_facilityidattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_land_use ADD CONSTRAINT ur_land_use_lusefacil_fk_1 FOREIGN KEY (lusefacilitytypeattribute_id)
+REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -4915,12 +5028,6 @@ REFERENCES ur_indoorattribute (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
--- ur_otherconstruction 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_otherconstruction ADD CONSTRAINT ur_otherconstruction_fk FOREIGN KEY (id)
-REFERENCES ur_construction (id);
-
--- -------------------------------------------------------------------- 
 -- ur_parkfacilitylongevityp 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_parkfacilitylongevityp ADD CONSTRAINT ur_parkfacilitylongevit_fk FOREIGN KEY (id)
@@ -4968,6 +5075,16 @@ REFERENCES ur_utilitylink (id);
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_point ADD CONSTRAINT ur_point_publictr_point_fk FOREIGN KEY (publictransit_point_id)
 REFERENCES ur_publictransit (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_pointcloud 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pointcloud ADD CONSTRAINT ur_pointcloud_fk FOREIGN KEY (id)
+REFERENCES cityobject (id);
+
+ALTER TABLE ur_pointcloud ADD CONSTRAINT ur_pointcloud_pointclou_fk FOREIGN KEY (pointcloudspecattribute_id)
+REFERENCES ur_pointcloudspecattribut (id)
+ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
 -- ur_pollution 
@@ -5092,12 +5209,6 @@ REFERENCES surface_geometry (id);
 
 ALTER TABLE ur_railwaytrackattribute ADD CONSTRAINT ur_railway_lod3net_brep_fk FOREIGN KEY (lod3network_brep_id)
 REFERENCES surface_geometry (id);
-
--- -------------------------------------------------------------------- 
--- ur_realestateidattribute 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_realestateidattribute ADD CONSTRAINT ur_realestateidattribut_fk FOREIGN KEY (id)
-REFERENCES ur_buildingattribute (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_recreations 
@@ -5236,12 +5347,12 @@ ON DELETE SET NULL;
 ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_fk FOREIGN KEY (id)
 REFERENCES ur_publictransitdatatype (id);
 
-ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_stop_fk FOREIGN KEY (stop_id)
-REFERENCES ur_stop (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_trip_fk FOREIGN KEY (trip_id)
 REFERENCES ur_trip (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_stoptime ADD CONSTRAINT ur_stoptime_stop_fk FOREIGN KEY (stop_id)
+REFERENCES ur_stop (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -5329,6 +5440,34 @@ REFERENCES ur_publictransit (id);
 ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transportati_complex_fk FOREIGN KEY (id)
 REFERENCES transportation_complex (id);
 
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_railwa_fk FOREIGN KEY (railwayrouteattribute_id)
+REFERENCES ur_railwayrouteattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_roadst_fk FOREIGN KEY (roadstatus_id)
+REFERENCES ur_roadtype (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_compl_roads_fk_1 FOREIGN KEY (roadstructureattribute_id)
+REFERENCES ur_roadstructureattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_square_fk FOREIGN KEY (squareurbanplanattribute_id)
+REFERENCES ur_squareurbanplanattribu (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tracka_fk FOREIGN KEY (trackattribute_id)
+REFERENCES ur_trackattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_traffi_fk FOREIGN KEY (trafficvolumeattribute_id)
+REFERENCES ur_trafficvolumeattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tranda_fk FOREIGN KEY (trandataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tranfa_fk FOREIGN KEY (tranfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
@@ -5337,36 +5476,8 @@ ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_compl_tranf_fk_1 
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tranda_fk FOREIGN KEY (trandataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tranus_fk FOREIGN KEY (tranusecaseattribute_id)
 REFERENCES ur_trafficobjectusecaseat (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_traffi_fk FOREIGN KEY (trafficvolumeattribute_id)
-REFERENCES ur_trafficvolumeattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_roadst_fk FOREIGN KEY (roadstructureattribute_id)
-REFERENCES ur_roadstructureattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_compl_roads_fk_1 FOREIGN KEY (roadstatus_id)
-REFERENCES ur_roadtype (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_railwa_fk FOREIGN KEY (railwayrouteattribute_id)
-REFERENCES ur_railwayrouteattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_tracka_fk FOREIGN KEY (trackattribute_id)
-REFERENCES ur_trackattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_transportation_complex ADD CONSTRAINT ur_transp_comple_square_fk FOREIGN KEY (squareurbanplanattribute_id)
-REFERENCES ur_squareurbanplanattribu (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -5374,10 +5485,6 @@ ON DELETE SET NULL;
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_fk FOREIGN KEY (id)
 REFERENCES ur_publictransit (id);
-
-ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_shape_fk FOREIGN KEY (shape_id)
-REFERENCES ur_publictransit (id)
-ON DELETE SET NULL;
 
 ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_route_fk FOREIGN KEY (route_id)
 REFERENCES ur_route (id)
@@ -5395,6 +5502,10 @@ ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_office_fk FOREIGN KEY (office_id)
 REFERENCES ur_office (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_trip ADD CONSTRAINT ur_trip_shape_fk FOREIGN KEY (shape_id)
+REFERENCES ur_publictransit (id)
+ON DELETE SET NULL;
+
 -- -------------------------------------------------------------------- 
 -- ur_tunnel 
 -- -------------------------------------------------------------------- 
@@ -5405,6 +5516,10 @@ ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunbaseattrib_fk FOREIGN KEY (tun
 REFERENCES ur_constructionbaseattrib (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tundataqualit_fk FOREIGN KEY (tundataqualityattribute_id)
+REFERENCES ur_dataqualityattribute (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunfacilityid_fk FOREIGN KEY (tunfacilityidattribute_id)
 REFERENCES ur_facilityidattribute (id)
 ON DELETE SET NULL;
@@ -5413,20 +5528,16 @@ ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunfacilityty_fk FOREIGN KEY (tun
 REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunfunctional_fk FOREIGN KEY (tunfunctionalattribute_id)
+REFERENCES ur_tunnelfunctionalattrib (id)
+ON DELETE SET NULL;
+
 ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunriskassess_fk FOREIGN KEY (tunriskassessmentattribut_id)
 REFERENCES ur_constructionriskassess (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tundataqualit_fk FOREIGN KEY (tundataqualityattribute_id)
-REFERENCES ur_dataqualityattribute (id)
-ON DELETE SET NULL;
-
 ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunstructurea_fk FOREIGN KEY (tunstructureattribute_id)
 REFERENCES ur_tunnelstructureattribu (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_tunnel ADD CONSTRAINT ur_tunnel_tunfunctional_fk FOREIGN KEY (tunfunctionalattribute_id)
-REFERENCES ur_tunnelfunctionalattrib (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -5477,20 +5588,20 @@ REFERENCES ur_urbanfunction (id);
 -- -------------------------------------------------------------------- 
 -- ur_utilitylink 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_utilitylink ADD CONSTRAINT ur_utilitylink_fk FOREIGN KEY (id)
-REFERENCES ur_utilitynetworkelement (id);
-
 ALTER TABLE ur_utilitylink ADD CONSTRAINT ur_utilitylin_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
+
+ALTER TABLE ur_utilitylink ADD CONSTRAINT ur_utilitylink_fk FOREIGN KEY (id)
+REFERENCES ur_utilitynetworkelement (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_utilitynetworkelement 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_utilitynetworkelement ADD CONSTRAINT ur_utilitynetworkelemen_fk FOREIGN KEY (id)
-REFERENCES city_furniture (id);
-
 ALTER TABLE ur_utilitynetworkelement ADD CONSTRAINT ur_utilitynet_objectcla_fk FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
+
+ALTER TABLE ur_utilitynetworkelement ADD CONSTRAINT ur_utilitynetworkelemen_fk FOREIGN KEY (id)
+REFERENCES city_furniture (id);
 
 -- -------------------------------------------------------------------- 
 -- ur_utilitynode 
@@ -5513,20 +5624,20 @@ REFERENCES ur_utilitynetworkelement (id);
 ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_fk FOREIGN KEY (id)
 REFERENCES waterbody (id);
 
-ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_wtrfacilit_fk FOREIGN KEY (wtrfacilityidattribute_id)
-REFERENCES ur_facilityidattribute (id)
-ON DELETE SET NULL;
-
-ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_wtrfacil_fk_1 FOREIGN KEY (wtrfacilitytypeattribute_id)
-REFERENCES ur_facilitytypeattribute (id)
+ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_waterbodyd_fk FOREIGN KEY (waterbodydetailattribute_id)
+REFERENCES ur_waterbodydetailattribu (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_wtrdataqua_fk FOREIGN KEY (wtrdataqualityattribute_id)
 REFERENCES ur_dataqualityattribute (id)
 ON DELETE SET NULL;
 
-ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_waterbodyd_fk FOREIGN KEY (waterbodydetailattribute_id)
-REFERENCES ur_waterbodydetailattribu (id)
+ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_wtrfacilit_fk FOREIGN KEY (wtrfacilityidattribute_id)
+REFERENCES ur_facilityidattribute (id)
+ON DELETE SET NULL;
+
+ALTER TABLE ur_waterbody ADD CONSTRAINT ur_waterbody_wtrfacil_fk_1 FOREIGN KEY (wtrfacilitytypeattribute_id)
+REFERENCES ur_facilitytypeattribute (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -5676,6 +5787,8 @@ CREATE INDEX ur_city_furnit_frnfa_fkx_1 ON ur_city_furniture (frnfacilitytypeatt
 -- -------------------------------------------------------------------- 
 -- ur_cityobject 
 -- -------------------------------------------------------------------- 
+CREATE INDEX ur_cityobjec_pointclou_fkx ON ur_cityobject (pointcloud_id);
+
 CREATE INDEX ur_cityobjec_vegdataqu_fkx ON ur_cityobject (vegdataqualityattribute_id);
 
 CREATE INDEX ur_cityobjec_vegfacili_fkx ON ur_cityobject (vegfacilityidattribute_id);
@@ -5965,6 +6078,13 @@ CREATE INDEX ur_ifcbuildi_objectcla_fkx ON ur_ifcbuildingelement (objectclass_id
 CREATE INDEX ur_ifcclassi_reference_fkx ON ur_ifcclassificationrefer (referencedsource_id);
 
 -- -------------------------------------------------------------------- 
+-- ur_ifccoordinatereferen_1 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_ifccoordina_context_fkx ON ur_ifccoordinatereferen_1 (context_id);
+
+CREATE INDEX ur_ifccoordi_objectcla_fkx ON ur_ifccoordinatereferen_1 (objectclass_id);
+
+-- -------------------------------------------------------------------- 
 -- ur_ifcelement 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_ifcelemen_objectcla_fkx ON ur_ifcelement (objectclass_id);
@@ -5980,6 +6100,11 @@ CREATE INDEX ur_ifcgeomet_objectcla_fkx ON ur_ifcgeometricrepresenta (objectclas
 CREATE INDEX ur_ifcmapcon_sourcecrs_fkx ON ur_ifcmapconversion (sourcecrs_id);
 
 CREATE INDEX ur_ifcmapcon_targetcrs_fkx ON ur_ifcmapconversion (targetcrs_id);
+
+-- -------------------------------------------------------------------- 
+-- ur_ifcobjectdefinition 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_ifcobject_objectcla_fkx ON ur_ifcobjectdefinition (objectclass_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcproduct 
@@ -6156,6 +6281,17 @@ CREATE INDEX ur_point_point_spx ON ur_point (point) INDEXTYPE IS MDSYS.SPATIAL_I
 CREATE INDEX ur_point_publict_point_fkx ON ur_point (publictransit_point_id);
 
 -- -------------------------------------------------------------------- 
+-- ur_pointcloud 
+-- -------------------------------------------------------------------- 
+CREATE INDEX ur_pointclou_pointclou_fkx ON ur_pointcloud (pointcloudspecattribute_id);
+
+DELETE FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME='UR_POINTCLOUD' AND COLUMN_NAME='POINTS';
+INSERT INTO USER_SDO_GEOM_METADATA (TABLE_NAME, COLUMN_NAME, DIMINFO, SRID)
+VALUES ('UR_POINTCLOUD','POINTS',
+MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', 0.000, 10000000.000, 0.0005), MDSYS.SDO_DIM_ELEMENT('Y', 0.000, 10000000.000, 0.0005),MDSYS.SDO_DIM_ELEMENT('Z', -1000, 10000, 0.0005)), &SRSNO);
+CREATE INDEX ur_pointcloud_points_spx ON ur_pointcloud (points) INDEXTYPE IS MDSYS.SPATIAL_INDEX;
+
+-- -------------------------------------------------------------------- 
 -- ur_populationbyageandsex 
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_popula_popula_popul_fkx ON ur_populationbyageandsex (population_populationbyag_id);
@@ -6308,9 +6444,9 @@ CREATE INDEX ur_translatio_recordid_fkx ON ur_translation (recordid_id);
 -- -------------------------------------------------------------------- 
 CREATE INDEX ur_transp_comple_railw_fkx ON ur_transportation_complex (railwayrouteattribute_id);
 
-CREATE INDEX ur_trans_compl_roads_fkx_1 ON ur_transportation_complex (roadstatus_id);
+CREATE INDEX ur_transp_comple_roads_fkx ON ur_transportation_complex (roadstatus_id);
 
-CREATE INDEX ur_transp_comple_roads_fkx ON ur_transportation_complex (roadstructureattribute_id);
+CREATE INDEX ur_trans_compl_roads_fkx_1 ON ur_transportation_complex (roadstructureattribute_id);
 
 CREATE INDEX ur_transp_comple_squar_fkx ON ur_transportation_complex (squareurbanplanattribute_id);
 

@@ -1,4 +1,4 @@
--- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2026-11-07 12:19:38 
+-- This document was automatically created by the ADE-Manager tool of 3DCityDB (https://www.3dcitydb.org) on 2026-11-07 13:00:51 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 -- *********************************** Drop foreign keys ********************************** 
 -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
@@ -21,10 +21,10 @@ ALTER TABLE ur_attribution
     DROP CONSTRAINT ur_attribution_fk;
 
 ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_route_fk;
+    DROP CONSTRAINT ur_attribution_agency_fk;
 
 ALTER TABLE ur_attribution
-    DROP CONSTRAINT ur_attribution_agency_fk;
+    DROP CONSTRAINT ur_attribution_route_fk;
 
 ALTER TABLE ur_attribution
     DROP CONSTRAINT ur_attribution_trip_fk;
@@ -57,13 +57,13 @@ ALTER TABLE ur_bridge
     DROP CONSTRAINT ur_bridge_bridbaseattri_fk;
 
 ALTER TABLE ur_bridge
+    DROP CONSTRAINT ur_bridge_briddataquali_fk;
+
+ALTER TABLE ur_bridge
     DROP CONSTRAINT ur_bridge_bridfacilityi_fk;
 
 ALTER TABLE ur_bridge
     DROP CONSTRAINT ur_bridge_bridfacilityt_fk;
-
-ALTER TABLE ur_bridge
-    DROP CONSTRAINT ur_bridge_bridstructure_fk;
 
 ALTER TABLE ur_bridge
     DROP CONSTRAINT ur_bridge_bridfunctiona_fk;
@@ -72,7 +72,7 @@ ALTER TABLE ur_bridge
     DROP CONSTRAINT ur_bridge_bridriskasses_fk;
 
 ALTER TABLE ur_bridge
-    DROP CONSTRAINT ur_bridge_briddataquali_fk;
+    DROP CONSTRAINT ur_bridge_bridstructure_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_building 
@@ -81,22 +81,13 @@ ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_fk;
 
 ALTER TABLE ur_building
+    DROP CONSTRAINT ur_building_bldgdataqua_fk;
+
+ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_bldgfacilit_fk;
 
 ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_bldgfacil_fk_1;
-
-ALTER TABLE ur_building
-    DROP CONSTRAINT ur_building_bldgdataqua_fk;
-
-ALTER TABLE ur_building
-    DROP CONSTRAINT ur_building_buildingida_fk;
-
-ALTER TABLE ur_building
-    DROP CONSTRAINT ur_building_buildingdet_fk;
-
-ALTER TABLE ur_building
-    DROP CONSTRAINT ur_building_largecustom_fk;
 
 ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_bldgrealest_fk;
@@ -105,10 +96,19 @@ ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_bldgusecase_fk;
 
 ALTER TABLE ur_building
+    DROP CONSTRAINT ur_building_buildingdet_fk;
+
+ALTER TABLE ur_building
+    DROP CONSTRAINT ur_building_buildingida_fk;
+
+ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_ifcbuilding_fk;
 
 ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_indoorbuild_fk;
+
+ALTER TABLE ur_building
+    DROP CONSTRAINT ur_building_largecustom_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_building_furniture 
@@ -204,16 +204,16 @@ ALTER TABLE ur_city_furniture
     DROP CONSTRAINT ur_city_furniture_fk;
 
 ALTER TABLE ur_city_furniture
-    DROP CONSTRAINT ur_city_furnitu_frnfaci_fk;
-
-ALTER TABLE ur_city_furniture
-    DROP CONSTRAINT ur_city_furnit_frnfac_fk_1;
+    DROP CONSTRAINT ur_city_furnitu_cityfur_fk;
 
 ALTER TABLE ur_city_furniture
     DROP CONSTRAINT ur_city_furnitu_frndata_fk;
 
 ALTER TABLE ur_city_furniture
-    DROP CONSTRAINT ur_city_furnitu_cityfur_fk;
+    DROP CONSTRAINT ur_city_furnitu_frnfaci_fk;
+
+ALTER TABLE ur_city_furniture
+    DROP CONSTRAINT ur_city_furnit_frnfac_fk_1;
 
 -- -------------------------------------------------------------------- 
 -- ur_cityobject 
@@ -222,13 +222,16 @@ ALTER TABLE ur_cityobject
     DROP CONSTRAINT ur_cityobject_fk;
 
 ALTER TABLE ur_cityobject
+    DROP CONSTRAINT ur_cityobject_vegdataqu_fk;
+
+ALTER TABLE ur_cityobject
     DROP CONSTRAINT ur_cityobject_vegfacili_fk;
 
 ALTER TABLE ur_cityobject
     DROP CONSTRAINT ur_cityobjec_vegfacil_fk_1;
 
 ALTER TABLE ur_cityobject
-    DROP CONSTRAINT ur_cityobject_vegdataqu_fk;
+    DROP CONSTRAINT ur_cityobject_pointclou_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_cityobjectgroup 
@@ -267,16 +270,16 @@ ALTER TABLE ur_construction
     DROP CONSTRAINT ur_construction_fk;
 
 ALTER TABLE ur_construction
-    DROP CONSTRAINT ur_constructi_consbasea_fk;
-
-ALTER TABLE ur_construction
     DROP CONSTRAINT ur_constructi_consfacil_fk;
 
 ALTER TABLE ur_construction
-    DROP CONSTRAINT ur_constructi_consdataq_fk;
+    DROP CONSTRAINT ur_constructi_consbasea_fk;
 
 ALTER TABLE ur_construction
     DROP CONSTRAINT ur_constructi_consstruc_fk;
+
+ALTER TABLE ur_construction
+    DROP CONSTRAINT ur_constructi_consdataq_fk;
 
 ALTER TABLE ur_construction
     DROP CONSTRAINT ur_constru_lod0geo_brep_fk;
@@ -381,10 +384,10 @@ ALTER TABLE ur_disasterriskattribute
     DROP CONSTRAINT ur_disasterri_objectcla_fk;
 
 ALTER TABLE ur_disasterriskattribute
-    DROP CONSTRAINT ur_disast_bridge_briddi_fk;
+    DROP CONSTRAINT ur_disast_buildi_bldgdi_fk;
 
 ALTER TABLE ur_disasterriskattribute
-    DROP CONSTRAINT ur_disast_buildi_bldgdi_fk;
+    DROP CONSTRAINT ur_disast_bridge_briddi_fk;
 
 ALTER TABLE ur_disasterriskattribute
     DROP CONSTRAINT ur_disast_tunnel_tundis_fk;
@@ -408,19 +411,25 @@ ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmattribut_objectcla_fk;
 
 ALTER TABLE ur_dmattribute
-    DROP CONSTRAINT ur_dmattr_bridge_briddm_fk;
+    DROP CONSTRAINT ur_dmattribut_dmelement_fk;
 
 ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmattr_buildi_bldgdm_fk;
 
 ALTER TABLE ur_dmattribute
-    DROP CONSTRAINT ur_dmatt_land_use_lused_fk;
+    DROP CONSTRAINT ur_dmattr_bridge_briddm_fk;
 
 ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmatt_city_furn_frnd_fk;
 
 ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmatt_reli_comp_demd_fk;
+
+ALTER TABLE ur_dmattribute
+    DROP CONSTRAINT ur_dmattr_waterb_wtrdma_fk;
+
+ALTER TABLE ur_dmattribute
+    DROP CONSTRAINT ur_dmatt_land_use_lused_fk;
 
 ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmatt_tran_comp_tran_fk;
@@ -432,13 +441,7 @@ ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmattr_cityob_vegdma_fk;
 
 ALTER TABLE ur_dmattribute
-    DROP CONSTRAINT ur_dmattr_waterb_wtrdma_fk;
-
-ALTER TABLE ur_dmattribute
     DROP CONSTRAINT ur_dmattr_constr_consdm_fk;
-
-ALTER TABLE ur_dmattribute
-    DROP CONSTRAINT ur_dmattribut_dmelement_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_dmgeometricattribute 
@@ -468,16 +471,19 @@ ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facilityat_objectcla_fk;
 
 ALTER TABLE ur_facilityattribute
-    DROP CONSTRAINT ur_facili_bridge_bridfa_fk;
-
-ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facili_buildi_bldgfa_fk;
 
 ALTER TABLE ur_facilityattribute
-    DROP CONSTRAINT ur_facil_land_use_lusef_fk;
+    DROP CONSTRAINT ur_facili_bridge_bridfa_fk;
 
 ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facil_city_furn_frnf_fk;
+
+ALTER TABLE ur_facilityattribute
+    DROP CONSTRAINT ur_facili_waterb_wtrfac_fk;
+
+ALTER TABLE ur_facilityattribute
+    DROP CONSTRAINT ur_facil_land_use_lusef_fk;
 
 ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facil_tran_comp_tran_fk;
@@ -487,9 +493,6 @@ ALTER TABLE ur_facilityattribute
 
 ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facili_cityob_vegfac_fk;
-
-ALTER TABLE ur_facilityattribute
-    DROP CONSTRAINT ur_facili_waterb_wtrfac_fk;
 
 ALTER TABLE ur_facilityattribute
     DROP CONSTRAINT ur_facili_const_consf_fk_1;
@@ -516,10 +519,10 @@ ALTER TABLE ur_farerule
     DROP CONSTRAINT ur_farerule_fk;
 
 ALTER TABLE ur_farerule
-    DROP CONSTRAINT ur_farerule_route_fk;
+    DROP CONSTRAINT ur_farerule_fare_fk;
 
 ALTER TABLE ur_farerule
-    DROP CONSTRAINT ur_farerule_fare_fk;
+    DROP CONSTRAINT ur_farerule_route_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_feedinfo 
@@ -621,6 +624,15 @@ ALTER TABLE ur_ifcclassificationrefer
     DROP CONSTRAINT ur_ifcclassif_reference_fk;
 
 -- -------------------------------------------------------------------- 
+-- ur_ifccoordinatereferen_1 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifccoordinatereferen_1
+    DROP CONSTRAINT ur_ifccoordin_objectcla_fk;
+
+ALTER TABLE ur_ifccoordinatereferen_1
+    DROP CONSTRAINT ur_ifccoordinat_context_fk;
+
+-- -------------------------------------------------------------------- 
 -- ur_ifccoordinatereference 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifccoordinatereference
@@ -648,16 +660,31 @@ ALTER TABLE ur_ifcgeometricrepresenta
     DROP CONSTRAINT ur_ifcgeometr_objectcla_fk;
 
 -- -------------------------------------------------------------------- 
+-- ur_ifcgroup 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifcgroup
+    DROP CONSTRAINT ur_ifcgroup_fk;
+
+-- -------------------------------------------------------------------- 
 -- ur_ifcmapconversion 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifcmapconversion
     DROP CONSTRAINT ur_ifcmapconversion_fk;
 
 ALTER TABLE ur_ifcmapconversion
-    DROP CONSTRAINT ur_ifcmapconv_targetcrs_fk;
+    DROP CONSTRAINT ur_ifcmapconv_sourcecrs_fk;
 
 ALTER TABLE ur_ifcmapconversion
-    DROP CONSTRAINT ur_ifcmapconv_sourcecrs_fk;
+    DROP CONSTRAINT ur_ifcmapconv_targetcrs_fk;
+
+-- -------------------------------------------------------------------- 
+-- ur_ifcobjectdefinition 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_ifcobjectdefinition
+    DROP CONSTRAINT ur_ifcobjectd_objectcla_fk;
+
+ALTER TABLE ur_ifcobjectdefinition
+    DROP CONSTRAINT ur_ifcobjectdefinition_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcopeningelement 
@@ -669,10 +696,10 @@ ALTER TABLE ur_ifcopeningelement
 -- ur_ifcproduct 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_ifcproduct
-    DROP CONSTRAINT ur_ifcproduct_fk;
+    DROP CONSTRAINT ur_ifcproduct_objectcla_fk;
 
 ALTER TABLE ur_ifcproduct
-    DROP CONSTRAINT ur_ifcproduct_objectcla_fk;
+    DROP CONSTRAINT ur_ifcproduct_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcproject 
@@ -834,19 +861,22 @@ ALTER TABLE ur_keyvaluepair
 -- ur_keyvaluepairattribute 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_keyvaluepairattribute
-    DROP CONSTRAINT ur_keyval_bridge_bridke_fk;
-
-ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyval_buildi_bldgke_fk;
 
 ALTER TABLE ur_keyvaluepairattribute
-    DROP CONSTRAINT ur_keyva_land_use_lusek_fk;
+    DROP CONSTRAINT ur_keyval_bridge_bridke_fk;
 
 ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyva_city_furn_frnk_fk;
 
 ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyva_reli_feat_demk_fk;
+
+ALTER TABLE ur_keyvaluepairattribute
+    DROP CONSTRAINT ur_keyval_waterb_wtrkey_fk;
+
+ALTER TABLE ur_keyvaluepairattribute
+    DROP CONSTRAINT ur_keyva_land_use_lusek_fk;
 
 ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyva_tran_comp_tran_fk;
@@ -858,9 +888,6 @@ ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyval_cityob_vegkey_fk;
 
 ALTER TABLE ur_keyvaluepairattribute
-    DROP CONSTRAINT ur_keyval_waterb_wtrkey_fk;
-
-ALTER TABLE ur_keyvaluepairattribute
     DROP CONSTRAINT ur_keyval_constr_conske_fk;
 
 -- -------------------------------------------------------------------- 
@@ -870,19 +897,19 @@ ALTER TABLE ur_land_use
     DROP CONSTRAINT ur_land_use_fk;
 
 ALTER TABLE ur_land_use
-    DROP CONSTRAINT ur_land_use_lusefacilit_fk;
+    DROP CONSTRAINT ur_land_use_ifclandusea_fk;
 
 ALTER TABLE ur_land_use
-    DROP CONSTRAINT ur_land_use_lusefacil_fk_1;
+    DROP CONSTRAINT ur_land_use_landusedeta_fk;
 
 ALTER TABLE ur_land_use
     DROP CONSTRAINT ur_land_use_lusedataqua_fk;
 
 ALTER TABLE ur_land_use
-    DROP CONSTRAINT ur_land_use_ifclandusea_fk;
+    DROP CONSTRAINT ur_land_use_lusefacilit_fk;
 
 ALTER TABLE ur_land_use
-    DROP CONSTRAINT ur_land_use_landusedeta_fk;
+    DROP CONSTRAINT ur_land_use_lusefacil_fk_1;
 
 -- -------------------------------------------------------------------- 
 -- ur_landprice 
@@ -1002,12 +1029,6 @@ ALTER TABLE ur_opening
     DROP CONSTRAINT ur_opening_indooropenin_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_otherconstruction 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_otherconstruction
-    DROP CONSTRAINT ur_otherconstruction_fk;
-
--- -------------------------------------------------------------------- 
 -- ur_parkfacilitylongevityp 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_parkfacilitylongevityp
@@ -1051,6 +1072,15 @@ ALTER TABLE ur_pipe
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_point
     DROP CONSTRAINT ur_point_publictr_point_fk;
+
+-- -------------------------------------------------------------------- 
+-- ur_pointcloud 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_pointcloud
+    DROP CONSTRAINT ur_pointcloud_fk;
+
+ALTER TABLE ur_pointcloud
+    DROP CONSTRAINT ur_pointcloud_pointclou_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_pollution 
@@ -1174,12 +1204,6 @@ ALTER TABLE ur_railwaytrackattribute
 
 ALTER TABLE ur_railwaytrackattribute
     DROP CONSTRAINT ur_railway_lod3net_brep_fk;
-
--- -------------------------------------------------------------------- 
--- ur_realestateidattribute 
--- -------------------------------------------------------------------- 
-ALTER TABLE ur_realestateidattribute
-    DROP CONSTRAINT ur_realestateidattribut_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_recreations 
@@ -1311,10 +1335,10 @@ ALTER TABLE ur_stoptime
     DROP CONSTRAINT ur_stoptime_fk;
 
 ALTER TABLE ur_stoptime
-    DROP CONSTRAINT ur_stoptime_stop_fk;
+    DROP CONSTRAINT ur_stoptime_trip_fk;
 
 ALTER TABLE ur_stoptime
-    DROP CONSTRAINT ur_stoptime_trip_fk;
+    DROP CONSTRAINT ur_stoptime_stop_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_terminalattribute 
@@ -1395,19 +1419,7 @@ ALTER TABLE ur_transportation_complex
     DROP CONSTRAINT ur_transportati_complex_fk;
 
 ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_tranfa_fk;
-
-ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_compl_tranf_fk_1;
-
-ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_tranda_fk;
-
-ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_tranus_fk;
-
-ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_traffi_fk;
+    DROP CONSTRAINT ur_transp_comple_railwa_fk;
 
 ALTER TABLE ur_transportation_complex
     DROP CONSTRAINT ur_transp_comple_roadst_fk;
@@ -1416,22 +1428,31 @@ ALTER TABLE ur_transportation_complex
     DROP CONSTRAINT ur_transp_compl_roads_fk_1;
 
 ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_railwa_fk;
+    DROP CONSTRAINT ur_transp_comple_square_fk;
 
 ALTER TABLE ur_transportation_complex
     DROP CONSTRAINT ur_transp_comple_tracka_fk;
 
 ALTER TABLE ur_transportation_complex
-    DROP CONSTRAINT ur_transp_comple_square_fk;
+    DROP CONSTRAINT ur_transp_comple_traffi_fk;
+
+ALTER TABLE ur_transportation_complex
+    DROP CONSTRAINT ur_transp_comple_tranda_fk;
+
+ALTER TABLE ur_transportation_complex
+    DROP CONSTRAINT ur_transp_comple_tranfa_fk;
+
+ALTER TABLE ur_transportation_complex
+    DROP CONSTRAINT ur_transp_compl_tranf_fk_1;
+
+ALTER TABLE ur_transportation_complex
+    DROP CONSTRAINT ur_transp_comple_tranus_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_trip 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_trip
     DROP CONSTRAINT ur_trip_fk;
-
-ALTER TABLE ur_trip
-    DROP CONSTRAINT ur_trip_shape_fk;
 
 ALTER TABLE ur_trip
     DROP CONSTRAINT ur_trip_route_fk;
@@ -1445,6 +1466,9 @@ ALTER TABLE ur_trip
 ALTER TABLE ur_trip
     DROP CONSTRAINT ur_trip_office_fk;
 
+ALTER TABLE ur_trip
+    DROP CONSTRAINT ur_trip_shape_fk;
+
 -- -------------------------------------------------------------------- 
 -- ur_tunnel 
 -- -------------------------------------------------------------------- 
@@ -1455,22 +1479,22 @@ ALTER TABLE ur_tunnel
     DROP CONSTRAINT ur_tunnel_tunbaseattrib_fk;
 
 ALTER TABLE ur_tunnel
+    DROP CONSTRAINT ur_tunnel_tundataqualit_fk;
+
+ALTER TABLE ur_tunnel
     DROP CONSTRAINT ur_tunnel_tunfacilityid_fk;
 
 ALTER TABLE ur_tunnel
     DROP CONSTRAINT ur_tunnel_tunfacilityty_fk;
 
 ALTER TABLE ur_tunnel
+    DROP CONSTRAINT ur_tunnel_tunfunctional_fk;
+
+ALTER TABLE ur_tunnel
     DROP CONSTRAINT ur_tunnel_tunriskassess_fk;
 
 ALTER TABLE ur_tunnel
-    DROP CONSTRAINT ur_tunnel_tundataqualit_fk;
-
-ALTER TABLE ur_tunnel
     DROP CONSTRAINT ur_tunnel_tunstructurea_fk;
-
-ALTER TABLE ur_tunnel
-    DROP CONSTRAINT ur_tunnel_tunfunctional_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_undergroundbuilding 
@@ -1518,19 +1542,19 @@ ALTER TABLE ur_urbanization
 -- ur_utilitylink 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_utilitylink
-    DROP CONSTRAINT ur_utilitylink_fk;
+    DROP CONSTRAINT ur_utilitylin_objectcla_fk;
 
 ALTER TABLE ur_utilitylink
-    DROP CONSTRAINT ur_utilitylin_objectcla_fk;
+    DROP CONSTRAINT ur_utilitylink_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_utilitynetworkelement 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_utilitynetworkelement
-    DROP CONSTRAINT ur_utilitynetworkelemen_fk;
+    DROP CONSTRAINT ur_utilitynet_objectcla_fk;
 
 ALTER TABLE ur_utilitynetworkelement
-    DROP CONSTRAINT ur_utilitynet_objectcla_fk;
+    DROP CONSTRAINT ur_utilitynetworkelemen_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_utilitynode 
@@ -1554,16 +1578,16 @@ ALTER TABLE ur_waterbody
     DROP CONSTRAINT ur_waterbody_fk;
 
 ALTER TABLE ur_waterbody
-    DROP CONSTRAINT ur_waterbody_wtrfacilit_fk;
-
-ALTER TABLE ur_waterbody
-    DROP CONSTRAINT ur_waterbody_wtrfacil_fk_1;
+    DROP CONSTRAINT ur_waterbody_waterbodyd_fk;
 
 ALTER TABLE ur_waterbody
     DROP CONSTRAINT ur_waterbody_wtrdataqua_fk;
 
 ALTER TABLE ur_waterbody
-    DROP CONSTRAINT ur_waterbody_waterbodyd_fk;
+    DROP CONSTRAINT ur_waterbody_wtrfacilit_fk;
+
+ALTER TABLE ur_waterbody
+    DROP CONSTRAINT ur_waterbody_wtrfacil_fk_1;
 
 -- -------------------------------------------------------------------- 
 -- ur_waterway 
@@ -1942,6 +1966,11 @@ DROP TABLE ur_ifcclassification;
 DROP TABLE ur_ifcclassificationrefer;
 
 -- -------------------------------------------------------------------- 
+-- ur_ifccoordinatereferen_1 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_ifccoordinatereferen_1;
+
+-- -------------------------------------------------------------------- 
 -- ur_ifccoordinatereference 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_ifccoordinatereference;
@@ -1962,9 +1991,19 @@ DROP TABLE ur_ifcelement;
 DROP TABLE ur_ifcgeometricrepresenta;
 
 -- -------------------------------------------------------------------- 
+-- ur_ifcgroup 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_ifcgroup;
+
+-- -------------------------------------------------------------------- 
 -- ur_ifcmapconversion 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_ifcmapconversion;
+
+-- -------------------------------------------------------------------- 
+-- ur_ifcobjectdefinition 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_ifcobjectdefinition;
 
 -- -------------------------------------------------------------------- 
 -- ur_ifcopeningelement 
@@ -2202,11 +2241,6 @@ DROP TABLE ur_offsetdepth;
 DROP TABLE ur_opening;
 
 -- -------------------------------------------------------------------- 
--- ur_otherconstruction 
--- -------------------------------------------------------------------- 
-DROP TABLE ur_otherconstruction;
-
--- -------------------------------------------------------------------- 
 -- ur_parkfacilitylongevityp 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_parkfacilitylongevityp;
@@ -2230,6 +2264,16 @@ DROP TABLE ur_pipe;
 -- ur_point 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_point;
+
+-- -------------------------------------------------------------------- 
+-- ur_pointcloud 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_pointcloud;
+
+-- -------------------------------------------------------------------- 
+-- ur_pointcloudspecattribut 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_pointcloudspecattribut;
 
 -- -------------------------------------------------------------------- 
 -- ur_pollution 
@@ -2638,6 +2682,8 @@ DROP SEQUENCE ur_constructionriskas_seq;
 
 DROP SEQUENCE ur_trafficareaattribu_seq;
 
+DROP SEQUENCE ur_realestateidattrib_seq;
+
 DROP SEQUENCE ur_facilityattribute_seq;
 
 DROP SEQUENCE ur_bridgestructureatt_seq;
@@ -2654,9 +2700,9 @@ DROP SEQUENCE ur_longevitymeasures_seq;
 
 DROP SEQUENCE ur_occupancy_seq;
 
-DROP SEQUENCE ur_countermeasurescos_seq;
-
 DROP SEQUENCE ur_height_seq;
+
+DROP SEQUENCE ur_countermeasurescos_seq;
 
 DROP SEQUENCE ur_roomattribute_seq;
 
@@ -2678,17 +2724,21 @@ DROP SEQUENCE ur_railwayrouteattrib_seq;
 
 DROP SEQUENCE ur_numberofannualdive_seq;
 
+DROP SEQUENCE ur_ifccoordinaterefer_seq;
+
 DROP SEQUENCE ur_transitioncurvetyp_seq;
 
 DROP SEQUENCE ur_crs_seq;
 
 DROP SEQUENCE ur_tunnelstructureatt_seq;
 
-DROP SEQUENCE ur_waterwaydetailattr_seq;
-
 DROP SEQUENCE ur_lengthattribute_seq;
 
+DROP SEQUENCE ur_waterwaydetailattr_seq;
+
 DROP SEQUENCE ur_context_seq;
+
+DROP SEQUENCE ur_pointcloudspecattr_seq;
 
 DROP SEQUENCE ur_constructionstruct_seq;
 
@@ -2714,9 +2764,9 @@ DROP SEQUENCE ur_ifcaxis2placement3_seq;
 
 DROP SEQUENCE ur_verticalcurvetype_seq;
 
-DROP SEQUENCE ur_constructionbaseat_seq;
-
 DROP SEQUENCE ur_facilitytypeattrib_seq;
+
+DROP SEQUENCE ur_constructionbaseat_seq;
 
 DROP SEQUENCE ur_waterbodydetailatt_seq;
 

@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+### 3.2.0 - 2026-11-07
+
+#### Breaking changes
+* Updated the Urban Object module (`uro`) to version 3.2 of the i-UR ADE. The database schema for `uro` was
+  regenerated with the ADE Manager Plugin; the building tables are identical to 3.1 except that
+  `ur_realestateidattribute` is a standalone type with its own sequence. `urf`, `urg` and `urt` are unchanged.
+* Updated iur-ade-citygml4j to 3.2.0.
+
 ### 3.1.0 - 2026-11-07
 
 #### Breaking changes
