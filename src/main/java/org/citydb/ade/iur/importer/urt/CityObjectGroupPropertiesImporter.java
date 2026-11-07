@@ -38,21 +38,15 @@ import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.*;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class CityObjectGroupPropertiesImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
 
-    private final FareRuleImporter fareRuleImporter;
-    private final FeedInfoImporter feedInfoImporter;
-    private final FrequencyImporter frequencyImporter;
-    private final StopTimeImporter stopTimeImporter;
-    private final TransferImporter transferImporter;
-    private final TranslationImporter translationImporter;
+    private final PublicTransitDataTypeImporter publicTransitDataTypeImporter;
+    private final CityObjectGroupToPublicTransitDataTypeImporter cityObjectGroupToPublicTransitDataTypeImporter;
 
     private int batchCounter;
 
@@ -65,12 +59,8 @@ public class CityObjectGroupPropertiesImporter implements PublicTransitModuleImp
                 "(id) " +
                 "values (?)");
 
-        fareRuleImporter = manager.getImporter(FareRuleImporter.class);
-        feedInfoImporter = manager.getImporter(FeedInfoImporter.class);
-        frequencyImporter = manager.getImporter(FrequencyImporter.class);
-        stopTimeImporter = manager.getImporter(StopTimeImporter.class);
-        transferImporter = manager.getImporter(TransferImporter.class);
-        translationImporter = manager.getImporter(TranslationImporter.class);
+        publicTransitDataTypeImporter = manager.getImporter(PublicTransitDataTypeImporter.class);
+        cityObjectGroupToPublicTransitDataTypeImporter = manager.getImporter(CityObjectGroupToPublicTransitDataTypeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, CityObjectGroup parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -80,21 +70,12 @@ public class CityObjectGroupPropertiesImporter implements PublicTransitModuleImp
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_3));
 
-        for (DataTypeProperty property : properties.getAll(DataTypeProperty.class)) {
-            if (property.isSetValue() && property.getValue().isSetObject()) {
-                PublicTransitDataType dataType = property.getValue().getObject();
-                if (dataType instanceof FareRule)
-                    fareRuleImporter.doImport((FareRule) dataType, parentId);
-                else if (dataType instanceof FeedInfo)
-                    feedInfoImporter.doImport((FeedInfo) dataType, parentId);
-                else if (dataType instanceof Frequency)
-                    frequencyImporter.doImport((Frequency) dataType, parentId);
-                else if (dataType instanceof StopTime)
-                    stopTimeImporter.doImport((StopTime) dataType, parentId);
-                else if (dataType instanceof Transfer)
-                    transferImporter.doImport((Transfer) dataType, parentId);
-                else if (dataType instanceof Translation)
-                    translationImporter.doImport((Translation) dataType, parentId);
+        if (properties.contains(DataTypePropertyElement.class)) {
+            for (DataTypePropertyElement property : properties.getAll(DataTypePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long dataTypeId = publicTransitDataTypeImporter.doImport(property.getValue().getObject());
+                    cityObjectGroupToPublicTransitDataTypeImporter.doImport(dataTypeId, parentId);
+                }
             }
         }
     }

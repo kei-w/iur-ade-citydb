@@ -36,10 +36,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.LandPricePerLandUse;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class LandPricePerLandUseImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
@@ -54,31 +51,32 @@ public class LandPricePerLandUseImporter implements StatisticalGridModuleImporte
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LANDPRICEPERLANDUSE)) + " " +
-                "(id, landprice_landprice_id, landprice, landuse, landuse_codespace) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, landuse, landuse_codespace, landprice) " +
+                "values (?, ?, ?, ?)");
     }
 
-    public void doImport(LandPricePerLandUse landPricePerLandUse, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(LandPricePerLandUse landPricePerLandUse) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.LANDPRICEPERLANDUS_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
-
-        if (landPricePerLandUse.getLandPrice() != null)
-            ps.setInt(3, landPricePerLandUse.getLandPrice());
-        else
-            ps.setNull(3, Types.INTEGER);
 
         if (landPricePerLandUse.getLandUse() != null && landPricePerLandUse.getLandUse().isSetValue()) {
-            ps.setString(4, landPricePerLandUse.getLandUse().getValue());
-            ps.setString(5, landPricePerLandUse.getLandUse().getCodeSpace());
+            ps.setString(2, landPricePerLandUse.getLandUse().getValue());
+            ps.setString(3, landPricePerLandUse.getLandUse().getCodeSpace());
         } else {
-            ps.setNull(4, Types.VARCHAR);
-            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(2, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
         }
+
+        if (landPricePerLandUse.getLandPrice() != null)
+            ps.setInt(4, landPricePerLandUse.getLandPrice());
+        else
+            ps.setNull(4, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.LANDPRICEPERLANDUSE));
+
+        return objectId;
     }
 
     @Override

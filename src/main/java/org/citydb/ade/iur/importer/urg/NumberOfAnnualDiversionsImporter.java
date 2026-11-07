@@ -52,28 +52,29 @@ public class NumberOfAnnualDiversionsImporter implements StatisticalGridModuleIm
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.NUMBEROFANNUALDIVERSIO)) + " " +
-                "(id, landusediver_numberofannu_id, count, year) " +
-                "values (?, ?, ?, ?)");
+                "(id, year, count) " +
+                "values (?, ?, ?)");
     }
 
-    public void doImport(NumberOfAnnualDiversions numberOfAnnualDiversions, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(NumberOfAnnualDiversions numberOfAnnualDiversions) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.NUMBEROFANNUALDIVE_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
+
+        if (numberOfAnnualDiversions.getYear() != null)
+            ps.setDate(2, Date.valueOf(LocalDate.of(numberOfAnnualDiversions.getYear().getValue(), 1, 1)));
+        else
+            ps.setNull(2, Types.DATE);
 
         if (numberOfAnnualDiversions.getCount() != null)
             ps.setInt(3, numberOfAnnualDiversions.getCount());
         else
             ps.setNull(3, Types.INTEGER);
 
-        if (numberOfAnnualDiversions.getYear() != null)
-            ps.setDate(4, Date.valueOf(LocalDate.of(numberOfAnnualDiversions.getYear().getValue(), 1, 1)));
-        else
-            ps.setNull(4, Types.DATE);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.NUMBEROFANNUALDIVERSIO));
+
+        return objectId;
     }
 
     @Override

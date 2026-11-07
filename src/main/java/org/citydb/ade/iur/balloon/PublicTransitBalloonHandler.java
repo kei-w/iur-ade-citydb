@@ -45,36 +45,32 @@ public class PublicTransitBalloonHandler implements ADEBalloonHandler {
                                   String aggregateColumnsClause,
                                   int lod,
                                   String schemaName) {
-
         String sqlStatement = null;
 
         if (schemaMapper.getTableName(ADETable.PUBLICTRANSIT).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.ROUTE).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.AGENCY).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.ATTRIBUTION).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.STOP).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.LEVEL).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.TRIP).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.SHAPE).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.OFFICE).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.CALENDAR).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.CALENDARDATE).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.FAREATTRIBUTE).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.OFFICE).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.PATHWAY).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.ROUTE).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.STOP).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.TRANSLATIONJP).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.TRIP).equalsIgnoreCase(table)) {
+                || schemaMapper.getTableName(ADETable.ATTRIBUTION).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
                     " FROM " + schemaName + "." + table + " " + tableShortId +
                     " WHERE " + tableShortId + ".id = ?";
         } else if (schemaMapper.getTableName(ADETable.DESCRIPTION).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
-                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.ROUTE) + " r" +
-                    " WHERE " + tableShortId + ".id = r.description_id" +
-                    " AND r.id = ?";
-        } else if (schemaMapper.getTableName(ADETable.POINT).equalsIgnoreCase(table)) {
-            sqlStatement = "SELECT " + aggregateColumnsClause +
-                    " FROM " + schemaName + "." + table + " " + tableShortId +
-                    " WHERE " + tableShortId + ".publictransit_point_id = ?";
+                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.ROUTE) + " p" +
+                    " WHERE " + tableShortId + ".id = p.description_id" +
+                    " AND p.id = ?";
         }
 
         return sqlStatement;
     }
-
 }

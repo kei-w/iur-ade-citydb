@@ -33,7 +33,6 @@ import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -41,37 +40,25 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urt.Office;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class OfficeExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
 
     public OfficeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.OFFICE);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumn("name"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
-        if (projectionFilter.containsProperty("url", module))
-            select.addProjection(table.getColumn("url"));
-        if (projectionFilter.containsProperty("phone", module))
-            select.addProjection(table.getColumn("phone"));
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -80,17 +67,26 @@ public class OfficeExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(office, projectionFilter, "pt", rs);
-
-                office.setOfficeName(rs.getString("name"));
-
-                if (projectionFilter.containsProperty("url", module))
-                    office.setUrl(rs.getString("url"));
-
-                if (projectionFilter.containsProperty("phone", module))
-                    office.setUrl(rs.getString("phone"));
+                publicTransitExporter.doExport(office, objectId, "pt_", rs);
+                doExport(office, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("name", prefix + "name"),
+                table.getColumn("url", prefix + "url"),
+                table.getColumn("phone", prefix + "phone"));
+
+        return select;
+    }
+
+    public void doExport(Office office, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        office.setOfficeName(rs.getString(prefix + "name"));
+
+        office.setUrl(rs.getString(prefix + "url"));
+
+        office.setPhone(rs.getString(prefix + "phone"));
     }
 
     @Override

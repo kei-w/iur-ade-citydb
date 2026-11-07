@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urt;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -40,6 +41,7 @@ import java.sql.*;
 
 public class CalendarImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
 
@@ -47,9 +49,10 @@ public class CalendarImporter implements PublicTransitModuleImporter {
 
     public CalendarImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CALENDAR)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CALENDAR)) + " " +
                 "(id, monday, tuesday, wednesday, thursday, friday, saturday, sunday, startdate, enddate) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -58,15 +61,43 @@ public class CalendarImporter implements PublicTransitModuleImporter {
 
     public void doImport(Calendar calendar, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(calendar, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        ps.setInt(2, calendar.isMonday() ? 1 : 0);
-        ps.setInt(3, calendar.isTuesday() ? 1 : 0);
-        ps.setInt(4, calendar.isWednesday() ? 1 : 0);
-        ps.setInt(5, calendar.isThursday() ? 1 : 0);
-        ps.setInt(6, calendar.isFriday() ? 1 : 0);
-        ps.setInt(7, calendar.isSaturday() ? 1 : 0);
-        ps.setInt(8, calendar.isSunday() ? 1 : 0);
+        if (calendar.getMonday() != null)
+            ps.setInt(2, calendar.getMonday() ? 1 : 0);
+        else
+            ps.setNull(2, Types.INTEGER);
+
+        if (calendar.getTuesday() != null)
+            ps.setInt(3, calendar.getTuesday() ? 1 : 0);
+        else
+            ps.setNull(3, Types.INTEGER);
+
+        if (calendar.getWednesday() != null)
+            ps.setInt(4, calendar.getWednesday() ? 1 : 0);
+        else
+            ps.setNull(4, Types.INTEGER);
+
+        if (calendar.getThursday() != null)
+            ps.setInt(5, calendar.getThursday() ? 1 : 0);
+        else
+            ps.setNull(5, Types.INTEGER);
+
+        if (calendar.getFriday() != null)
+            ps.setInt(6, calendar.getFriday() ? 1 : 0);
+        else
+            ps.setNull(6, Types.INTEGER);
+
+        if (calendar.getSaturday() != null)
+            ps.setInt(7, calendar.getSaturday() ? 1 : 0);
+        else
+            ps.setNull(7, Types.INTEGER);
+
+        if (calendar.getSunday() != null)
+            ps.setInt(8, calendar.getSunday() ? 1 : 0);
+        else
+            ps.setNull(8, Types.INTEGER);
 
         if (calendar.getStartDate() != null)
             ps.setDate(9, Date.valueOf(calendar.getStartDate()));

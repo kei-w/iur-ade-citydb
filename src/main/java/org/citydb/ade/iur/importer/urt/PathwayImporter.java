@@ -37,17 +37,17 @@ import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Pathway;
 import org.citygml4j.ade.iur.model.urt.Stop;
+import org.citygml4j.ade.iur.model.urt.StopProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PathwayImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
+    private final PathwayToStopImporter pathwayToStopImporter;
+    private final PathwayToToStopImporter pathwayToToStopImporter;
 
     private int batchCounter;
 
@@ -56,111 +56,99 @@ public class PathwayImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PATHWAY)) + " " +
-                "(id, isbidirectional, isbidirectional_codespace, length, length_uom, maxslope, minwidth, " +
-                "mode_, mode_codespace, reversedsignpostedas, signpostedas, staircount, traversaltime, " +
-                "from_id, to_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PATHWAY)) + " " +
+                "(id, mode_, mode__codespace, isbidirectional, isbidirectional_codespace, length, length_uom," +
+                "traversaltime, staircount, maxslope, minwidth, signpostedas, reversedsignpostedas) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
+        pathwayToStopImporter = manager.getImporter(PathwayToStopImporter.class);
+        pathwayToToStopImporter = manager.getImporter(PathwayToToStopImporter.class);
     }
 
     public void doImport(Pathway pathway, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(pathway, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (pathway.getIsBidirectional() != null && pathway.getIsBidirectional().isSetValue()) {
-            ps.setString(2, pathway.getIsBidirectional().getValue());
-            ps.setString(3, pathway.getIsBidirectional().getCodeSpace());
+        if (pathway.getMode() != null && pathway.getMode().isSetValue()) {
+            ps.setString(2, pathway.getMode().getValue());
+            ps.setString(3, pathway.getMode().getCodeSpace());
         } else {
             ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (pathway.getLength() != null && pathway.getLength().isSetValue()) {
-            ps.setDouble(4, pathway.getLength().getValue());
-            ps.setString(5, pathway.getLength().getUom());
+        if (pathway.getIsBidirectional() != null && pathway.getIsBidirectional().isSetValue()) {
+            ps.setString(4, pathway.getIsBidirectional().getValue());
+            ps.setString(5, pathway.getIsBidirectional().getCodeSpace());
         } else {
-            ps.setNull(4, Types.DOUBLE);
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (pathway.getMaxSlope() != null)
-            ps.setDouble(6, pathway.getMaxSlope());
-        else
-            ps.setNull(6, Types.DOUBLE);
-
-        if (pathway.getMinWidth() != null)
-            ps.setDouble(7, pathway.getMinWidth());
-        else
-            ps.setNull(7, Types.DOUBLE);
-
-        if (pathway.getMode() != null && pathway.getMode().isSetValue()) {
-            ps.setString(8, pathway.getMode().getValue());
-            ps.setString(9, pathway.getMode().getCodeSpace());
+        if (pathway.getLength() != null && pathway.getLength().isSetValue()) {
+            ps.setDouble(6, pathway.getLength().getValue());
+            ps.setString(7, pathway.getLength().getUom());
         } else {
-            ps.setNull(8, Types.VARCHAR);
-            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(6, Types.DOUBLE);
+            ps.setNull(7, Types.VARCHAR);
         }
-
-        ps.setString(10, pathway.getReversedSignpostedAs());
-        ps.setString(11, pathway.getSignpostedAs());
-
-        if (pathway.getStairCount() != null)
-            ps.setInt(12, pathway.getStairCount());
-        else
-            ps.setNull(12, Types.INTEGER);
 
         if (pathway.getTraversalTime() != null)
-            ps.setInt(13, pathway.getTraversalTime());
+            ps.setInt(8, pathway.getTraversalTime());
         else
-            ps.setNull(13, Types.INTEGER);
+            ps.setNull(8, Types.INTEGER);
 
-        long fromId = 0;
-        if (pathway.getFrom() != null) {
-            Stop object = pathway.getFrom().getObject();
-            if (object != null) {
-                fromId = helper.importObject(object);
-                pathway.getFrom().unsetObject();
-            } else {
-                String href = pathway.getFrom().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.PATHWAY),
-                            objectId, href, "from_id");
-                }
-            }
-        }
-
-        if (fromId != 0)
-            ps.setLong(14, fromId);
+        if (pathway.getStairCount() != null)
+            ps.setInt(9, pathway.getStairCount());
         else
-            ps.setNull(14, Types.NULL);
+            ps.setNull(9, Types.INTEGER);
 
-        long toId = 0;
-        if (pathway.getTo() != null) {
-            Stop object = pathway.getTo().getObject();
-            if (object != null) {
-                toId = helper.importObject(object);
-                pathway.getTo().unsetObject();
-            } else {
-                String href = pathway.getTo().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.PATHWAY),
-                            objectId, href, "to_id");
-                }
-            }
-        }
-
-        if (toId != 0)
-            ps.setLong(15, toId);
+        if (pathway.getMaxSlope() != null)
+            ps.setDouble(10, pathway.getMaxSlope());
         else
-            ps.setNull(15, Types.NULL);
+            ps.setNull(10, Types.DOUBLE);
+
+        if (pathway.getMinWidth() != null)
+            ps.setDouble(11, pathway.getMinWidth());
+        else
+            ps.setNull(11, Types.DOUBLE);
+
+        ps.setString(12, pathway.getSignpostedAs());
+
+        ps.setString(13, pathway.getReversedSignpostedAs());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        if (pathway.getFrom() != null) {
+            StopProperty property = pathway.getFrom();
+            Stop cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                pathwayToStopImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.PATHWAY_TO_STOP), objectId, "pathway_id", href, "stop_id");
+            }
+        }
+        if (pathway.getTo() != null) {
+            StopProperty property = pathway.getTo();
+            Stop cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                pathwayToToStopImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.PATHWAY_TO_STOP_2), objectId, "pathway_id", href, "stop_id");
+            }
+        }
     }
 
     @Override

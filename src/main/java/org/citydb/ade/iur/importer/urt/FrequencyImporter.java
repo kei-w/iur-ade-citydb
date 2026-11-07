@@ -35,6 +35,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Frequency;
 import org.citygml4j.ade.iur.model.urt.Trip;
+import org.citygml4j.ade.iur.model.urt.TripProperty;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -44,7 +45,7 @@ public class FrequencyImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final PublicTransitDataTypeImporter dataTypeImporter;
+    private final FrequencyToTripImporter frequencyToTripImporter;
 
     private int batchCounter;
 
@@ -53,64 +54,56 @@ public class FrequencyImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FREQUENCY)) + " " +
-                "(id, endtime, exacttimes, exacttimes_codespace, headwaysecs, starttime, trip_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FREQUENCY)) + " " +
+                "(id, starttime, endtime, headwaysecs, exacttimes, exacttimes_codespace) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
-        dataTypeImporter = manager.getImporter(PublicTransitDataTypeImporter.class);
+        frequencyToTripImporter = manager.getImporter(FrequencyToTripImporter.class);
     }
 
-    public void doImport(Frequency frequency, long cityObjectGroupId) throws CityGMLImportException, SQLException {
-        long objectId = dataTypeImporter.doImport(frequency, cityObjectGroupId);
+    public void doImport(Frequency frequency, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
 
-        if (frequency.getEndTime() != null)
-            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.of(LocalDate.ofEpochDay(0), frequency.getEndTime())));
+        if (frequency.getStartTime() != null)
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.of(LocalDate.ofEpochDay(0), frequency.getStartTime())));
         else
             ps.setNull(2, Types.TIMESTAMP_WITH_TIMEZONE);
 
-        if (frequency.getExactTimes() != null && frequency.getExactTimes().isSetValue()) {
-            ps.setString(3, frequency.getExactTimes().getValue());
-            ps.setString(4, frequency.getExactTimes().getCodeSpace());
-        } else {
-            ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
-        }
+        if (frequency.getEndTime() != null)
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.of(LocalDate.ofEpochDay(0), frequency.getEndTime())));
+        else
+            ps.setNull(3, Types.TIMESTAMP_WITH_TIMEZONE);
 
         if (frequency.getHeadwaySecs() != null)
-            ps.setInt(5, frequency.getHeadwaySecs());
+            ps.setInt(4, frequency.getHeadwaySecs());
         else
-            ps.setNull(5, Types.INTEGER);
+            ps.setNull(4, Types.INTEGER);
 
-        if (frequency.getStartTime() != null)
-            ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.of(LocalDate.ofEpochDay(0), frequency.getStartTime())));
-        else
-            ps.setNull(6, Types.TIMESTAMP_WITH_TIMEZONE);
-
-        long tripId = 0;
-        if (frequency.getTrip() != null) {
-            Trip trip = frequency.getTrip().getObject();
-            if (trip != null) {
-                tripId = helper.importObject(trip);
-                frequency.getTrip().unsetObject();
-            } else {
-                String href = frequency.getTrip().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.FREQUENCY),
-                            objectId, href, "trip_id");
-                }
-            }
+        if (frequency.getExactTimes() != null && frequency.getExactTimes().isSetValue()) {
+            ps.setString(5, frequency.getExactTimes().getValue());
+            ps.setString(6, frequency.getExactTimes().getCodeSpace());
+        } else {
+            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
         }
-
-        if (tripId != 0)
-            ps.setLong(7, tripId);
-        else
-            ps.setNull(7, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.FREQUENCY));
+
+        if (frequency.getTrip() != null) {
+            TripProperty property = frequency.getTrip();
+            Trip cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                frequencyToTripImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.FREQUENCY_TO_TRIP), objectId, "frequency_id", href, "trip_id");
+            }
+        }
     }
 
     @Override

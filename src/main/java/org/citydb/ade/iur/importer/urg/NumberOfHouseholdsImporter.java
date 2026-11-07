@@ -36,10 +36,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.NumberOfHouseholds;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class NumberOfHouseholdsImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
@@ -48,32 +45,27 @@ public class NumberOfHouseholdsImporter implements StatisticalGridModuleImporter
 
     private int batchCounter;
 
-    enum Type {
-        BY_OWNERSHIP,
-        BY_STRUCTURE
-    }
-
     public NumberOfHouseholdsImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS)) + " " +
-                "(id, households_numberofhouseh_id, households_numberofhous_id_1, class, class_codespace, number_) " +
+                "(id, households_numberofhouseh_id, households_numberofhouseh__2, class, class_codespace, number_) " +
                 "values (?, ?, ?, ?, ?, ?)");
     }
 
-    public void doImport(NumberOfHouseholds numberOfHouseholds, Type type, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(NumberOfHouseholds numberOfHouseholds, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.NUMBEROFHOUSEHOLDS_SEQ));
         ps.setLong(1, objectId);
-
-        if (type == Type.BY_OWNERSHIP) {
+        if ("households_numberofhouseh_id".equals(parentColumn))
             ps.setLong(2, parentId);
-            ps.setNull(3, Types.NULL);
-        } else {
+        else
             ps.setNull(2, Types.NULL);
+        if ("households_numberofhouseh__2".equals(parentColumn))
             ps.setLong(3, parentId);
-        }
+        else
+            ps.setNull(3, Types.NULL);
 
         if (numberOfHouseholds.getClassifier() != null && numberOfHouseholds.getClassifier().isSetValue()) {
             ps.setString(4, numberOfHouseholds.getClassifier().getValue());
@@ -91,6 +83,8 @@ public class NumberOfHouseholdsImporter implements StatisticalGridModuleImporter
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS));
+
+        return objectId;
     }
 
     @Override

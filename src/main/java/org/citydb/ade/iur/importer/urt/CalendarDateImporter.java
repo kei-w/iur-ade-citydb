@@ -37,6 +37,7 @@ import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Calendar;
 import org.citygml4j.ade.iur.model.urt.CalendarDate;
+import org.citygml4j.ade.iur.model.urt.CalendarProperty;
 
 import java.sql.*;
 
@@ -45,6 +46,7 @@ public class CalendarDateImporter implements PublicTransitModuleImporter {
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final PublicTransitImporter publicTransitImporter;
+    private final CalendarDateToCalendarImporter calendarDateToCalendarImporter;
 
     private int batchCounter;
 
@@ -53,15 +55,17 @@ public class CalendarDateImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CALENDARDATE)) + " " +
-                "(id, date_, exceptiontype, exceptiontype_codespace, calendar_id) " +
-                "values (?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CALENDARDATE)) + " " +
+                "(id, date_, exceptiontype, exceptiontype_codespace) " +
+                "values (?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
+        calendarDateToCalendarImporter = manager.getImporter(CalendarDateToCalendarImporter.class);
     }
 
     public void doImport(CalendarDate calendarDate, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(calendarDate, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (calendarDate.getDate() != null)
@@ -77,30 +81,23 @@ public class CalendarDateImporter implements PublicTransitModuleImporter {
             ps.setNull(4, Types.VARCHAR);
         }
 
-        long calendarId = 0;
-        if (calendarDate.getCalendar() != null) {
-            Calendar calendar = calendarDate.getCalendar().getObject();
-            if (calendar != null) {
-                calendarId = helper.importObject(calendar);
-                calendarDate.getCalendar().unsetObject();
-            } else {
-                String href = calendarDate.getCalendar().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.CALENDARDATE),
-                            objectId, href, "calendar_id");
-                }
-            }
-        }
-
-        if (calendarId != 0)
-            ps.setLong(5, calendarId);
-        else
-            ps.setNull(5, Types.NULL);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        if (calendarDate.getCalendar() != null) {
+            CalendarProperty property = calendarDate.getCalendar();
+            Calendar cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                calendarDateToCalendarImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.CALENDARD_TO_CALENDAR), objectId, "calendardate_id", href, "calendar_id");
+            }
+        }
     }
 
     @Override

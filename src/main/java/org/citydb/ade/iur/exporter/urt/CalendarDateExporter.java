@@ -34,15 +34,14 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
 import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urt.CalendarDate;
 import org.citygml4j.ade.iur.model.urt.CalendarProperty;
 import org.citygml4j.model.gml.basicTypes.Code;
@@ -50,30 +49,30 @@ import org.citygml4j.model.gml.basicTypes.Code;
 import java.sql.*;
 
 public class CalendarDateExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psCalendarDateCalendar;
 
     public CalendarDateExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CALENDARDATE);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumns("date_", "exceptiontype", "exceptiontype_codespace"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
-        if (projectionFilter.containsProperty("calendar", module)) {
-            Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(cityObject.getColumn("gmlid", "cgmlid"))
-                    .addJoin(JoinFactory.left(cityObject, "id", ComparisonName.EQUAL_TO, table.getColumn("calendar_id")));
-        }
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
+
+        Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table calendarDateCalendars = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CALENDARD_TO_CALENDAR)));
+        Select calendarDateCalendarSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, calendarDateCalendars.getColumn("calendar_id")))
+                .addSelection(ComparisonFactory.equalTo(calendarDateCalendars.getColumn("calendardate_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psCalendarDateCalendar = connection.prepareStatement(calendarDateCalendarSelect.toString());
     }
 
     public void doExport(CalendarDate calendarDate, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -81,24 +80,38 @@ public class CalendarDateExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(calendarDate, projectionFilter, "pt", rs);
+                publicTransitExporter.doExport(calendarDate, objectId, "pt_", rs);
+                doExport(calendarDate, objectId, "", rs);
+            }
+        }
+    }
 
-                Date date = rs.getDate("date_");
-                if (!rs.wasNull())
-                    calendarDate.setDate(date.toLocalDate());
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("date_", prefix + "date_"),
+                table.getColumn("exceptiontype", prefix + "exceptiontype"),
+                table.getColumn("exceptiontype_codespace", prefix + "exceptiontype_codespace"));
 
-                String exceptionType = rs.getString("exceptiontype");
-                if (!rs.wasNull()) {
-                    Code code = new Code(exceptionType);
-                    code.setCodeSpace(rs.getString("exceptiontype_codespace"));
-                    calendarDate.setExceptionType(code);
-                }
+        return select;
+    }
 
-                if (projectionFilter.containsProperty("calendar", module)) {
-                    String gmlId = rs.getString("cgmlid");
-                    if (gmlId != null)
-                        calendarDate.setCalendar(new CalendarProperty("#" + gmlId));
-                }
+    public void doExport(CalendarDate calendarDate, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        Date date = rs.getDate(prefix + "date_");
+        if (!rs.wasNull())
+            calendarDate.setDate(date.toLocalDate());
+
+        String exceptionType = rs.getString(prefix + "exceptiontype");
+        if (!rs.wasNull()) {
+            Code code = new Code(exceptionType);
+            code.setCodeSpace(rs.getString(prefix + "exceptiontype_codespace"));
+            calendarDate.setExceptionType(code);
+        }
+
+        psCalendarDateCalendar.setLong(1, objectId);
+        try (ResultSet calendarRs = psCalendarDateCalendar.executeQuery()) {
+            while (calendarRs.next()) {
+                CalendarProperty calendarProperty = new CalendarProperty();
+                calendarProperty.setHref("#" + calendarRs.getString("gmlid"));
+                calendarDate.setCalendar(calendarProperty);
             }
         }
     }
@@ -106,5 +119,6 @@ public class CalendarDateExporter implements PublicTransitModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psCalendarDateCalendar.close();
     }
 }

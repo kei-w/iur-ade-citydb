@@ -52,14 +52,18 @@ public class AreaOfAnnualDiversionsImporter implements StatisticalGridModuleImpo
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.AREAOFANNUALDIVERSIONS)) + " " +
-                "(id, landusediver_areaofannual_id, area, area_uom, year) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, year, area, area_uom) " +
+                "values (?, ?, ?, ?)");
     }
 
-    public void doImport(AreaOfAnnualDiversions areaOfAnnualDiversions, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(AreaOfAnnualDiversions areaOfAnnualDiversions) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.AREAOFANNUALDIVERS_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
+
+        if (areaOfAnnualDiversions.getYear() != null)
+            ps.setDate(2, Date.valueOf(LocalDate.of(areaOfAnnualDiversions.getYear().getValue(), 1, 1)));
+        else
+            ps.setNull(2, Types.DATE);
 
         if (areaOfAnnualDiversions.getArea() != null && areaOfAnnualDiversions.getArea().isSetValue()) {
             ps.setDouble(3, areaOfAnnualDiversions.getArea().getValue());
@@ -69,14 +73,11 @@ public class AreaOfAnnualDiversionsImporter implements StatisticalGridModuleImpo
             ps.setNull(4, Types.VARCHAR);
         }
 
-        if (areaOfAnnualDiversions.getYear() != null)
-            ps.setDate(5, Date.valueOf(LocalDate.of(areaOfAnnualDiversions.getYear().getValue(), 1, 1)));
-        else
-            ps.setNull(5, Types.DATE);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.AREAOFANNUALDIVERSIONS));
+
+        return objectId;
     }
 
     @Override

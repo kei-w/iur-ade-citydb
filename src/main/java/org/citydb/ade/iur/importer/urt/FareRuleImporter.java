@@ -34,19 +34,19 @@ import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.FareAttribute;
+import org.citygml4j.ade.iur.model.urt.FareAttributeProperty;
 import org.citygml4j.ade.iur.model.urt.FareRule;
 import org.citygml4j.ade.iur.model.urt.Route;
+import org.citygml4j.ade.iur.model.urt.RouteProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class FareRuleImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final PublicTransitDataTypeImporter dataTypeImporter;
+    private final FareRuleToFareAttributeImporter fareRuleToFareAttributeImporter;
+    private final FareRuleToRouteImporter fareRuleToRouteImporter;
 
     private int batchCounter;
 
@@ -55,21 +55,21 @@ public class FareRuleImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FARERULE)) + " " +
-                "(id, containsid, containsid_codespace, destinationid, destinationid_codespace, originid, " +
-                "originid_codespace, fare_id, route_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FARERULE)) + " " +
+                "(id, originid, originid_codespace, destinationid, destinationid_codespace, containsid," +
+                "containsid_codespace) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
 
-        dataTypeImporter = manager.getImporter(PublicTransitDataTypeImporter.class);
+        fareRuleToFareAttributeImporter = manager.getImporter(FareRuleToFareAttributeImporter.class);
+        fareRuleToRouteImporter = manager.getImporter(FareRuleToRouteImporter.class);
     }
 
-    public void doImport(FareRule fareRule, long cityObjectGroupId) throws CityGMLImportException, SQLException {
-        long objectId = dataTypeImporter.doImport(fareRule, cityObjectGroupId);
+    public void doImport(FareRule fareRule, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
 
-        if (fareRule.getContainsId() != null && fareRule.getContainsId().isSetValue()) {
-            ps.setString(2, fareRule.getContainsId().getValue());
-            ps.setString(3, fareRule.getContainsId().getCodeSpace());
+        if (fareRule.getOriginId() != null && fareRule.getOriginId().isSetValue()) {
+            ps.setString(2, fareRule.getOriginId().getValue());
+            ps.setString(3, fareRule.getOriginId().getCodeSpace());
         } else {
             ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
@@ -83,59 +83,44 @@ public class FareRuleImporter implements PublicTransitModuleImporter {
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (fareRule.getOriginId() != null && fareRule.getOriginId().isSetValue()) {
-            ps.setString(6, fareRule.getOriginId().getValue());
-            ps.setString(7, fareRule.getOriginId().getCodeSpace());
+        if (fareRule.getContainsId() != null && fareRule.getContainsId().isSetValue()) {
+            ps.setString(6, fareRule.getContainsId().getValue());
+            ps.setString(7, fareRule.getContainsId().getCodeSpace());
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
         }
 
-        long fareId = 0;
-        if (fareRule.getFare() != null) {
-            FareAttribute fareAttribute = fareRule.getFare().getObject();
-            if (fareAttribute != null) {
-                fareId = helper.importObject(fareAttribute);
-                fareRule.getFare().unsetObject();
-            } else {
-                String href = fareRule.getFare().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.FARERULE),
-                            objectId, href, "fare_id");
-                }
-            }
-        }
-
-        if (fareId != 0)
-            ps.setLong(8, fareId);
-        else
-            ps.setNull(8, Types.NULL);
-
-        long routeId = 0;
-        if (fareRule.getRoute() != null) {
-            Route route = fareRule.getRoute().getObject();
-            if (route != null) {
-                routeId = helper.importObject(route);
-                fareRule.getRoute().unsetObject();
-            } else {
-                String href = fareRule.getRoute().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.FARERULE),
-                            objectId, href, "route_id");
-                }
-            }
-        }
-
-        if (routeId != 0)
-            ps.setLong(9, routeId);
-        else
-            ps.setNull(9, Types.NULL);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.FARERULE));
+
+        if (fareRule.getFare() != null) {
+            FareAttributeProperty property = fareRule.getFare();
+            FareAttribute cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                fareRuleToFareAttributeImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.FARERULE_TO_FAREATTRI), objectId, "farerule_id", href, "fareattribute_id");
+            }
+        }
+        if (fareRule.getRoute() != null) {
+            RouteProperty property = fareRule.getRoute();
+            Route cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                fareRuleToRouteImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.FARERULE_TO_ROUTE), objectId, "farerule_id", href, "route_id");
+            }
+        }
     }
 
     @Override

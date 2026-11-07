@@ -35,12 +35,12 @@ import org.citydb.core.ade.importer.ADEPropertyCollection;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.urg.FiscalYearOfPublicationProperty;
-import org.citygml4j.ade.iur.model.urg.LanguageProperty;
+import org.citygml4j.ade.iur.model.urg.*;
 import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
 
-import java.sql.*;
 import java.time.LocalDate;
+
+import java.sql.*;
 
 public class CityObjectGroupPropertiesImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
@@ -57,6 +57,7 @@ public class CityObjectGroupPropertiesImporter implements StatisticalGridModuleI
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP)) + " " +
                 "(id, fiscalyearofpublication, language, language_codespace) " +
                 "values (?, ?, ?, ?)");
+
     }
 
     public void doImport(ADEPropertyCollection properties, CityObjectGroup parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {

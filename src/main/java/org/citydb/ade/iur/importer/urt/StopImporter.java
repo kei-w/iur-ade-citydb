@@ -38,20 +38,21 @@ import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citydb.core.operation.importer.util.GeometryConverter;
 import org.citygml4j.ade.iur.model.urt.Level;
+import org.citygml4j.ade.iur.model.urt.LevelProperty;
 import org.citygml4j.ade.iur.model.urt.Stop;
+import org.citygml4j.ade.iur.model.urt.StopProperty;
+import org.citygml4j.model.gml.geometry.AbstractGeometry;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class StopImporter implements PublicTransitModuleImporter {
     private final Connection connection;
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
     private final PublicTransitImporter publicTransitImporter;
+    private final StopToStopImporter stopToStopImporter;
+    private final StopToLevelImporter stopToLevelImporter;
     private final GeometryConverter geometryConverter;
 
     private int batchCounter;
@@ -62,18 +63,21 @@ public class StopImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STOP)) + " " +
-                "(id, code, code_codespace, latitude, longitude, locationtype, locationtype_codespace, platformcode, " +
-                "point, timezone, timezone_codespace, ttsname, url, wheelchairboarding, wheelchairboarding_codespace, " +
-                "zoneid, zoneid_codespace, level_id, parentstation_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.STOP)) + " " +
+                "(id, code, code_codespace, ttsname, latitude, longitude, zoneid, zoneid_codespace, url," +
+                "locationtype, locationtype_codespace, timezone, timezone_codespace, wheelchairboarding," +
+                "wheelchairboarding_codespace, platformcode, point) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         publicTransitImporter = manager.getImporter(PublicTransitImporter.class);
+        stopToStopImporter = manager.getImporter(StopToStopImporter.class);
+        stopToLevelImporter = manager.getImporter(StopToLevelImporter.class);
         geometryConverter = helper.getGeometryConverter();
     }
 
     public void doImport(Stop stop, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         publicTransitImporter.doImport(stop, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (stop.getCode() != null && stop.getCode().isSetValue()) {
@@ -84,44 +88,43 @@ public class StopImporter implements PublicTransitModuleImporter {
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (stop.getLatitude() != null)
-            ps.setDouble(4, stop.getLatitude());
-        else
-            ps.setNull(4, Types.DOUBLE);
+        ps.setString(4, stop.getTtsName());
 
-        if (stop.getLongitude() != null)
-            ps.setDouble(5, stop.getLongitude());
+        if (stop.getLatitude() != null)
+            ps.setDouble(5, stop.getLatitude());
         else
             ps.setNull(5, Types.DOUBLE);
 
-        if (stop.getLocationType() != null && stop.getLocationType().isSetValue()) {
-            ps.setString(6, stop.getLocationType().getValue());
-            ps.setString(7, stop.getLocationType().getCodeSpace());
+        if (stop.getLongitude() != null)
+            ps.setDouble(6, stop.getLongitude());
+        else
+            ps.setNull(6, Types.DOUBLE);
+
+        if (stop.getZoneId() != null && stop.getZoneId().isSetValue()) {
+            ps.setString(7, stop.getZoneId().getValue());
+            ps.setString(8, stop.getZoneId().getCodeSpace());
         } else {
-            ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
+            ps.setNull(8, Types.VARCHAR);
         }
 
-        ps.setString(8, stop.getPlatformCode());
+        ps.setString(9, stop.getUrl());
 
-        GeometryObject point = geometryConverter.getPoint(stop.getPoint());
-        if (point != null) {
-            ps.setObject(9, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(point, connection));
-            stop.setPoint(null);
-        } else
-            ps.setNull(9, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
-                    helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
-
-        if (stop.getTimeZone() != null && stop.getTimeZone().isSetValue()) {
-            ps.setString(10, stop.getTimeZone().getValue());
-            ps.setString(11, stop.getTimeZone().getCodeSpace());
+        if (stop.getLocationType() != null && stop.getLocationType().isSetValue()) {
+            ps.setString(10, stop.getLocationType().getValue());
+            ps.setString(11, stop.getLocationType().getCodeSpace());
         } else {
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
         }
 
-        ps.setString(12, stop.getTtsName());
-        ps.setString(13, stop.getUrl());
+        if (stop.getTimeZone() != null && stop.getTimeZone().isSetValue()) {
+            ps.setString(12, stop.getTimeZone().getValue());
+            ps.setString(13, stop.getTimeZone().getCodeSpace());
+        } else {
+            ps.setNull(12, Types.VARCHAR);
+            ps.setNull(13, Types.VARCHAR);
+        }
 
         if (stop.getWheelchairBoarding() != null && stop.getWheelchairBoarding().isSetValue()) {
             ps.setString(14, stop.getWheelchairBoarding().getValue());
@@ -131,59 +134,48 @@ public class StopImporter implements PublicTransitModuleImporter {
             ps.setNull(15, Types.VARCHAR);
         }
 
-        if (stop.getZoneId() != null && stop.getZoneId().isSetValue()) {
-            ps.setString(16, stop.getZoneId().getValue());
-            ps.setString(17, stop.getZoneId().getCodeSpace());
-        } else {
-            ps.setNull(16, Types.VARCHAR);
-            ps.setNull(17, Types.VARCHAR);
-        }
+        ps.setString(16, stop.getPlatformCode());
 
-        long levelId = 0;
-        if (stop.getLevel() != null) {
-            Level level = stop.getLevel().getObject();
-            if (level != null) {
-                levelId = helper.importObject(level);
-                stop.getLevel().unsetObject();
-            } else {
-                String href = stop.getLevel().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.STOP),
-                            objectId, href, "level_id");
-                }
-            }
-        }
+        GeometryObject point = null;
+        if (stop.getPoint() != null)
+            point = geometryConverter.getPoint(stop.getPoint());
 
-        if (levelId != 0)
-            ps.setLong(18, levelId);
+        if (point != null)
+            ps.setObject(17, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(point, connection));
         else
-            ps.setNull(18, Types.NULL);
-
-        long parentStationId = 0;
-        if (stop.getParentStation() != null) {
-            Stop parent = stop.getParentStation().getObject();
-            if (parent != null) {
-                parentStationId = helper.importObject(parent);
-                stop.getParentStation().unsetObject();
-            } else {
-                String href = stop.getParentStation().getHref();
-                if (href != null && !href.isEmpty()) {
-                    helper.propagateObjectXlink(
-                            schemaMapper.getTableName(ADETable.STOP),
-                            objectId, href, "parentstation_id");
-                }
-            }
-        }
-
-        if (parentStationId != 0)
-            ps.setLong(19, parentStationId);
-        else
-            ps.setNull(19, Types.NULL);
+            ps.setNull(17, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+                    helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        if (stop.getParentStation() != null) {
+            StopProperty property = stop.getParentStation();
+            Stop cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                stopToStopImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.STOP_TO_STOP), objectId, "stop_id", href, "stop_id_2");
+            }
+        }
+        if (stop.getLevel() != null) {
+            LevelProperty property = stop.getLevel();
+            Level cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                stopToLevelImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.STOP_TO_LEVEL), objectId, "stop_id", href, "level__id");
+            }
+        }
     }
 
     @Override
