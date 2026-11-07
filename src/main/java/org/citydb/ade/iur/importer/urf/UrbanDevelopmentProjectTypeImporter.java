@@ -50,7 +50,7 @@ public class UrbanDevelopmentProjectTypeImporter implements UrbanFunctionModuleI
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC)) + " " +
                 "(id, id_, dateofdecision, projectname, plannedarea, plannedarea_uom, ongoingarea, ongoingarea_uom," +
                 "costuptolastfiscalyear, cost, completedarea, completedarea_uom, projectperiod, note) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -109,7 +109,7 @@ public class UrbanDevelopmentProjectTypeImporter implements UrbanFunctionModuleI
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC));
 
         return objectId;
     }

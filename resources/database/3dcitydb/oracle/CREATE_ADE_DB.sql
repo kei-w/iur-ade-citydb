@@ -5524,6 +5524,17 @@ CREATE TABLE ur_treeplantingdistrict
 CREATE TABLE ur_urbandevelopmentproj_2
 (
     id NUMBER(38) NOT NULL,
+    objectclass_id INTEGER,
+    scheduledexecutor VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_urbandevelopmentprojec 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_urbandevelopmentprojec
+(
+    id NUMBER(38) NOT NULL,
     completedarea NUMBER,
     completedarea_uom VARCHAR2(1000),
     cost NUMBER,
@@ -5537,17 +5548,6 @@ CREATE TABLE ur_urbandevelopmentproj_2
     plannedarea_uom VARCHAR2(1000),
     projectname VARCHAR2(1000),
     projectperiod VARCHAR2(1000),
-    PRIMARY KEY (id)
-);
-
--- -------------------------------------------------------------------- 
--- ur_urbandevelopmentprojec 
--- -------------------------------------------------------------------- 
-CREATE TABLE ur_urbandevelopmentprojec
-(
-    id NUMBER(38) NOT NULL,
-    objectclass_id INTEGER,
-    scheduledexecutor VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -8376,7 +8376,7 @@ REFERENCES ur_residentialdevelopment (id)
 ON DELETE SET NULL;
 
 ALTER TABLE ur_developmentproject ADD CONSTRAINT ur_developme_urbandevelo_fk_2 FOREIGN KEY (urbandevelopmenttype_id)
-REFERENCES ur_urbandevelopmentproj_2 (id)
+REFERENCES ur_urbandevelopmentprojec (id)
 ON DELETE SET NULL;
 
 -- -------------------------------------------------------------------- 
@@ -8422,7 +8422,7 @@ ON DELETE CASCADE;
 -- ur_disasterpreventionbloc 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_disasterpreventionbloc ADD CONSTRAINT ur_disasterpreventionbloc_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -8556,7 +8556,7 @@ ON DELETE CASCADE;
 -- ur_industrialparkdevelopm 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_industrialparkdevelopm ADD CONSTRAINT ur_industrialparkdevelopm_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -8581,7 +8581,7 @@ ON DELETE CASCADE;
 -- ur_landreadjustmentprojec 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_landreadjustmentprojec ADD CONSTRAINT ur_landreadjustmentprojec_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -8617,14 +8617,14 @@ ON DELETE CASCADE;
 -- ur_newhousingandurbandeve 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_newhousingandurbandeve ADD CONSTRAINT ur_newhousingandurbandeve_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
 -- ur_newurbaninfrastructure 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_newurbaninfrastructure ADD CONSTRAINT ur_newurbaninfrastructure_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -8716,7 +8716,7 @@ ON DELETE CASCADE;
 -- ur_residentialblockconstr 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_residentialblockconstr ADD CONSTRAINT ur_residentialblockconstr_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -8916,12 +8916,12 @@ REFERENCES ur_districtsandzones (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
--- ur_urbandevelopmentprojec 
+-- ur_urbandevelopmentproj_2 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_urbandevelopmentprojec ADD CONSTRAINT ur_urbandevelop_objectclass__2 FOREIGN KEY (objectclass_id)
+ALTER TABLE ur_urbandevelopmentproj_2 ADD CONSTRAINT ur_urbandevelop_objectclass__2 FOREIGN KEY (objectclass_id)
 REFERENCES objectclass (id);
 
-ALTER TABLE ur_urbandevelopmentprojec ADD CONSTRAINT ur_urbandevelopmentprojec_fk_2 FOREIGN KEY (id)
+ALTER TABLE ur_urbandevelopmentproj_2 ADD CONSTRAINT ur_urbandevelopmentproj_2_fk_2 FOREIGN KEY (id)
 REFERENCES ur_zone (id)
 ON DELETE CASCADE;
 
@@ -9075,7 +9075,7 @@ ON DELETE CASCADE;
 -- ur_urbanredevelopmentproj 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_urbanredevelopmentproj ADD CONSTRAINT ur_urbanredevelopmentproj_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -9089,7 +9089,7 @@ ON DELETE CASCADE;
 -- ur_urbanrenewalproject 
 -- -------------------------------------------------------------------- 
 ALTER TABLE ur_urbanrenewalproject ADD CONSTRAINT ur_urbanrenewalproject_fk_2 FOREIGN KEY (id)
-REFERENCES ur_urbandevelopmentprojec (id)
+REFERENCES ur_urbandevelopmentproj_2 (id)
 ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
@@ -10433,9 +10433,9 @@ CREATE INDEX ur_trafficfa_vehicleter_fkx_2 ON ur_trafficfacility (vehicletermina
 CREATE INDEX ur_treatment_sewersyste_fkx_2 ON ur_treatmentfacility (sewersystemsattribute_id);
 
 -- -------------------------------------------------------------------- 
--- ur_urbandevelopmentprojec 
+-- ur_urbandevelopmentproj_2 
 -- -------------------------------------------------------------------- 
-CREATE INDEX ur_urbandeve_objectclas_fkx_2 ON ur_urbandevelopmentprojec (objectclass_id);
+CREATE INDEX ur_urbandeve_objectclas_fkx_2 ON ur_urbandevelopmentproj_2 (objectclass_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_urbanfacility 

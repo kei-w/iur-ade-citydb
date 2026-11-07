@@ -76,7 +76,7 @@ public class UrbanFunctionBalloonHandler implements ADEBalloonHandler {
                 || schemaMapper.getTableName(ADETable.PROJECTPROMOTIONAREA).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.URBANREDEVELOPMENTPROM).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.URBANDISASTERRECOVERYP).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.LANDREADJUSTMENTPROJEC).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.NEWHOUSINGANDURBANDEVE).equalsIgnoreCase(table)
                 || schemaMapper.getTableName(ADETable.INDUSTRIALPARKDEVELOPM).equalsIgnoreCase(table)
@@ -215,7 +215,7 @@ public class UrbanFunctionBalloonHandler implements ADEBalloonHandler {
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.DEVELOPMENTPROJECT) + " p" +
                     " WHERE " + tableShortId + ".id = p.residentialdevelopmenttyp_id" +
                     " AND p.id = ?";
-        } else if (schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2).equalsIgnoreCase(table)) {
+        } else if (schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.DEVELOPMENTPROJECT) + " p" +
                     " WHERE " + tableShortId + ".id = p.urbandevelopmenttype_id" +

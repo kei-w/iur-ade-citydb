@@ -60,7 +60,7 @@ public class DisasterPreventionBlockImprovementProjectExporter implements UrbanF
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table urbanFunction = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION)));
         Table zone = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ZONE)));
-        Table urbanDevelopmentProject = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJEC)));
+        Table urbanDevelopmentProject = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJ_2)));
         Select select = new Select()
                 .addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.inner(zone, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))

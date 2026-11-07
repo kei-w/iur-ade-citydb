@@ -3109,11 +3109,6 @@ public class ADETableMapper {
             }});
             put(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");
-                add("OBJECTCLASS_ID");
-                add("SCHEDULEDEXECUTOR");
-            }});
-            put(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2).toUpperCase(), new LinkedHashSet<String>() {{
-                add("ID");
                 add("COMPLETEDAREA");
                 add("COMPLETEDAREA_UOM");
                 add("COST");
@@ -3127,6 +3122,11 @@ public class ADETableMapper {
                 add("PLANNEDAREA_UOM");
                 add("PROJECTNAME");
                 add("PROJECTPERIOD");
+            }});
+            put(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("OBJECTCLASS_ID");
+                add("SCHEDULEDEXECUTOR");
             }});
             put(schemaMapper.getTableName(ADETable.URBANDISASTERRECOVERYP).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

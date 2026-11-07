@@ -45,7 +45,7 @@ public class UrbanDevelopmentProjectTypeExporter implements UrbanFunctionModuleE
     private final PreparedStatement ps;
 
     public UrbanDevelopmentProjectTypeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJ_2);
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJEC);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("id_", "dateofdecision", "projectname", "plannedarea", "plannedarea_uom", "ongoingarea",

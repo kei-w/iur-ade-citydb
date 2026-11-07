@@ -2340,13 +2340,13 @@ ALTER TABLE ur_treeplantingdistrict
     DROP CONSTRAINT ur_treeplantingdistrict_fk;
 
 -- -------------------------------------------------------------------- 
--- ur_urbandevelopmentprojec 
+-- ur_urbandevelopmentproj_2 
 -- -------------------------------------------------------------------- 
-ALTER TABLE ur_urbandevelopmentprojec
+ALTER TABLE ur_urbandevelopmentproj_2
     DROP CONSTRAINT ur_urbandevelop_objectclass_fk;
 
-ALTER TABLE ur_urbandevelopmentprojec
-    DROP CONSTRAINT ur_urbandevelopmentprojec_fk;
+ALTER TABLE ur_urbandevelopmentproj_2
+    DROP CONSTRAINT ur_urbandevelopmentproj_2_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_urbandisasterrecoveryp 

@@ -52,7 +52,7 @@ public class UrbanDevelopmentProjectImporter implements UrbanFunctionModuleImpor
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJEC)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.URBANDEVELOPMENTPROJ_2)) + " " +
                 "(id, objectclass_id, scheduledexecutor) " +
                 "values (?, ?, ?)");
 

@@ -50,7 +50,7 @@ public class UrbanDevelopmentProjectExporter implements UrbanFunctionModuleExpor
     private final PreparedStatement ps;
 
     public UrbanDevelopmentProjectExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJEC);
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJ_2);
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
         zoneExporter = manager.getExporter(ZoneExporter.class);
 
