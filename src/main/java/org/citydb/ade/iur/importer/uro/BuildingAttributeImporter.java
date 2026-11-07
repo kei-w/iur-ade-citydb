@@ -37,9 +37,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.uro.BuildingAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
@@ -55,7 +53,7 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
         this.objectMapper = manager.getObjectMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGATTRIBUTE)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE)) + " " +
                 "(id, objectclass_id) " +
                 "values (?, ?)");
     }

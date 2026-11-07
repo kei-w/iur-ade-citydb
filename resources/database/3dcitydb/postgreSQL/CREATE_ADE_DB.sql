@@ -2098,6 +2098,7 @@ CREATE TABLE ur_ifccoordinatereferen_1
     ifccoordinateref_description VARCHAR(1000),
     ifccoordinatereferences_name VARCHAR(1000),
     objectclass_id INTEGER,
+    crs_id BIGINT,
     PRIMARY KEY (id)
 );
 
@@ -2152,6 +2153,7 @@ CREATE TABLE ur_ifcgeometricrepresenta
     objectclass_id INTEGER,
     precision NUMERIC,
     truenorth VARCHAR(1000),
+    worldcoordinatesystem_id BIGINT,
     PRIMARY KEY (id)
 );
 
@@ -3829,7 +3831,7 @@ CREATE TABLE ur_squareurbanplanattribu
     city VARCHAR(1000),
     city_codespace VARCHAR(1000),
     dateofdecision TIMESTAMP WITH TIME ZONE,
-    dateofrevision TIMESTAMP WITH TIME ZONE,
+    dateofrevision VARCHAR(1000),
     enforcer VARCHAR(1000),
     isauthorized NUMERIC,
     iscompleted NUMERIC,

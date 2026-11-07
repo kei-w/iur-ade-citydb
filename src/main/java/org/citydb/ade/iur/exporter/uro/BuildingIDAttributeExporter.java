@@ -48,9 +48,10 @@ public class BuildingIDAttributeExporter implements UrbanObjectModuleExporter {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGIDATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("branchid", "buildingid", "city", "city_codespace", "partid", "prefecture", "prefecture_codespace"))
+        Select select = new Select().addProjection(table.getColumns("buildingid", "branchid", "partid", "prefecture", "prefecture_codespace", "city", "city_codespace"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
+
     }
 
     public void doExport(BuildingIDAttribute buildingIDAttribute, long objectId) throws CityGMLExportException, SQLException {
@@ -58,18 +59,11 @@ public class BuildingIDAttributeExporter implements UrbanObjectModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
+                buildingIDAttribute.setBuildingID(rs.getString("buildingid"));
+
                 int branchID = rs.getInt("branchid");
                 if (!rs.wasNull())
                     buildingIDAttribute.setBranchID(branchID);
-
-                buildingIDAttribute.setBuildingID(rs.getString("buildingid"));
-
-                String city = rs.getString("city");
-                if (!rs.wasNull()) {
-                    Code code = new Code(city);
-                    code.setCodeSpace(rs.getString("city_codespace"));
-                    buildingIDAttribute.setCity(code);
-                }
 
                 int partID = rs.getInt("partid");
                 if (!rs.wasNull())
@@ -80,6 +74,13 @@ public class BuildingIDAttributeExporter implements UrbanObjectModuleExporter {
                     Code code = new Code(prefecture);
                     code.setCodeSpace(rs.getString("prefecture_codespace"));
                     buildingIDAttribute.setPrefecture(code);
+                }
+
+                String city = rs.getString("city");
+                if (!rs.wasNull()) {
+                    Code code = new Code(city);
+                    code.setCodeSpace(rs.getString("city_codespace"));
+                    buildingIDAttribute.setCity(code);
                 }
             }
         }

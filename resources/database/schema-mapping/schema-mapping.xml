@@ -765,7 +765,7 @@
             <attribute column="urbanplanningareaname" type="string" maxOccurs="1" path="urbanPlanningAreaName" schema="ur_1"/>
             <attribute column="enforcer" type="string" path="enforcer" schema="ur_1"/>
             <attribute column="dateofdecision" type="timestamp" maxOccurs="1" path="dateOfDecision" schema="ur_1"/>
-            <attribute column="dateofrevision" type="timestamp" path="dateOfRevision" schema="ur_1"/>
+            <attribute column="dateofrevision" type="string" path="dateOfRevision" schema="ur_1"/>
             <complexAttribute maxOccurs="1" path="areaPlanned" schema="ur_1">
                 <attribute column="areaplanned_uom" type="string" path="@uom" schema="gml"/>
                 <attribute column="areaplanned" type="double" path="." schema="ur_1"/>
@@ -1607,13 +1607,8 @@
             <attribute column="verticaldatum" type="string" maxOccurs="1" path="verticalDatum" schema="ur_1"/>
         </complexType>
         <complexType id="ur_1_IfcCoordinateReferenceSystemSelectType" table="ur_ifccoordinatereferen_1" objectClassId="60104" path="IfcCoordinateReferenceSystemSelect" schema="ur_1">
-            <complexProperty minOccurs="1" maxOccurs="1" path="crs" schema="ur_1">
-                <type path="IfcCoordinateReferenceSystem" schema="ur_1">
-                    <attribute column="ifccoordinatereferences_name" type="string" maxOccurs="1" path="name" schema="ur_1"/>
-                    <attribute column="ifccoordinateref_description" type="string" maxOccurs="1" path="description" schema="ur_1"/>
-                    <attribute column="ifccoordinater_geodeticdatum" type="string" maxOccurs="1" path="geodeticDatum" schema="ur_1"/>
-                    <attribute column="ifccoordinater_verticaldatum" type="string" maxOccurs="1" path="verticalDatum" schema="ur_1"/>
-                </type>
+            <complexProperty refType="ur_1_IfcCoordinateReferenceSystemType" minOccurs="1" maxOccurs="1" path="crs" schema="ur_1">
+                <join table="ur_ifccoordinatereference" fromColumn="crs_id" toColumn="id" toRole="parent"/>
             </complexProperty>
             <complexProperty refType="ur_1_IfcGeometricRepresentationContextType" minOccurs="1" maxOccurs="1" path="context" schema="ur_1">
                 <join table="ur_ifcgeometricrepresenta" fromColumn="context_id" toColumn="id" toRole="parent">
@@ -1626,11 +1621,8 @@
             <attribute column="contexttype" type="string" maxOccurs="1" path="contextType" schema="ur_1"/>
             <attribute column="coordinatespacedimension" type="integer" maxOccurs="1" path="coordinateSpaceDimension" schema="ur_1"/>
             <attribute column="precision" type="double" maxOccurs="1" path="precision" schema="ur_1"/>
-            <complexProperty minOccurs="1" maxOccurs="1" path="worldCoordinateSystem" schema="ur_1">
-                <type path="IfcAxis2Placement3D" schema="ur_1">
-                    <attribute column="ifcaxis2placement3dtype_axis" type="string" maxOccurs="1" path="axis" schema="ur_1"/>
-                    <attribute column="ifcaxis2placeme_refdirection" type="string" maxOccurs="1" path="refDirection" schema="ur_1"/>
-                </type>
+            <complexProperty refType="ur_1_IfcAxis2Placement3DType" minOccurs="1" maxOccurs="1" path="worldCoordinateSystem" schema="ur_1">
+                <join table="ur_ifcaxis2placement3d" fromColumn="worldcoordinatesystem_id" toColumn="id" toRole="parent"/>
             </complexProperty>
             <attribute column="truenorth" type="string" maxOccurs="1" path="trueNorth" schema="ur_1"/>
         </complexType>

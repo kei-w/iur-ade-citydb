@@ -50,8 +50,8 @@ public class RealEstateIDAttributeExporter implements UrbanObjectModuleExporter 
         String tableName = manager.getSchemaMapper().getTableName(ADETable.REALESTATEIDATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("matchingscore", "numberofbuildingunitownershi", "numberofrealestateidofland",
-                        "realestateidofbuilding", "realestateidofbuildingunitow", "realestateidofland"))
+        Select select = new Select().addProjection(table.getColumns("realestateidofbuilding", "numberofbuildingunitownershi", "realestateidofbuildingunitow",
+                        "numberofrealestateidofland", "realestateidofland", "matchingscore"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -63,25 +63,25 @@ public class RealEstateIDAttributeExporter implements UrbanObjectModuleExporter 
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                int matchingScore = rs.getInt("matchingscore");
-                if (!rs.wasNull())
-                    realEstateIDAttribute.setMatchingScore(matchingScore);
+                realEstateIDAttribute.setRealEstateIDOfBuilding(rs.getString("realestateidofbuilding"));
 
                 int numberOfBuildingUnitOwnership = rs.getInt("numberofbuildingunitownershi");
                 if (!rs.wasNull())
                     realEstateIDAttribute.setNumberOfBuildingUnitOwnership(numberOfBuildingUnitOwnership);
 
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("realestateidofbuildingunitow")))
+                    realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership().add(splitValue.result(0));
+
                 int numberOfRealEstateIDOfLand = rs.getInt("numberofrealestateidofland");
                 if (!rs.wasNull())
                     realEstateIDAttribute.setNumberOfRealEstateIDOfLand(numberOfRealEstateIDOfLand);
 
-                realEstateIDAttribute.setRealEstateIDOfBuilding(rs.getString("realestateidofbuilding"));
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("realestateidofbuildingunitow")))
-                    realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership().add(splitValue.result(0));
-
                 for (SplitValue splitValue : valueSplitter.split(rs.getString("realestateidofland")))
                     realEstateIDAttribute.getRealEstateIDOfLand().add(splitValue.result(0));
+
+                int matchingScore = rs.getInt("matchingscore");
+                if (!rs.wasNull())
+                    realEstateIDAttribute.setMatchingScore(matchingScore);
             }
         }
     }

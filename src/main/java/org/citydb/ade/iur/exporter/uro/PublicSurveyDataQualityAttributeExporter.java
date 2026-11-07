@@ -51,12 +51,12 @@ public class PublicSurveyDataQualityAttributeExporter implements UrbanObjectModu
         String tableName = manager.getSchemaMapper().getTableName(ADETable.PUBLICSURVEYDATAQUALIT);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("publicsurveysrcdesclod0", "publicsurveysrcdes_codespace", "publicsurveysrcdesclod1",
-                        "publicsurveysrcd_codespace_1", "publicsurveysrcdesclod2", "publicsurveysrcd_codespace_2",
-                        "publicsurveysrcdesclod3", "publicsurveysrcd_codespace_3", "publicsurveysrcdesclod4",
-                        "publicsurveysrcd_codespace_4", "srcscalelod0", "srcscalelod0_codespace", "srcscalelod1",
-                        "srcscalelod1_codespace", "srcscalelod2", "srcscalelod2_codespace", "srcscalelod3",
-                        "srcscalelod3_codespace", "srcscalelod4", "srcscalelod4_codespace"))
+        Select select = new Select().addProjection(table.getColumns("srcscalelod0", "srcscalelod0_codespace", "srcscalelod1", "srcscalelod1_codespace", "srcscalelod2",
+                        "srcscalelod2_codespace", "srcscalelod3", "srcscalelod3_codespace", "srcscalelod4",
+                        "srcscalelod4_codespace", "publicsurveysrcdesclod0", "publicsurveysrcdes_codespace",
+                        "publicsurveysrcdesclod1", "publicsurveysrcd_codespace_1", "publicsurveysrcdesclod2",
+                        "publicsurveysrcd_codespace_2", "publicsurveysrcdesclod3", "publicsurveysrcd_codespace_3",
+                        "publicsurveysrcdesclod4", "publicsurveysrcd_codespace_4"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -68,36 +68,6 @@ public class PublicSurveyDataQualityAttributeExporter implements UrbanObjectModu
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod0"), rs.getString("publicsurveysrcdes_codespace"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0().add(code);
-                }
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod1"), rs.getString("publicsurveysrcd_codespace_1"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1().add(code);
-                }
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod2"), rs.getString("publicsurveysrcd_codespace_2"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2().add(code);
-                }
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod3"), rs.getString("publicsurveysrcd_codespace_3"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3().add(code);
-                }
-
-                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod4"), rs.getString("publicsurveysrcd_codespace_4"))) {
-                    Code code = new Code(splitValue.result(0));
-                    code.setCodeSpace(splitValue.result(1));
-                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4().add(code);
-                }
-
                 String srcScaleLod0 = rs.getString("srcscalelod0");
                 if (!rs.wasNull()) {
                     Code code = new Code(srcScaleLod0);
@@ -131,6 +101,36 @@ public class PublicSurveyDataQualityAttributeExporter implements UrbanObjectModu
                     Code code = new Code(srcScaleLod4);
                     code.setCodeSpace(rs.getString("srcscalelod4_codespace"));
                     publicSurveyDataQualityAttribute.setSrcScaleLod4(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod0"), rs.getString("publicsurveysrcdes_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod0().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod1"), rs.getString("publicsurveysrcd_codespace_1"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod1().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod2"), rs.getString("publicsurveysrcd_codespace_2"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod2().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod3"), rs.getString("publicsurveysrcd_codespace_3"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod3().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("publicsurveysrcdesclod4"), rs.getString("publicsurveysrcd_codespace_4"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    publicSurveyDataQualityAttribute.getPublicSurveySrcDescLod4().add(code);
                 }
             }
         }

@@ -192,26 +192,17 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "FareRule":
                     typeClassIds.put(FareRule.class, typeClassId);
                     break;
-                case "BuildingIDAttribute":
-                    typeClassIds.put(BuildingIDAttribute.class, typeClassId);
+                case "DataQualityAttribute":
+                    typeClassIds.put(DataQualityAttribute.class, typeClassId);
                     break;
-                case "BuildingDetailAttribute":
-                    typeClassIds.put(BuildingDetailAttribute.class, typeClassId);
+                case "PublicSurveyDataQualityAttribute":
+                    typeClassIds.put(PublicSurveyDataQualityAttribute.class, typeClassId);
                     break;
-                case "LargeCustomerFacilityAttribute":
-                    typeClassIds.put(LargeCustomerFacilityAttribute.class, typeClassId);
+                case "DisasterRiskAttribute":
+                    typeClassIds.put(DisasterRiskAttribute.class, typeClassId);
                     break;
-                case "RealEstateIDAttribute":
-                    typeClassIds.put(RealEstateIDAttribute.class, typeClassId);
-                    break;
-                case "BuildingUsecaseAttribute":
-                    typeClassIds.put(BuildingUsecaseAttribute.class, typeClassId);
-                    break;
-                case "RiverFloodingRiskAttribute":
-                    typeClassIds.put(RiverFloodingRiskAttribute.class, typeClassId);
-                    break;
-                case "TsunamiRiskAttribute":
-                    typeClassIds.put(TsunamiRiskAttribute.class, typeClassId);
+                case "FloodingRiskAttribute":
+                    typeClassIds.put(FloodingRiskAttribute.class, typeClassId);
                     break;
                 case "HighTideRiskAttribute":
                     typeClassIds.put(HighTideRiskAttribute.class, typeClassId);
@@ -222,17 +213,374 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "ReservoirFloodingRiskAttribute":
                     typeClassIds.put(ReservoirFloodingRiskAttribute.class, typeClassId);
                     break;
+                case "RiverFloodingRiskAttribute":
+                    typeClassIds.put(RiverFloodingRiskAttribute.class, typeClassId);
+                    break;
+                case "TsunamiRiskAttribute":
+                    typeClassIds.put(TsunamiRiskAttribute.class, typeClassId);
+                    break;
                 case "LandSlideRiskAttribute":
                     typeClassIds.put(LandSlideRiskAttribute.class, typeClassId);
+                    break;
+                case "DmAttribute":
+                    typeClassIds.put(DmAttribute.class, typeClassId);
+                    break;
+                case "DmAnnotation":
+                    typeClassIds.put(DmAnnotation.class, typeClassId);
+                    break;
+                case "DmElement":
+                    typeClassIds.put(DmElement.class, typeClassId);
+                    break;
+                case "DmGeometricAttribute":
+                    typeClassIds.put(DmGeometricAttribute.class, typeClassId);
+                    break;
+                case "FacilityAttribute":
+                    typeClassIds.put(FacilityAttribute.class, typeClassId);
+                    break;
+                case "FishingPortAttribute":
+                    typeClassIds.put(FishingPortAttribute.class, typeClassId);
+                    break;
+                case "FishingPortCapacity":
+                    typeClassIds.put(FishingPortCapacity.class, typeClassId);
+                    break;
+                case "FishingPortFacility":
+                    typeClassIds.put(FishingPortFacility.class, typeClassId);
+                    break;
+                case "MaintenanceHistoryAttribute":
+                    typeClassIds.put(MaintenanceHistoryAttribute.class, typeClassId);
+                    break;
+                case "ParkFacilityLongevityPlanAttribute":
+                    typeClassIds.put(ParkFacilityLongevityPlanAttribute.class, typeClassId);
+                    break;
+                case "NumberOfFacilities":
+                    typeClassIds.put(NumberOfFacilities.class, typeClassId);
+                    break;
+                case "RepairsBeforeParkHealthAssessment":
+                    typeClassIds.put(RepairsBeforeParkHealthAssessment.class, typeClassId);
+                    break;
+                case "ParkHealthAssessment":
+                    typeClassIds.put(ParkHealthAssessment.class, typeClassId);
+                    break;
+                case "LongevityMeasures":
+                    typeClassIds.put(LongevityMeasures.class, typeClassId);
+                    break;
+                case "CountermeasuresCost":
+                    typeClassIds.put(CountermeasuresCost.class, typeClassId);
+                    break;
+                case "PortAttribute":
+                    typeClassIds.put(PortAttribute.class, typeClassId);
+                    break;
+                case "CargoHandlingFacility":
+                    typeClassIds.put(CargoHandlingFacility.class, typeClassId);
+                    break;
+                case "CyberportMarinaAndPBS":
+                    typeClassIds.put(CyberportMarinaAndPBS.class, typeClassId);
+                    break;
+                case "HarborFacility":
+                    typeClassIds.put(HarborFacility.class, typeClassId);
+                    break;
+                case "MooringFacility":
+                    typeClassIds.put(MooringFacility.class, typeClassId);
+                    break;
+                case "NavigationAssistanceFacility":
+                    typeClassIds.put(NavigationAssistanceFacility.class, typeClassId);
+                    break;
+                case "PortEnvironmentalImprovementFacility":
+                    typeClassIds.put(PortEnvironmentalImprovementFacility.class, typeClassId);
+                    break;
+                case "PortManagementFacility":
+                    typeClassIds.put(PortManagementFacility.class, typeClassId);
+                    break;
+                case "PortPassengerFacility":
+                    typeClassIds.put(PortPassengerFacility.class, typeClassId);
+                    break;
+                case "PortPollutionControlFacility":
+                    typeClassIds.put(PortPollutionControlFacility.class, typeClassId);
+                    break;
+                case "PortProtectiveFacility":
+                    typeClassIds.put(PortProtectiveFacility.class, typeClassId);
+                    break;
+                case "PortStorageFacility":
+                    typeClassIds.put(PortStorageFacility.class, typeClassId);
+                    break;
+                case "PortTransportationFacility":
+                    typeClassIds.put(PortTransportationFacility.class, typeClassId);
+                    break;
+                case "PortWasteTreatmentFacility":
+                    typeClassIds.put(PortWasteTreatmentFacility.class, typeClassId);
+                    break;
+                case "PortWelfareFacility":
+                    typeClassIds.put(PortWelfareFacility.class, typeClassId);
+                    break;
+                case "ShipServiceFacility":
+                    typeClassIds.put(ShipServiceFacility.class, typeClassId);
+                    break;
+                case "FacilityIdAttribute":
+                    typeClassIds.put(FacilityIdAttribute.class, typeClassId);
+                    break;
+                case "RiverFacilityIdAttribute":
+                    typeClassIds.put(RiverFacilityIdAttribute.class, typeClassId);
+                    break;
+                case "FacilityTypeAttribute":
+                    typeClassIds.put(FacilityTypeAttribute.class, typeClassId);
                     break;
                 case "KeyValuePairAttribute":
                     typeClassIds.put(KeyValuePairAttribute.class, typeClassId);
                     break;
-                case "DataQualityAttribute":
-                    typeClassIds.put(DataQualityAttribute.class, typeClassId);
+                case "RealEstateIDAttribute":
+                    typeClassIds.put(RealEstateIDAttribute.class, typeClassId);
                     break;
-                case "PublicSurveyDataQualityAttribute":
-                    typeClassIds.put(PublicSurveyDataQualityAttribute.class, typeClassId);
+                case "BuildingAttribute":
+                    typeClassIds.put(BuildingAttribute.class, typeClassId);
+                    break;
+                case "BuildingUsecaseAttribute":
+                    typeClassIds.put(BuildingUsecaseAttribute.class, typeClassId);
+                    break;
+                case "ConstructionBaseAttribute":
+                    typeClassIds.put(ConstructionBaseAttribute.class, typeClassId);
+                    break;
+                case "BridgeFunctionalAttribute":
+                    typeClassIds.put(BridgeFunctionalAttribute.class, typeClassId);
+                    break;
+                case "ConstructionRiskAssessmentAttribute":
+                    typeClassIds.put(ConstructionRiskAssessmentAttribute.class, typeClassId);
+                    break;
+                case "BridgeStructureAttribute":
+                    typeClassIds.put(BridgeStructureAttribute.class, typeClassId);
+                    break;
+                case "BuildingDetailAttribute":
+                    typeClassIds.put(BuildingDetailAttribute.class, typeClassId);
+                    break;
+                case "BuildingIDAttribute":
+                    typeClassIds.put(BuildingIDAttribute.class, typeClassId);
+                    break;
+                case "CityFurnitureAttribute":
+                    typeClassIds.put(CityFurnitureAttribute.class, typeClassId);
+                    break;
+                case "CityFurnitureDetailAttribute":
+                    typeClassIds.put(CityFurnitureDetailAttribute.class, typeClassId);
+                    break;
+                case "IfcAttribute":
+                    typeClassIds.put(IfcAttribute.class, typeClassId);
+                    break;
+                case "IfcClassificationReference":
+                    typeClassIds.put(IfcClassificationReference.class, typeClassId);
+                    break;
+                case "IfcClassification":
+                    typeClassIds.put(IfcClassification.class, typeClassId);
+                    break;
+                case "IfcCoordinateReferenceSystem":
+                    typeClassIds.put(IfcCoordinateReferenceSystem.class, typeClassId);
+                    break;
+                case "IfcProjectedCRS":
+                    typeClassIds.put(IfcProjectedCRS.class, typeClassId);
+                    break;
+                case "IfcMapConversion":
+                    typeClassIds.put(IfcMapConversion.class, typeClassId);
+                    break;
+                case "IfcCoordinateReferenceSystemSelect":
+                    typeClassIds.put(IfcCoordinateReferenceSystemSelect.class, typeClassId);
+                    break;
+                case "IfcGeometricRepresentationContext":
+                    typeClassIds.put(IfcGeometricRepresentationContext.class, typeClassId);
+                    break;
+                case "IfcAxis2Placement3D":
+                    typeClassIds.put(IfcAxis2Placement3D.class, typeClassId);
+                    break;
+                case "IfcPsetBuildingCommon":
+                    typeClassIds.put(IfcPsetBuildingCommon.class, typeClassId);
+                    break;
+                case "IfcPsetDoorCommon":
+                    typeClassIds.put(IfcPsetDoorCommon.class, typeClassId);
+                    break;
+                case "IfcPsetOpeningElementCommon":
+                    typeClassIds.put(IfcPsetOpeningElementCommon.class, typeClassId);
+                    break;
+                case "IfcPsetSiteCommon":
+                    typeClassIds.put(IfcPsetSiteCommon.class, typeClassId);
+                    break;
+                case "IfcPsetSpaceCommon":
+                    typeClassIds.put(IfcPsetSpaceCommon.class, typeClassId);
+                    break;
+                case "IfcPsetWindowCommon":
+                    typeClassIds.put(IfcPsetWindowCommon.class, typeClassId);
+                    break;
+                case "IfcRoot":
+                    typeClassIds.put(IfcRoot.class, typeClassId);
+                    break;
+                case "IfcObjectDefinition":
+                    typeClassIds.put(IfcObjectDefinition.class, typeClassId);
+                    break;
+                case "IfcObject":
+                    typeClassIds.put(IfcObject.class, typeClassId);
+                    break;
+                case "IfcGroup":
+                    typeClassIds.put(IfcGroup.class, typeClassId);
+                    break;
+                case "IfcZone":
+                    typeClassIds.put(IfcZone.class, typeClassId);
+                    break;
+                case "IfcProduct":
+                    typeClassIds.put(IfcProduct.class, typeClassId);
+                    break;
+                case "IfcElement":
+                    typeClassIds.put(IfcElement.class, typeClassId);
+                    break;
+                case "IfcBuildingElement":
+                    typeClassIds.put(IfcBuildingElement.class, typeClassId);
+                    break;
+                case "IfcCurtainWall":
+                    typeClassIds.put(IfcCurtainWall.class, typeClassId);
+                    break;
+                case "IfcDoor":
+                    typeClassIds.put(IfcDoor.class, typeClassId);
+                    break;
+                case "IfcRoof":
+                    typeClassIds.put(IfcRoof.class, typeClassId);
+                    break;
+                case "IfcWall":
+                    typeClassIds.put(IfcWall.class, typeClassId);
+                    break;
+                case "IfcWallStandardCase":
+                    typeClassIds.put(IfcWallStandardCase.class, typeClassId);
+                    break;
+                case "IfcWindow":
+                    typeClassIds.put(IfcWindow.class, typeClassId);
+                    break;
+                case "IfcFurnishingElement":
+                    typeClassIds.put(IfcFurnishingElement.class, typeClassId);
+                    break;
+                case "IfcOpeningElement":
+                    typeClassIds.put(IfcOpeningElement.class, typeClassId);
+                    break;
+                case "IfcSpatialStructureElement":
+                    typeClassIds.put(IfcSpatialStructureElement.class, typeClassId);
+                    break;
+                case "IfcBuilding":
+                    typeClassIds.put(IfcBuilding.class, typeClassId);
+                    break;
+                case "IfcBuildingStorey":
+                    typeClassIds.put(IfcBuildingStorey.class, typeClassId);
+                    break;
+                case "IfcSite":
+                    typeClassIds.put(IfcSite.class, typeClassId);
+                    break;
+                case "IfcSpace":
+                    typeClassIds.put(IfcSpace.class, typeClassId);
+                    break;
+                case "IfcProject":
+                    typeClassIds.put(IfcProject.class, typeClassId);
+                    break;
+                case "IfcUnit":
+                    typeClassIds.put(IfcUnit.class, typeClassId);
+                    break;
+                case "IfcSpaceBaseQuantity":
+                    typeClassIds.put(IfcSpaceBaseQuantity.class, typeClassId);
+                    break;
+                case "IndoorAttribute":
+                    typeClassIds.put(IndoorAttribute.class, typeClassId);
+                    break;
+                case "IndoorFacilityAttribute":
+                    typeClassIds.put(IndoorFacilityAttribute.class, typeClassId);
+                    break;
+                case "IndoorFurnishingAttribute":
+                    typeClassIds.put(IndoorFurnishingAttribute.class, typeClassId);
+                    break;
+                case "IndoorPublicTagAttribute":
+                    typeClassIds.put(IndoorPublicTagAttribute.class, typeClassId);
+                    break;
+                case "IndoorSpaceAttribute":
+                    typeClassIds.put(IndoorSpaceAttribute.class, typeClassId);
+                    break;
+                case "IndoorStoreyAttribute":
+                    typeClassIds.put(IndoorStoreyAttribute.class, typeClassId);
+                    break;
+                case "IndoorTactileTileAttribute":
+                    typeClassIds.put(IndoorTactileTileAttribute.class, typeClassId);
+                    break;
+                case "IndoorUserDefinedAttribute":
+                    typeClassIds.put(IndoorUserDefinedAttribute.class, typeClassId);
+                    break;
+                case "UserDefinedValue":
+                    typeClassIds.put(UserDefinedValue.class, typeClassId);
+                    break;
+                case "IndoorZoneAttribute":
+                    typeClassIds.put(IndoorZoneAttribute.class, typeClassId);
+                    break;
+                case "LandUseAttribute":
+                    typeClassIds.put(LandUseAttribute.class, typeClassId);
+                    break;
+                case "LandUseDetailAttribute":
+                    typeClassIds.put(LandUseDetailAttribute.class, typeClassId);
+                    break;
+                case "LargeCustomerFacilityAttribute":
+                    typeClassIds.put(LargeCustomerFacilityAttribute.class, typeClassId);
+                    break;
+                case "RailwayRouteAttribute":
+                    typeClassIds.put(RailwayRouteAttribute.class, typeClassId);
+                    break;
+                case "RailwayTrackAttribute":
+                    typeClassIds.put(RailwayTrackAttribute.class, typeClassId);
+                    break;
+                case "ControlPoint":
+                    typeClassIds.put(ControlPoint.class, typeClassId);
+                    break;
+                case "ControlPointType":
+                    typeClassIds.put(ControlPointParameter.class, typeClassId);
+                    break;
+                case "CircularCurveType":
+                    typeClassIds.put(CircularCurveType.class, typeClassId);
+                    break;
+                case "TransitionCurveType":
+                    typeClassIds.put(TransitionCurveType.class, typeClassId);
+                    break;
+                case "SlopeType":
+                    typeClassIds.put(SlopeType.class, typeClassId);
+                    break;
+                case "VerticalCurveType":
+                    typeClassIds.put(VerticalCurveType.class, typeClassId);
+                    break;
+                case "RoadType":
+                    typeClassIds.put(RoadType.class, typeClassId);
+                    break;
+                case "RoadAttribute":
+                    typeClassIds.put(RoadAttribute.class, typeClassId);
+                    break;
+                case "RoadStructureAttribute":
+                    typeClassIds.put(RoadStructureAttribute.class, typeClassId);
+                    break;
+                case "SquareUrbanPlanAttribute":
+                    typeClassIds.put(SquareUrbanPlanAttribute.class, typeClassId);
+                    break;
+                case "StationSquareAttribute":
+                    typeClassIds.put(StationSquareAttribute.class, typeClassId);
+                    break;
+                case "TerminalAttribute":
+                    typeClassIds.put(TerminalAttribute.class, typeClassId);
+                    break;
+                case "TrackAttribute":
+                    typeClassIds.put(TrackAttribute.class, typeClassId);
+                    break;
+                case "TrafficAreaAttribute":
+                    typeClassIds.put(TrafficAreaAttribute.class, typeClassId);
+                    break;
+                case "TrafficAreaStructureAttribute":
+                    typeClassIds.put(TrafficAreaStructureAttribute.class, typeClassId);
+                    break;
+                case "TrafficVolumeAttribute":
+                    typeClassIds.put(TrafficVolumeAttribute.class, typeClassId);
+                    break;
+                case "TrafficObjectUsecaseAttribute":
+                    typeClassIds.put(TrafficObjectUsecaseAttribute.class, typeClassId);
+                    break;
+                case "TunnelFunctionalAttribute":
+                    typeClassIds.put(TunnelFunctionalAttribute.class, typeClassId);
+                    break;
+                case "TunnelStructureAttribute":
+                    typeClassIds.put(TunnelStructureAttribute.class, typeClassId);
+                    break;
+                case "WaterBodyDetailAttribute":
+                    typeClassIds.put(WaterBodyDetailAttribute.class, typeClassId);
                     break;
             }
         }

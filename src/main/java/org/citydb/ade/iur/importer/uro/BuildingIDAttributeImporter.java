@@ -51,7 +51,7 @@ public class BuildingIDAttributeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGIDATTRIBUTE)) + " " +
-                "(id, branchid, buildingid, city, city_codespace, partid, prefecture, prefecture_codespace) " +
+                "(id, buildingid, branchid, partid, prefecture, prefecture_codespace, city, city_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
@@ -61,29 +61,29 @@ public class BuildingIDAttributeImporter implements UrbanObjectModuleImporter {
         long objectId = buildingAttributeImporter.doImport(buildingIDAttribute);
         ps.setLong(1, objectId);
 
+        ps.setString(2, buildingIDAttribute.getBuildingID());
+
         if (buildingIDAttribute.getBranchID() != null)
-            ps.setInt(2, buildingIDAttribute.getBranchID());
+            ps.setInt(3, buildingIDAttribute.getBranchID());
         else
-            ps.setNull(2, Types.INTEGER);
-
-        ps.setString(3, buildingIDAttribute.getBuildingID());
-
-        if (buildingIDAttribute.getCity() != null && buildingIDAttribute.getCity().isSetValue()) {
-            ps.setString(4, buildingIDAttribute.getCity().getValue());
-            ps.setString(5, buildingIDAttribute.getCity().getCodeSpace());
-        } else {
-            ps.setNull(4, Types.VARCHAR);
-            ps.setNull(5, Types.VARCHAR);
-        }
+            ps.setNull(3, Types.INTEGER);
 
         if (buildingIDAttribute.getPartID() != null)
-            ps.setInt(6, buildingIDAttribute.getPartID());
+            ps.setInt(4, buildingIDAttribute.getPartID());
         else
-            ps.setNull(6, Types.INTEGER);
+            ps.setNull(4, Types.INTEGER);
 
         if (buildingIDAttribute.getPrefecture() != null && buildingIDAttribute.getPrefecture().isSetValue()) {
-            ps.setString(7, buildingIDAttribute.getPrefecture().getValue());
-            ps.setString(8, buildingIDAttribute.getPrefecture().getCodeSpace());
+            ps.setString(5, buildingIDAttribute.getPrefecture().getValue());
+            ps.setString(6, buildingIDAttribute.getPrefecture().getCodeSpace());
+        } else {
+            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
+        }
+
+        if (buildingIDAttribute.getCity() != null && buildingIDAttribute.getCity().isSetValue()) {
+            ps.setString(7, buildingIDAttribute.getCity().getValue());
+            ps.setString(8, buildingIDAttribute.getCity().getCodeSpace());
         } else {
             ps.setNull(7, Types.VARCHAR);
             ps.setNull(8, Types.VARCHAR);

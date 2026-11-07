@@ -39,10 +39,7 @@ import org.citygml4j.ade.iur.model.uro.DisasterRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.FloodingRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.LandSlideRiskAttribute;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class DisasterRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
@@ -60,34 +57,50 @@ public class DisasterRiskAttributeImporter implements UrbanObjectModuleImporter 
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE)) + " " +
-                "(id, objectclass_id, building_bldgdisasterrisk_id, description, description_codespace, areatype, areatype_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, building_bldgdisasterrisk_id, bridge_briddisasterriskat_id," +
+                "tunnel_tundisasterriskatt_id, description, description_codespace, areatype, areatype_codespace) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         floodingRiskAttributeImporter = manager.getImporter(FloodingRiskAttributeImporter.class);
     }
 
-    public long doImport(DisasterRiskAttribute disasterRiskAttribute, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(DisasterRiskAttribute disasterRiskAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.DISASTERRISKATTRIB_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(disasterRiskAttribute.getClass()));
-        ps.setLong(3, parentId);
+        if ("building_bldgdisasterrisk_id".equals(parentColumn))
+            ps.setLong(3, parentId);
+        else
+            ps.setNull(3, Types.NULL);
+        if ("bridge_briddisasterriskat_id".equals(parentColumn))
+            ps.setLong(4, parentId);
+        else
+            ps.setNull(4, Types.NULL);
+        if ("tunnel_tundisasterriskatt_id".equals(parentColumn))
+            ps.setLong(5, parentId);
+        else
+            ps.setNull(5, Types.NULL);
 
         if (disasterRiskAttribute.getDescription() != null && disasterRiskAttribute.getDescription().isSetValue()) {
-            ps.setString(4, disasterRiskAttribute.getDescription().getValue());
-            ps.setString(5, disasterRiskAttribute.getDescription().getCodeSpace());
-        } else {
-            ps.setNull(4, Types.VARCHAR);
-            ps.setNull(5, Types.VARCHAR);
-        }
-
-        if (disasterRiskAttribute instanceof LandSlideRiskAttribute
-                && ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType() != null
-                && ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().isSetValue()) {
-            ps.setString(6, ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().getValue());
-            ps.setString(7, ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().getCodeSpace());
+            ps.setString(6, disasterRiskAttribute.getDescription().getValue());
+            ps.setString(7, disasterRiskAttribute.getDescription().getCodeSpace());
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
+        }
+
+        if (disasterRiskAttribute instanceof LandSlideRiskAttribute) {
+            LandSlideRiskAttribute landSlideRiskAttribute = (LandSlideRiskAttribute) disasterRiskAttribute;
+            if (landSlideRiskAttribute.getAreaType() != null && landSlideRiskAttribute.getAreaType().isSetValue()) {
+                ps.setString(8, landSlideRiskAttribute.getAreaType().getValue());
+                ps.setString(9, landSlideRiskAttribute.getAreaType().getCodeSpace());
+            } else {
+                ps.setNull(8, Types.VARCHAR);
+                ps.setNull(9, Types.VARCHAR);
+            }
+        } else {
+            ps.setNull(8, Types.VARCHAR);
+            ps.setNull(9, Types.VARCHAR);
         }
 
         ps.addBatch();
@@ -95,7 +108,7 @@ public class DisasterRiskAttributeImporter implements UrbanObjectModuleImporter 
             helper.executeBatch(schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE));
 
         if (disasterRiskAttribute instanceof FloodingRiskAttribute)
-            floodingRiskAttributeImporter.doImport((FloodingRiskAttribute) disasterRiskAttribute, objectId);
+            floodingRiskAttributeImporter.doImport((FloodingRiskAttribute) disasterRiskAttribute, objectId, parentId, parentColumn);
 
         return objectId;
     }

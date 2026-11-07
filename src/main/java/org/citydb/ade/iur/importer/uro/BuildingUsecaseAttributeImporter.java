@@ -51,7 +51,7 @@ public class BuildingUsecaseAttributeImporter implements UrbanObjectModuleImport
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGUSECASEATTRIBU)) + " " +
-                "(id, floorheight, floorheight_uom, isgroundflooropen, istemporal, istemporal_codespace) " +
+                "(id, istemporal, istemporal_codespace, floorheight, floorheight_uom, isgroundflooropen) " +
                 "values (?, ?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
@@ -61,26 +61,26 @@ public class BuildingUsecaseAttributeImporter implements UrbanObjectModuleImport
         long objectId = buildingAttributeImporter.doImport(buildingUsecaseAttribute);
         ps.setLong(1, objectId);
 
-        if (buildingUsecaseAttribute.getFloorHeight() != null && buildingUsecaseAttribute.getFloorHeight().isSetValue()) {
-            ps.setDouble(2, buildingUsecaseAttribute.getFloorHeight().getValue());
-            ps.setString(3, buildingUsecaseAttribute.getFloorHeight().getUom());
+        if (buildingUsecaseAttribute.getIsTemporal() != null && buildingUsecaseAttribute.getIsTemporal().isSetValue()) {
+            ps.setString(2, buildingUsecaseAttribute.getIsTemporal().getValue());
+            ps.setString(3, buildingUsecaseAttribute.getIsTemporal().getCodeSpace());
         } else {
-            ps.setNull(2, Types.DOUBLE);
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (buildingUsecaseAttribute.getIsGroundFloorOpen() != null)
-            ps.setInt(4, buildingUsecaseAttribute.getIsGroundFloorOpen() ? 1 : 0);
-        else
-            ps.setNull(4, Types.INTEGER);
-
-        if (buildingUsecaseAttribute.getIsTemporal() != null && buildingUsecaseAttribute.getIsTemporal().isSetValue()) {
-            ps.setString(5, buildingUsecaseAttribute.getIsTemporal().getValue());
-            ps.setString(6, buildingUsecaseAttribute.getIsTemporal().getCodeSpace());
+        if (buildingUsecaseAttribute.getFloorHeight() != null && buildingUsecaseAttribute.getFloorHeight().isSetValue()) {
+            ps.setDouble(4, buildingUsecaseAttribute.getFloorHeight().getValue());
+            ps.setString(5, buildingUsecaseAttribute.getFloorHeight().getUom());
         } else {
+            ps.setNull(4, Types.DOUBLE);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
+
+        if (buildingUsecaseAttribute.getIsGroundFloorOpen() != null)
+            ps.setInt(6, buildingUsecaseAttribute.getIsGroundFloorOpen() ? 1 : 0);
+        else
+            ps.setNull(6, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
