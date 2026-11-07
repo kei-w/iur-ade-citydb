@@ -36,10 +36,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urt.Description;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class DescriptionImporter implements PublicTransitModuleImporter {
     private final CityGMLImportHelper helper;
@@ -53,7 +50,7 @@ public class DescriptionImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DESCRIPTION)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DESCRIPTION)) + " " +
                 "(id, description, frequencyofservice, numberofcustomers) " +
                 "values (?, ?, ?, ?)");
     }

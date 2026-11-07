@@ -32,103 +32,98 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
+import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.StatisticalGridModule;
 import org.citygml4j.ade.iur.model.urg.LandPrice;
 import org.citygml4j.ade.iur.model.urg.LandPricePerLandUse;
 import org.citygml4j.ade.iur.model.urg.LandPricePerLandUseProperty;
 import org.citygml4j.model.gml.basicTypes.Code;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class LandPriceExporter implements StatisticalGridModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
+    private final ExportManager manager;
     private final StatisticalGridExporter statisticalGridExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psLandPrice;
+    private final LandPricePerLandUseExporter landPricePerLandUseExporter;
+    private final AttributeValueSplitter valueSplitter;
 
     public LandPriceExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LANDPRICE);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = StatisticalGridModule.v1_4.getNamespaceURI();
-
         statisticalGridExporter = manager.getExporter(StatisticalGridExporter.class);
+        landPricePerLandUseExporter = manager.getExporter(LandPricePerLandUseExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table statisticalGrid = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID)));
-
-        Select select = statisticalGridExporter.addProjection(new Select(), statisticalGrid, projectionFilter, "sg")
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(statisticalGrid, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("currencyUnit", module))
-            select.addProjection(table.getColumns("currencyunit", "currencyunit_codespace"));
-        if (projectionFilter.containsProperty("landPrice", module)) {
-            Table landPricePerLandUse = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDPRICEPERLANDUSE)));
-            select.addProjection(landPricePerLandUse.getColumn("id", "lpid"))
-                    .addProjection(landPricePerLandUse.getColumns("landprice", "landuse", "landuse_codespace"))
-                    .addJoin(JoinFactory.left(landPricePerLandUse, "landprice_landprice_id", ComparisonName.EQUAL_TO, table.getColumn("id")));
-        }
+        addProjection(select, table, "");
+        statisticalGridExporter.addProjection(select, statisticalGrid, "sg_");
         ps = connection.prepareStatement(select.toString());
+
+        Table landPrices = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LANDPRICE_TO_LANDPRICE)));
+        Select landPriceSelect = new Select().addProjection(landPrices.getColumn("landpriceperlanduse_id"))
+                .addSelection(ComparisonFactory.equalTo(landPrices.getColumn("landprice_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(landPrices.getColumn("landpriceperlanduse_id")));
+        psLandPrice = connection.prepareStatement(landPriceSelect.toString());
     }
 
     public void doExport(LandPrice landPrice, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    statisticalGridExporter.doExport(landPrice, projectionFilter, "sg", rs);
-
-                    if (projectionFilter.containsProperty("currencyUnit", module)) {
-                        String currencyUnit = rs.getString("currencyunit");
-                        if (!rs.wasNull()) {
-                            Code code = new Code(currencyUnit);
-                            code.setCodeSpace(rs.getString("currencyunit_codespace"));
-                            landPrice.setCurrencyUnit(code);
-                        }
-                    }
-
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("landPrice", module)) {
-                    rs.getLong("lpid");
-                    if (rs.wasNull())
-                        continue;
-
-                    LandPricePerLandUse landPricePerLandUse = new LandPricePerLandUse();
-
-                    int price = rs.getInt("landprice");
-                    if (!rs.wasNull())
-                        landPricePerLandUse.setLandPrice(price);
-
-                    String landUse = rs.getString("landuse");
-                    if (!rs.wasNull()) {
-                        Code code = new Code(landUse);
-                        code.setCodeSpace(rs.getString("landuse_codespace"));
-                        landPricePerLandUse.setLandUse(code);
-                    }
-
-                    landPrice.getLandPrices().add(new LandPricePerLandUseProperty(landPricePerLandUse));
-                }
+            if (rs.next()) {
+                statisticalGridExporter.doExport(landPrice, objectId, "sg_", rs);
+                doExport(landPrice, objectId, "", rs);
             }
+        }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), landPrice, objectId, (FeatureType) objectType, projectionFilter);
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("currencyunit", prefix + "currencyunit"),
+                table.getColumn("currencyunit_codespace", prefix + "currencyunit_codespace"));
+
+        return select;
+    }
+
+    public void doExport(LandPrice landPrice, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        psLandPrice.setLong(1, objectId);
+        try (ResultSet landPriceValueRs = psLandPrice.executeQuery()) {
+            while (landPriceValueRs.next()) {
+                LandPricePerLandUse landPriceValue = new LandPricePerLandUse();
+                landPricePerLandUseExporter.doExport(landPriceValue, landPriceValueRs.getLong("landpriceperlanduse_id"));
+                landPrice.getLandPrice().add(new LandPricePerLandUseProperty(landPriceValue));
+            }
+        }
+
+        String currencyUnit = rs.getString(prefix + "currencyunit");
+        if (!rs.wasNull()) {
+            Code code = new Code(currencyUnit);
+            code.setCodeSpace(rs.getString(prefix + "currencyunit_codespace"));
+            landPrice.setCurrencyUnit(code);
         }
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psLandPrice.close();
     }
 }

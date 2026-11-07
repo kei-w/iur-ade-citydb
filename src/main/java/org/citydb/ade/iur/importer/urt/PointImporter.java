@@ -37,11 +37,9 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citydb.core.operation.importer.util.GeometryConverter;
 import org.citygml4j.ade.iur.model.urt.Point;
+import org.citygml4j.model.gml.geometry.AbstractGeometry;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PointImporter implements PublicTransitModuleImporter {
     private final Connection connection;
@@ -58,49 +56,52 @@ public class PointImporter implements PublicTransitModuleImporter {
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.POINT)) + " " +
-                "(id, publictransit_point_id, latitude, longitude, point, pointdistancetraveled, pointsequence) " +
-                "values (?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.POINT)) + " " +
+                "(id, latitude, longitude, point, pointsequence, pointdistancetraveled) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
         geometryConverter = helper.getGeometryConverter();
     }
 
-    public void doImport(Point point, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(Point point) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.POINT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (point.getLatitude() != null)
-            ps.setDouble(3, point.getLatitude());
+            ps.setDouble(2, point.getLatitude());
+        else
+            ps.setNull(2, Types.DOUBLE);
+
+        if (point.getLongitude() != null)
+            ps.setDouble(3, point.getLongitude());
         else
             ps.setNull(3, Types.DOUBLE);
 
-        if (point.getLongitude() != null)
-            ps.setDouble(4, point.getLongitude());
-        else
-            ps.setNull(4, Types.DOUBLE);
+        GeometryObject pointValue = null;
+        if (point.getPoint() != null)
+            pointValue = geometryConverter.getPoint(point.getPoint());
 
-        GeometryObject geometry = geometryConverter.getPoint(point.getPoint());
-        if (geometry != null) {
-            ps.setObject(5, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(geometry, connection));
-            point.setPoint(null);
-        } else
-            ps.setNull(5, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+        if (pointValue != null)
+            ps.setObject(4, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(pointValue, connection));
+        else
+            ps.setNull(4, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
                     helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
+
+        if (point.getPointSequence() != null)
+            ps.setInt(5, point.getPointSequence());
+        else
+            ps.setNull(5, Types.INTEGER);
 
         if (point.getPointDistanceTraveled() != null)
             ps.setDouble(6, point.getPointDistanceTraveled());
         else
             ps.setNull(6, Types.DOUBLE);
 
-        if (point.getPointSequence() != null)
-            ps.setInt(7, point.getPointSequence());
-        else
-            ps.setNull(7, Types.INTEGER);
-
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.POINT));
+
+        return objectId;
     }
 
     @Override

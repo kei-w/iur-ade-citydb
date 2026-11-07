@@ -32,8 +32,8 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.FeatureType;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -46,23 +46,22 @@ import org.citygml4j.ade.iur.model.urt.Calendar;
 import java.sql.*;
 
 public class CalendarExporter implements PublicTransitModuleExporter {
-    private final PreparedStatement ps;
+    private final ExportManager manager;
     private final PublicTransitExporter publicTransitExporter;
+    private final PreparedStatement ps;
 
     public CalendarExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        this.manager = manager;
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CALENDAR);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-
         publicTransitExporter = manager.getExporter(PublicTransitExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table publicTransit = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSIT)));
-
-        Select select = new Select().addProjection(table.getColumns("monday", "tuesday", "wednesday", "thursday",
-                        "friday", "saturday", "sunday", "startdate", "enddate"))
+        Select select = new Select()
                 .addJoin(JoinFactory.inner(publicTransit, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        publicTransitExporter.addProjection(select, publicTransit, projectionFilter, "pt");
+        addProjection(select, table, "");
+        publicTransitExporter.addProjection(select, publicTransit, "pt_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -71,25 +70,64 @@ public class CalendarExporter implements PublicTransitModuleExporter {
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                publicTransitExporter.doExport(calendar, projectionFilter, "pt", rs);
-
-                calendar.setMonday(rs.getBoolean("monday"));
-                calendar.setTuesday(rs.getBoolean("tuesday"));
-                calendar.setWednesday(rs.getBoolean("wednesday"));
-                calendar.setThursday(rs.getBoolean("thursday"));
-                calendar.setFriday(rs.getBoolean("friday"));
-                calendar.setSaturday(rs.getBoolean("saturday"));
-                calendar.setSunday(rs.getBoolean("sunday"));
-
-                Date startDate = rs.getDate("startdate");
-                if (!rs.wasNull())
-                    calendar.setStartDate(startDate.toLocalDate());
-
-                Date endDate = rs.getDate("enddate");
-                if (!rs.wasNull())
-                    calendar.setEndDate(endDate.toLocalDate());
+                publicTransitExporter.doExport(calendar, objectId, "pt_", rs);
+                doExport(calendar, objectId, "", rs);
             }
         }
+
+        manager.exportGenericApplicationProperties(manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT_2), calendar, objectId, (FeatureType) objectType, projectionFilter);
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("monday", prefix + "monday"),
+                table.getColumn("tuesday", prefix + "tuesday"),
+                table.getColumn("wednesday", prefix + "wednesday"),
+                table.getColumn("thursday", prefix + "thursday"),
+                table.getColumn("friday", prefix + "friday"),
+                table.getColumn("saturday", prefix + "saturday"),
+                table.getColumn("sunday", prefix + "sunday"),
+                table.getColumn("startdate", prefix + "startdate"),
+                table.getColumn("enddate", prefix + "enddate"));
+
+        return select;
+    }
+
+    public void doExport(Calendar calendar, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        boolean monday = rs.getBoolean(prefix + "monday");
+        if (!rs.wasNull())
+            calendar.setMonday(monday);
+
+        boolean tuesday = rs.getBoolean(prefix + "tuesday");
+        if (!rs.wasNull())
+            calendar.setTuesday(tuesday);
+
+        boolean wednesday = rs.getBoolean(prefix + "wednesday");
+        if (!rs.wasNull())
+            calendar.setWednesday(wednesday);
+
+        boolean thursday = rs.getBoolean(prefix + "thursday");
+        if (!rs.wasNull())
+            calendar.setThursday(thursday);
+
+        boolean friday = rs.getBoolean(prefix + "friday");
+        if (!rs.wasNull())
+            calendar.setFriday(friday);
+
+        boolean saturday = rs.getBoolean(prefix + "saturday");
+        if (!rs.wasNull())
+            calendar.setSaturday(saturday);
+
+        boolean sunday = rs.getBoolean(prefix + "sunday");
+        if (!rs.wasNull())
+            calendar.setSunday(sunday);
+
+        Date startDate = rs.getDate(prefix + "startdate");
+        if (!rs.wasNull())
+            calendar.setStartDate(startDate.toLocalDate());
+
+        Date endDate = rs.getDate(prefix + "enddate");
+        if (!rs.wasNull())
+            calendar.setEndDate(endDate.toLocalDate());
     }
 
     @Override

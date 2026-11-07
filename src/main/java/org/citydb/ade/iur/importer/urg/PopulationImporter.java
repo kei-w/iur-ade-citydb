@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urg;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -37,39 +38,42 @@ import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urg.Population;
 import org.citygml4j.ade.iur.model.urg.PopulationByAgeAndSexProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PopulationImporter implements StatisticalGridModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final PopulationByAgeAndSexImporter populationByAgeAndSexImporter;
     private final StatisticalGridImporter statisticalGridImporter;
+    private final PopulationToPopulationByAgeAndSexImporter populationToPopulationByAgeAndSexImporter;
+    private final PopulationByAgeAndSexImporter populationByAgeAndSexImporter;
 
     private int batchCounter;
 
     public PopulationImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.POPULATION)) + " " +
-                "(id, births, daytimepopulation, daytimepopulationdensity, deaths, femalepopulation, increasement, " +
-                "malepopulation, movefrom, moveto, naturalincrease, socialincrease, total) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.POPULATION)) + " " +
+                "(id, total, daytimepopulation, daytimepopulationdensity, daytimeofficecommuter," +
+                "daytimeschoolcommuter, daytimeunder15, daytimeover15, agriculturalworker, noncommuter," +
+                "naturalincrease, births, deaths, socialincrease, movefrom, moveto, increasement, malepopulation," +
+                "femalepopulation) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        populationByAgeAndSexImporter = manager.getImporter(PopulationByAgeAndSexImporter.class);
         statisticalGridImporter = manager.getImporter(StatisticalGridImporter.class);
+        populationToPopulationByAgeAndSexImporter = manager.getImporter(PopulationToPopulationByAgeAndSexImporter.class);
+        populationByAgeAndSexImporter = manager.getImporter(PopulationByAgeAndSexImporter.class);
     }
 
     public void doImport(Population population, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         statisticalGridImporter.doImport(population, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (population.getBirths() != null)
-            ps.setInt(2, population.getBirths());
+        if (population.getTotal() != null)
+            ps.setInt(2, population.getTotal());
         else
             ps.setNull(2, Types.INTEGER);
 
@@ -83,33 +87,33 @@ public class PopulationImporter implements StatisticalGridModuleImporter {
         else
             ps.setNull(4, Types.DOUBLE);
 
-        if (population.getDeaths() != null)
-            ps.setInt(5, population.getDeaths());
+        if (population.getDaytimeOfficeCommuter() != null)
+            ps.setInt(5, population.getDaytimeOfficeCommuter());
         else
             ps.setNull(5, Types.INTEGER);
 
-        if (population.getFemalePopulation() != null)
-            ps.setInt(6, population.getFemalePopulation());
+        if (population.getDaytimeSchoolCommuter() != null)
+            ps.setInt(6, population.getDaytimeSchoolCommuter());
         else
             ps.setNull(6, Types.INTEGER);
 
-        if (population.getIncreasement() != null)
-            ps.setInt(7, population.getIncreasement());
+        if (population.getDaytimeUnder15() != null)
+            ps.setInt(7, population.getDaytimeUnder15());
         else
             ps.setNull(7, Types.INTEGER);
 
-        if (population.getMalePopulation() != null)
-            ps.setInt(8, population.getMalePopulation());
+        if (population.getDaytimeOver15() != null)
+            ps.setInt(8, population.getDaytimeOver15());
         else
             ps.setNull(8, Types.INTEGER);
 
-        if (population.getMoveFrom() != null)
-            ps.setInt(9, population.getMoveFrom());
+        if (population.getAgriculturalWorker() != null)
+            ps.setInt(9, population.getAgriculturalWorker());
         else
             ps.setNull(9, Types.INTEGER);
 
-        if (population.getMoveTo() != null)
-            ps.setInt(10, population.getMoveTo());
+        if (population.getNonCommuter() != null)
+            ps.setInt(10, population.getNonCommuter());
         else
             ps.setNull(10, Types.INTEGER);
 
@@ -118,23 +122,55 @@ public class PopulationImporter implements StatisticalGridModuleImporter {
         else
             ps.setNull(11, Types.INTEGER);
 
-        if (population.getSocialIncrease() != null)
-            ps.setInt(12, population.getSocialIncrease());
+        if (population.getBirths() != null)
+            ps.setInt(12, population.getBirths());
         else
             ps.setNull(12, Types.INTEGER);
 
-        if (population.getTotal() != null)
-            ps.setInt(13, population.getTotal());
+        if (population.getDeaths() != null)
+            ps.setInt(13, population.getDeaths());
         else
             ps.setNull(13, Types.INTEGER);
+
+        if (population.getSocialIncrease() != null)
+            ps.setInt(14, population.getSocialIncrease());
+        else
+            ps.setNull(14, Types.INTEGER);
+
+        if (population.getMoveFrom() != null)
+            ps.setInt(15, population.getMoveFrom());
+        else
+            ps.setNull(15, Types.INTEGER);
+
+        if (population.getMoveTo() != null)
+            ps.setInt(16, population.getMoveTo());
+        else
+            ps.setNull(16, Types.INTEGER);
+
+        if (population.getIncreasement() != null)
+            ps.setInt(17, population.getIncreasement());
+        else
+            ps.setNull(17, Types.INTEGER);
+
+        if (population.getMalePopulation() != null)
+            ps.setInt(18, population.getMalePopulation());
+        else
+            ps.setNull(18, Types.INTEGER);
+
+        if (population.getFemalePopulation() != null)
+            ps.setInt(19, population.getFemalePopulation());
+        else
+            ps.setNull(19, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
 
         for (PopulationByAgeAndSexProperty property : population.getPopulationByAgeAndSex()) {
-            if (property.isSetObject())
-                populationByAgeAndSexImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long populationByAgeAndSexId = populationByAgeAndSexImporter.doImport(property.getObject());
+                populationToPopulationByAgeAndSexImporter.doImport(populationByAgeAndSexId, objectId);
+            }
         }
     }
 
