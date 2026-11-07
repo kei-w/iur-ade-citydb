@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -56,6 +57,10 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final IndoorAttributeExporter indoorAttributeExporter;
     private final BuildingAttributeExporter buildingAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psBldgFacilityAttribute;
+    private final PreparedStatement psBldgDmAttribute;
+    private final PreparedStatement psBuildingDisasterRiskAttribute;
+    private final PreparedStatement psKeyValuePairAttribute;
 
     public BuildingPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDING);
@@ -68,6 +73,26 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table bldgFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDING_TO_FACILITYA)));
+        Select bldgFacilityAttributeSelect = new Select().addProjection(bldgFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bldgFacilityAttributes.getColumn("building_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bldgFacilityAttributes.getColumn("facilityattribute_id")));
+        psBldgFacilityAttribute = connection.prepareStatement(bldgFacilityAttributeSelect.toString());
+        Table bldgDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDING_TO_DMATTRIBU)));
+        Select bldgDmAttributeSelect = new Select().addProjection(bldgDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(bldgDmAttributes.getColumn("building_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(bldgDmAttributes.getColumn("dmattribute_id")));
+        psBldgDmAttribute = connection.prepareStatement(bldgDmAttributeSelect.toString());
+        Table buildingDisasterRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDING_TO_BUILDINGD)));
+        Select buildingDisasterRiskAttributeSelect = new Select().addProjection(buildingDisasterRiskAttributes.getColumn("buildingdisasterriskat_id"))
+                .addSelection(ComparisonFactory.equalTo(buildingDisasterRiskAttributes.getColumn("building_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(buildingDisasterRiskAttributes.getColumn("buildingdisasterriskat_id")));
+        psBuildingDisasterRiskAttribute = connection.prepareStatement(buildingDisasterRiskAttributeSelect.toString());
+        Table keyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDING_TO_KEYVALUEP)));
+        Select keyValuePairAttributeSelect = new Select().addProjection(keyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(keyValuePairAttributes.getColumn("building_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(keyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psKeyValuePairAttribute = connection.prepareStatement(keyValuePairAttributeSelect.toString());
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
@@ -102,16 +127,28 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("bldgFacilityAttribute", module)) {
-                    for (FacilityAttribute bldgFacilityAttribute : facilityAttributeExporter.doExport(parentId, "building_bldgfacilityattr_id")) {
-                        BldgFacilityAttributePropertyElement property = new BldgFacilityAttributePropertyElement(new FacilityAttributeProperty(bldgFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    psBldgFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet bldgFacilityAttributeRs = psBldgFacilityAttribute.executeQuery()) {
+                        while (bldgFacilityAttributeRs.next()) {
+                            FacilityAttribute bldgFacilityAttribute = facilityAttributeExporter.doExport(bldgFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (bldgFacilityAttribute != null) {
+                                BldgFacilityAttributePropertyElement property = new BldgFacilityAttributePropertyElement(new FacilityAttributeProperty(bldgFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("bldgDmAttribute", module)) {
-                    for (DmAttribute bldgDmAttribute : dmAttributeExporter.doExport(parentId, "building_bldgdmattribute_id")) {
-                        BldgDmAttributePropertyElement property = new BldgDmAttributePropertyElement(new DmAttributeProperty(bldgDmAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    psBldgDmAttribute.setLong(1, parentId);
+                    try (ResultSet bldgDmAttributeRs = psBldgDmAttribute.executeQuery()) {
+                        while (bldgDmAttributeRs.next()) {
+                            DmAttribute bldgDmAttribute = dmAttributeExporter.doExport(bldgDmAttributeRs.getLong("dmattribute_id"));
+                            if (bldgDmAttribute != null) {
+                                BldgDmAttributePropertyElement property = new BldgDmAttributePropertyElement(new DmAttributeProperty(bldgDmAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                            }
+                        }
                     }
                 }
 
@@ -161,18 +198,28 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("buildingDisasterRiskAttribute", module)) {
-                    for (BuildingAttribute buildingDisasterRiskAttribute : buildingAttributeExporter.doExport(parentId, "building_buildingdisaster_id")) {
-                        if (buildingDisasterRiskAttribute instanceof BuildingDisasterRiskAttribute) {
-                            BuildingDisasterRiskAttributePropertyElement property = new BuildingDisasterRiskAttributePropertyElement(new BuildingDisasterRiskAttributeProperty((BuildingDisasterRiskAttribute) buildingDisasterRiskAttribute));
-                            parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    psBuildingDisasterRiskAttribute.setLong(1, parentId);
+                    try (ResultSet buildingDisasterRiskAttributeRs = psBuildingDisasterRiskAttribute.executeQuery()) {
+                        while (buildingDisasterRiskAttributeRs.next()) {
+                            BuildingAttribute buildingDisasterRiskAttribute = buildingAttributeExporter.doExport(buildingDisasterRiskAttributeRs.getLong("buildingdisasterriskat_id"));
+                            if (buildingDisasterRiskAttribute instanceof BuildingDisasterRiskAttribute) {
+                                BuildingDisasterRiskAttributePropertyElement property = new BuildingDisasterRiskAttributePropertyElement(new BuildingDisasterRiskAttributeProperty((BuildingDisasterRiskAttribute) buildingDisasterRiskAttribute));
+                                parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                            }
                         }
                     }
                 }
 
                 if (projectionFilter.containsProperty("keyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute keyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId)) {
-                        KeyValuePairAttributePropertyElement property = new KeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    psKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet keyValuePairAttributeRs = psKeyValuePairAttribute.executeQuery()) {
+                        while (keyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute keyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(keyValuePairAttribute, keyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            KeyValuePairAttributePropertyElement property = new KeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                        }
                     }
                 }
 
@@ -191,5 +238,9 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psBldgFacilityAttribute.close();
+        psBldgDmAttribute.close();
+        psBuildingDisasterRiskAttribute.close();
+        psKeyValuePairAttribute.close();
     }
 }

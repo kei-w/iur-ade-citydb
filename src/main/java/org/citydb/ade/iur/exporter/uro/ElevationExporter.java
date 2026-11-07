@@ -36,21 +36,18 @@ import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.Elevation;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.geometry.primitives.DirectPosition;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import java.sql.*;
 
 public class ElevationExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
     private final AttributeValueSplitter valueSplitter;
 
     public ElevationExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
@@ -58,21 +55,17 @@ public class ElevationExporter implements UrbanObjectModuleExporter {
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("elevationreference", "elevationreference_codespace", "elevationvalue"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("construction_elevation_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
         valueSplitter = helper.getAttributeValueSplitter();
     }
 
-    public List<Elevation> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(Elevation elevation, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<Elevation> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Elevation elevation = new Elevation();
+            if (rs.next()) {
                 String elevationReference = rs.getString("elevationreference");
                 if (!rs.wasNull()) {
                     Code code = new Code(elevationReference);
@@ -86,16 +79,12 @@ public class ElevationExporter implements UrbanObjectModuleExporter {
                     directPosition.setValue(valueSplitter.splitDoubleList(Pattern.compile(" "), elevationValue));
                     elevation.setElevationValue(directPosition);
                 }
-
-                result.add(elevation);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

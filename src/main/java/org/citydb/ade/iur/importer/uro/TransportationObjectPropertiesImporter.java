@@ -49,6 +49,7 @@ public class TransportationObjectPropertiesImporter implements UrbanObjectModule
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final TransportationObjectToFacilityAttributeImporter transportationObjectToFacilityAttributeImporter;
     private final VegetationDataQualityAttributeImporter vegetationDataQualityAttributeImporter;
 
     private int batchCounter;
@@ -66,6 +67,7 @@ public class TransportationObjectPropertiesImporter implements UrbanObjectModule
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        transportationObjectToFacilityAttributeImporter = manager.getImporter(TransportationObjectToFacilityAttributeImporter.class);
         vegetationDataQualityAttributeImporter = manager.getImporter(VegetationDataQualityAttributeImporter.class);
     }
 
@@ -127,8 +129,10 @@ public class TransportationObjectPropertiesImporter implements UrbanObjectModule
 
         if (properties.contains(VegFacilityAttributePropertyElement.class)) {
             for (VegFacilityAttributePropertyElement property : properties.getAll(VegFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "cityobject_vegfacilityatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long vegFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    transportationObjectToFacilityAttributeImporter.doImport(vegFacilityAttributeId, parentId);
+                }
             }
         }
 

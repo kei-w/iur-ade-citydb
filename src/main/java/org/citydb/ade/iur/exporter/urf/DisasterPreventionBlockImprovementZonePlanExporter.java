@@ -1,0 +1,136 @@
+/*
+ * 3D City Database - The Open Source CityGML Database
+ * https://www.3dcitydb.org/
+ *
+ * Copyright 2013 - 2024
+ * Chair of Geoinformatics
+ * Technical University of Munich, Germany
+ * https://www.lrg.tum.de/gis/
+ *
+ * The 3D City Database is jointly developed with the following
+ * cooperation partners:
+ *
+ * Virtual City Systems, Berlin <https://vc.systems/>
+ * M.O.S.S. Computer Grafik Systeme GmbH, Taufkirchen <http://www.moss.de/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.citydb.ade.iur.exporter.urf;
+
+import org.citydb.ade.iur.exporter.ExportManager;
+import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.core.ade.exporter.CityGMLExportHelper;
+import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.MappingConstants;
+import org.citydb.core.operation.exporter.CityGMLExportException;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
+import org.citydb.core.query.filter.projection.ProjectionFilter;
+import org.citydb.sqlbuilder.expression.PlaceHolder;
+import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
+import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.join.JoinFactory;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
+import org.citygml4j.ade.iur.model.urf.DisasterPreventionBlockImprovementZonePlan;
+import org.citygml4j.ade.iur.model.urf.ZonalDisasterPreventionFacilityProperty;
+import org.citygml4j.model.gml.base.StringOrRef;
+
+import java.sql.*;
+
+public class DisasterPreventionBlockImprovementZonePlanExporter implements UrbanFunctionModuleExporter {
+    private final UrbanFunctionExporter urbanFunctionExporter;
+    private final ZoneExporter zoneExporter;
+    private final AbstractDistrictPlanExporter abstractDistrictPlanExporter;
+    private final PreparedStatement ps;
+    private final PreparedStatement psZonalDisasterPreventionFacilities;
+    private final AttributeValueSplitter valueSplitter;
+
+    public DisasterPreventionBlockImprovementZonePlanExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.DISASTERPREVENTIONBL_2);
+        urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
+        zoneExporter = manager.getExporter(ZoneExporter.class);
+        abstractDistrictPlanExporter = manager.getExporter(AbstractDistrictPlanExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
+
+        Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Table urbanFunction = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION)));
+        Table zone = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ZONE)));
+        Table abstractDistrictPlan = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ABSTRACTDISTRICTPLAN)));
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addJoin(JoinFactory.inner(zone, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addJoin(JoinFactory.inner(abstractDistrictPlan, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        addProjection(select, table, "");
+        urbanFunctionExporter.addProjection(select, urbanFunction, "uf_");
+        zoneExporter.addProjection(select, zone, "z_");
+        abstractDistrictPlanExporter.addProjection(select, abstractDistrictPlan, "adp_");
+        ps = connection.prepareStatement(select.toString());
+
+        Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table zonalDisasterPreventionFacilitiess = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DISASTERP_TO_ZONALDISA)));
+        Select zonalDisasterPreventionFacilitiesSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, zonalDisasterPreventionFacilitiess.getColumn("zonaldisasterpreventio_id")))
+                .addSelection(ComparisonFactory.equalTo(zonalDisasterPreventionFacilitiess.getColumn("disasterpreventionbl_2_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psZonalDisasterPreventionFacilities = connection.prepareStatement(zonalDisasterPreventionFacilitiesSelect.toString());
+    }
+
+    public void doExport(DisasterPreventionBlockImprovementZonePlan disasterPreventionBlockImprovementZonePlan, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                urbanFunctionExporter.doExport(disasterPreventionBlockImprovementZonePlan, objectId, "uf_", rs);
+                zoneExporter.doExport(disasterPreventionBlockImprovementZonePlan, objectId, "z_", rs);
+                abstractDistrictPlanExporter.doExport(disasterPreventionBlockImprovementZonePlan, objectId, "adp_", rs);
+                doExport(disasterPreventionBlockImprovementZonePlan, objectId, "", rs);
+            }
+        }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("zonaldisasterpreventionfacil", prefix + "zonaldisasterpreventionfacil"),
+                table.getColumn("specifiedzonaldisasterpreven", prefix + "specifiedzonaldisasterpreven"));
+
+        return select;
+    }
+
+    public void doExport(DisasterPreventionBlockImprovementZonePlan disasterPreventionBlockImprovementZonePlan, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        String zonalDisasterPreventionFacilitiesAllocation = rs.getString(prefix + "zonaldisasterpreventionfacil");
+        if (!rs.wasNull())
+            disasterPreventionBlockImprovementZonePlan.setZonalDisasterPreventionFacilitiesAllocation(new StringOrRef(zonalDisasterPreventionFacilitiesAllocation));
+
+        String specifiedZonalDisasterPreventionFacilitiesAllocation = rs.getString(prefix + "specifiedzonaldisasterpreven");
+        if (!rs.wasNull())
+            disasterPreventionBlockImprovementZonePlan.setSpecifiedZonalDisasterPreventionFacilitiesAllocation(new StringOrRef(specifiedZonalDisasterPreventionFacilitiesAllocation));
+
+        psZonalDisasterPreventionFacilities.setLong(1, objectId);
+        try (ResultSet zonalDisasterPreventionFacilitiesRs = psZonalDisasterPreventionFacilities.executeQuery()) {
+            while (zonalDisasterPreventionFacilitiesRs.next()) {
+                ZonalDisasterPreventionFacilityProperty zonalDisasterPreventionFacilitiesProperty = new ZonalDisasterPreventionFacilityProperty();
+                zonalDisasterPreventionFacilitiesProperty.setHref("#" + zonalDisasterPreventionFacilitiesRs.getString("gmlid"));
+                disasterPreventionBlockImprovementZonePlan.getZonalDisasterPreventionFacilities().add(zonalDisasterPreventionFacilitiesProperty);
+            }
+        }
+    }
+
+    @Override
+    public void close() throws CityGMLExportException, SQLException {
+        ps.close();
+        psZonalDisasterPreventionFacilities.close();
+    }
+}

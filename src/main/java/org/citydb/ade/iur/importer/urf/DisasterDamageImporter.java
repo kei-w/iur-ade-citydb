@@ -30,19 +30,18 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.DisasterDamage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UrbanFunctionImporter urbanFunctionImporter;
 
@@ -50,52 +49,61 @@ public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
 
     public DisasterDamageImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DISASTERDAMAGE)) + " " +
-                "(id, damagedarea, damagedarea_uom, maximumrainfallperhour, numberofdamagedhouses, " +
-                "numberofhousesfloodedabovefl, numberofhousesfloodedbelowfl, totalrainfall) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DISASTERDAMAGE)) + " " +
+                "(id, id_, date_, damagedarea, damagedarea_uom, numberofdamagedhouses, numberofhousesfloodedabovefl," +
+                "numberofhousesfloodedbelowfl, maximumrainfallperhour, totalrainfall) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
     }
 
     public void doImport(DisasterDamage disasterDamage, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(disasterDamage, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
+        ps.setString(2, disasterDamage.getIdentifier());
+
+        if (disasterDamage.getDate() != null)
+            ps.setDate(3, Date.valueOf(disasterDamage.getDate()));
+        else
+            ps.setNull(3, Types.DATE);
+
         if (disasterDamage.getDamagedArea() != null && disasterDamage.getDamagedArea().isSetValue()) {
-            ps.setDouble(2, disasterDamage.getDamagedArea().getValue());
-            ps.setString(3, disasterDamage.getDamagedArea().getUom());
+            ps.setDouble(4, disasterDamage.getDamagedArea().getValue());
+            ps.setString(5, disasterDamage.getDamagedArea().getUom());
         } else {
-            ps.setNull(2, Types.DOUBLE);
-            ps.setNull(3, Types.VARCHAR);
+            ps.setNull(4, Types.DOUBLE);
+            ps.setNull(5, Types.VARCHAR);
         }
 
-        if (disasterDamage.getMaximumRainfallPerHour() != null)
-            ps.setInt(4, disasterDamage.getMaximumRainfallPerHour());
-        else
-            ps.setNull(4, Types.INTEGER);
-
         if (disasterDamage.getNumberOfDamagedHouses() != null)
-            ps.setInt(5, disasterDamage.getNumberOfDamagedHouses());
-        else
-            ps.setNull(5, Types.INTEGER);
-
-        if (disasterDamage.getNumberOfHousesFloodedAboveFloorLevel() != null)
-            ps.setInt(6, disasterDamage.getNumberOfHousesFloodedAboveFloorLevel());
+            ps.setInt(6, disasterDamage.getNumberOfDamagedHouses());
         else
             ps.setNull(6, Types.INTEGER);
 
-        if (disasterDamage.getNumberOfHousesFloodedBelowFloorLevel() != null)
-            ps.setInt(7, disasterDamage.getNumberOfHousesFloodedBelowFloorLevel());
+        if (disasterDamage.getNumberOfHousesFloodedAboveFloorLevel() != null)
+            ps.setInt(7, disasterDamage.getNumberOfHousesFloodedAboveFloorLevel());
         else
             ps.setNull(7, Types.INTEGER);
 
-        if (disasterDamage.getTotalRainfall() != null)
-            ps.setInt(8, disasterDamage.getTotalRainfall());
+        if (disasterDamage.getNumberOfHousesFloodedBelowFloorLevel() != null)
+            ps.setInt(8, disasterDamage.getNumberOfHousesFloodedBelowFloorLevel());
         else
             ps.setNull(8, Types.INTEGER);
+
+        if (disasterDamage.getMaximumRainfallPerHour() != null)
+            ps.setInt(9, disasterDamage.getMaximumRainfallPerHour());
+        else
+            ps.setNull(9, Types.INTEGER);
+
+        if (disasterDamage.getTotalRainfall() != null)
+            ps.setInt(10, disasterDamage.getTotalRainfall());
+        else
+            ps.setNull(10, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

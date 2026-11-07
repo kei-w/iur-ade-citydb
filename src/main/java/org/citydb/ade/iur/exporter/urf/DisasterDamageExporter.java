@@ -32,9 +32,7 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
-import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -42,53 +40,26 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.UrbanFunctionModule;
 import org.citygml4j.ade.iur.model.urf.DisasterDamage;
-import org.citygml4j.ade.iur.model.urf.TargetProperty;
 import org.citygml4j.model.gml.basicTypes.Measure;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DisasterDamageExporter implements UrbanFunctionModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final UrbanFunctionExporter urbanFunctionExporter;
+    private final PreparedStatement ps;
 
     public DisasterDamageExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.DISASTERDAMAGE);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = UrbanFunctionModule.v1_4.getNamespaceURI();
-
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table urbanFunction = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION)));
-
-        Select select = new Select().addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        urbanFunctionExporter.addProjection(select, urbanFunction, projectionFilter, "uf");
-        if (projectionFilter.containsProperty("damagedArea", module))
-            select.addProjection(table.getColumns("damagedarea", "damagedarea_uom"));
-        if (projectionFilter.containsProperty("numberOfDamagedHouses", module))
-            select.addProjection(table.getColumn("numberofdamagedhouses"));
-        if (projectionFilter.containsProperty("numberOfHousesFloodedAboveFloorLevel", module))
-            select.addProjection(table.getColumn("numberofhousesfloodedabovefl"));
-        if (projectionFilter.containsProperty("numberOfHousesFloodedBelowFloorLevel", module))
-            select.addProjection(table.getColumn("numberofhousesfloodedbelowfl"));
-        if (projectionFilter.containsProperty("maximumRainfallPerHour", module))
-            select.addProjection(table.getColumn("maximumrainfallperhour"));
-        if (projectionFilter.containsProperty("totalRainfall", module))
-            select.addProjection(table.getColumn("totalrainfall"));
-        if (projectionFilter.containsProperty("target", module)) {
-            Table targets = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_CITYOBJEC)));
-            Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(cityObject.getColumn("gmlid"))
-                    .addJoin(JoinFactory.left(targets, "urbanfunction_id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(cityObject, "id", ComparisonName.EQUAL_TO, targets.getColumn("cityobject_id")));
-        }
+        addProjection(select, table, "");
+        urbanFunctionExporter.addProjection(select, urbanFunction, "uf_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -96,61 +67,60 @@ public class DisasterDamageExporter implements UrbanFunctionModuleExporter {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    urbanFunctionExporter.doExport(disasterDamage, projectionFilter, "uf", rs);
-
-                    if (projectionFilter.containsProperty("damagedArea", module)) {
-                        double damagedArea = rs.getDouble("damagedarea");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(damagedArea);
-                            measure.setUom(rs.getString("damagedarea_uom"));
-                            disasterDamage.setDamagedArea(measure);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("numberOfDamagedHouses", module)) {
-                        int numberOfDamagedHouses = rs.getInt("numberofdamagedhouses");
-                        if (!rs.wasNull())
-                            disasterDamage.setNumberOfDamagedHouses(numberOfDamagedHouses);
-                    }
-
-                    if (projectionFilter.containsProperty("numberOfHousesFloodedAboveFloorLevel", module)) {
-                        int numberOfHousesFloodedAboveFloorLevel = rs.getInt("numberofhousesfloodedabovefl");
-                        if (!rs.wasNull())
-                            disasterDamage.setNumberOfHousesFloodedAboveFloorLevel(numberOfHousesFloodedAboveFloorLevel);
-                    }
-
-                    if (projectionFilter.containsProperty("numberOfHousesFloodedBelowFloorLevel", module)) {
-                        int numberOfHousesFloodedBelowFloorLevel = rs.getInt("numberofhousesfloodedbelowfl");
-                        if (!rs.wasNull())
-                            disasterDamage.setNumberOfHousesFloodedBelowFloorLevel(numberOfHousesFloodedBelowFloorLevel);
-                    }
-
-                    if (projectionFilter.containsProperty("maximumRainfallPerHour", module)) {
-                        int maximumRainfallPerHour = rs.getInt("maximumrainfallperhour");
-                        if (!rs.wasNull())
-                            disasterDamage.setMaximumRainfallPerHour(maximumRainfallPerHour);
-                    }
-
-                    if (projectionFilter.containsProperty("totalRainfall", module)) {
-                        int totalRainfall = rs.getInt("totalrainfall");
-                        if (!rs.wasNull())
-                            disasterDamage.setTotalRainfall(totalRainfall);
-                    }
-
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("target", module)) {
-                    String gmlId = rs.getString("gmlid");
-                    if (gmlId != null)
-                        disasterDamage.getTargets().add(new TargetProperty("#" + gmlId));
-                }
+            if (rs.next()) {
+                urbanFunctionExporter.doExport(disasterDamage, objectId, "uf_", rs);
+                doExport(disasterDamage, objectId, "", rs);
             }
         }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("id_", prefix + "id_"),
+                table.getColumn("date_", prefix + "date_"),
+                table.getColumn("damagedarea", prefix + "damagedarea"),
+                table.getColumn("damagedarea_uom", prefix + "damagedarea_uom"),
+                table.getColumn("numberofdamagedhouses", prefix + "numberofdamagedhouses"),
+                table.getColumn("numberofhousesfloodedabovefl", prefix + "numberofhousesfloodedabovefl"),
+                table.getColumn("numberofhousesfloodedbelowfl", prefix + "numberofhousesfloodedbelowfl"),
+                table.getColumn("maximumrainfallperhour", prefix + "maximumrainfallperhour"),
+                table.getColumn("totalrainfall", prefix + "totalrainfall"));
+
+        return select;
+    }
+
+    public void doExport(DisasterDamage disasterDamage, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        disasterDamage.setIdentifier(rs.getString(prefix + "id_"));
+
+        Date date = rs.getDate(prefix + "date_");
+        if (!rs.wasNull())
+            disasterDamage.setDate(date.toLocalDate());
+
+        double damagedArea = rs.getDouble(prefix + "damagedarea");
+        if (!rs.wasNull()) {
+            Measure measure = new Measure(damagedArea);
+            measure.setUom(rs.getString(prefix + "damagedarea_uom"));
+            disasterDamage.setDamagedArea(measure);
+        }
+
+        int numberOfDamagedHouses = rs.getInt(prefix + "numberofdamagedhouses");
+        if (!rs.wasNull())
+            disasterDamage.setNumberOfDamagedHouses(numberOfDamagedHouses);
+
+        int numberOfHousesFloodedAboveFloorLevel = rs.getInt(prefix + "numberofhousesfloodedabovefl");
+        if (!rs.wasNull())
+            disasterDamage.setNumberOfHousesFloodedAboveFloorLevel(numberOfHousesFloodedAboveFloorLevel);
+
+        int numberOfHousesFloodedBelowFloorLevel = rs.getInt(prefix + "numberofhousesfloodedbelowfl");
+        if (!rs.wasNull())
+            disasterDamage.setNumberOfHousesFloodedBelowFloorLevel(numberOfHousesFloodedBelowFloorLevel);
+
+        int maximumRainfallPerHour = rs.getInt(prefix + "maximumrainfallperhour");
+        if (!rs.wasNull())
+            disasterDamage.setMaximumRainfallPerHour(maximumRainfallPerHour);
+
+        int totalRainfall = rs.getInt(prefix + "totalrainfall");
+        if (!rs.wasNull())
+            disasterDamage.setTotalRainfall(totalRainfall);
     }
 
     @Override

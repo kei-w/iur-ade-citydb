@@ -60,59 +60,20 @@ public class FacilityAttributeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FACILITYATTRIBUTE)) + " " +
-                "(id, objectclass_id, construction_consfacility_id, bridge_bridfacilityattrib_id," +
-                "city_furniture_frnfacilit_id, transpor_complex_tranfaci_id, cityobject_vegfacilityatt_id," +
-                "tunnel_tunfacilityattribu_id, building_bldgfacilityattr_id, land_use_lusefacilityattr_id," +
-                "waterbody_wtrfacilityattr_id, facilityid) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, facilityid) " +
+                "values (?, ?, ?)");
 
         portAttributeImporter = manager.getImporter(PortAttributeImporter.class);
         fishingPortAttributeImporter = manager.getImporter(FishingPortAttributeImporter.class);
         maintenanceHistoryAttributeImporter = manager.getImporter(MaintenanceHistoryAttributeImporter.class);
     }
 
-    public long doImport(FacilityAttribute facilityAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
+    public long doImport(FacilityAttribute facilityAttribute) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.FACILITYATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(facilityAttribute.getClass()));
-        if ("construction_consfacility_id".equals(parentColumn))
-            ps.setLong(3, parentId);
-        else
-            ps.setNull(3, Types.NULL);
-        if ("bridge_bridfacilityattrib_id".equals(parentColumn))
-            ps.setLong(4, parentId);
-        else
-            ps.setNull(4, Types.NULL);
-        if ("city_furniture_frnfacilit_id".equals(parentColumn))
-            ps.setLong(5, parentId);
-        else
-            ps.setNull(5, Types.NULL);
-        if ("transpor_complex_tranfaci_id".equals(parentColumn))
-            ps.setLong(6, parentId);
-        else
-            ps.setNull(6, Types.NULL);
-        if ("cityobject_vegfacilityatt_id".equals(parentColumn))
-            ps.setLong(7, parentId);
-        else
-            ps.setNull(7, Types.NULL);
-        if ("tunnel_tunfacilityattribu_id".equals(parentColumn))
-            ps.setLong(8, parentId);
-        else
-            ps.setNull(8, Types.NULL);
-        if ("building_bldgfacilityattr_id".equals(parentColumn))
-            ps.setLong(9, parentId);
-        else
-            ps.setNull(9, Types.NULL);
-        if ("land_use_lusefacilityattr_id".equals(parentColumn))
-            ps.setLong(10, parentId);
-        else
-            ps.setNull(10, Types.NULL);
-        if ("waterbody_wtrfacilityattr_id".equals(parentColumn))
-            ps.setLong(11, parentId);
-        else
-            ps.setNull(11, Types.NULL);
 
-        ps.setString(12, facilityAttribute.getFacilityId());
+        ps.setString(3, facilityAttribute.getFacilityId());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

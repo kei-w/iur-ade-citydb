@@ -59,16 +59,24 @@ public class AbstractConstructionImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final AbstractConstructionToConstructionEventImporter abstractConstructionToConstructionEventImporter;
     private final ConstructionEventImporter constructionEventImporter;
+    private final AbstractConstructionToElevationImporter abstractConstructionToElevationImporter;
     private final ElevationImporter elevationImporter;
+    private final AbstractConstructionToHeightImporter abstractConstructionToHeightImporter;
     private final HeightImporter heightImporter;
+    private final AbstractConstructionToOccupancyImporter abstractConstructionToOccupancyImporter;
     private final OccupancyImporter occupancyImporter;
+    private final AbstractConstructionToFacilityTypeAttributeImporter abstractConstructionToFacilityTypeAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
+    private final AbstractConstructionToFacilityAttributeImporter abstractConstructionToFacilityAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
     private final ConstructionBaseAttributeImporter constructionBaseAttributeImporter;
     private final ConstructionStructureAttributeImporter constructionStructureAttributeImporter;
+    private final AbstractConstructionToDisasterRiskAttributeImporter abstractConstructionToDisasterRiskAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final AbstractConstructionToDmAttributeImporter abstractConstructionToDmAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
     private final ConstructionDataQualityAttributeImporter constructionDataQualityAttributeImporter;
     private final GeometryConverter geometryConverter;
@@ -89,16 +97,24 @@ public class AbstractConstructionImporter implements UrbanObjectModuleImporter {
                 "lod4geometry_other_geom) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+        abstractConstructionToConstructionEventImporter = manager.getImporter(AbstractConstructionToConstructionEventImporter.class);
         constructionEventImporter = manager.getImporter(ConstructionEventImporter.class);
+        abstractConstructionToElevationImporter = manager.getImporter(AbstractConstructionToElevationImporter.class);
         elevationImporter = manager.getImporter(ElevationImporter.class);
+        abstractConstructionToHeightImporter = manager.getImporter(AbstractConstructionToHeightImporter.class);
         heightImporter = manager.getImporter(HeightImporter.class);
+        abstractConstructionToOccupancyImporter = manager.getImporter(AbstractConstructionToOccupancyImporter.class);
         occupancyImporter = manager.getImporter(OccupancyImporter.class);
+        abstractConstructionToFacilityTypeAttributeImporter = manager.getImporter(AbstractConstructionToFacilityTypeAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
+        abstractConstructionToFacilityAttributeImporter = manager.getImporter(AbstractConstructionToFacilityAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         constructionBaseAttributeImporter = manager.getImporter(ConstructionBaseAttributeImporter.class);
         constructionStructureAttributeImporter = manager.getImporter(ConstructionStructureAttributeImporter.class);
+        abstractConstructionToDisasterRiskAttributeImporter = manager.getImporter(AbstractConstructionToDisasterRiskAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        abstractConstructionToDmAttributeImporter = manager.getImporter(AbstractConstructionToDmAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         constructionDataQualityAttributeImporter = manager.getImporter(ConstructionDataQualityAttributeImporter.class);
         geometryConverter = helper.getGeometryConverter();
@@ -283,36 +299,52 @@ public class AbstractConstructionImporter implements UrbanObjectModuleImporter {
             helper.executeBatch(objectType);
 
         for (ConstructionEventProperty property : abstractConstruction.getConstructionEvent()) {
-            if (property.isSetObject())
-                constructionEventImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long constructionEventId = constructionEventImporter.doImport(property.getObject());
+                abstractConstructionToConstructionEventImporter.doImport(constructionEventId, objectId);
+            }
         }
         for (ElevationProperty property : abstractConstruction.getElevation()) {
-            if (property.isSetObject())
-                elevationImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long elevationId = elevationImporter.doImport(property.getObject());
+                abstractConstructionToElevationImporter.doImport(elevationId, objectId);
+            }
         }
         for (HeightProperty property : abstractConstruction.getHeight()) {
-            if (property.isSetObject())
-                heightImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long heightId = heightImporter.doImport(property.getObject());
+                abstractConstructionToHeightImporter.doImport(heightId, objectId);
+            }
         }
         for (OccupancyProperty property : abstractConstruction.getOccupancy()) {
-            if (property.isSetObject())
-                occupancyImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long occupancyId = occupancyImporter.doImport(property.getObject());
+                abstractConstructionToOccupancyImporter.doImport(occupancyId, objectId);
+            }
         }
         for (FacilityTypeAttributeProperty property : abstractConstruction.getConsFacilityTypeAttribute()) {
-            if (property.isSetObject())
-                facilityTypeAttributeImporter.doImport(property.getObject(), objectId, "construction_consfacility_id");
+            if (property.isSetObject()) {
+                long consFacilityTypeAttributeId = facilityTypeAttributeImporter.doImport(property.getObject());
+                abstractConstructionToFacilityTypeAttributeImporter.doImport(consFacilityTypeAttributeId, objectId);
+            }
         }
         for (FacilityAttributeProperty property : abstractConstruction.getConsFacilityAttribute()) {
-            if (property.isSetObject())
-                facilityAttributeImporter.doImport(property.getObject(), objectId, "construction_consfacility_id");
+            if (property.isSetObject()) {
+                long consFacilityAttributeId = facilityAttributeImporter.doImport(property.getObject());
+                abstractConstructionToFacilityAttributeImporter.doImport(consFacilityAttributeId, objectId);
+            }
         }
         for (DisasterRiskAttributeProperty property : abstractConstruction.getConsDisasterRiskAttribute()) {
-            if (property.isSetObject())
-                disasterRiskAttributeImporter.doImport(property.getObject(), objectId, "construction_consdisaster_id");
+            if (property.isSetObject()) {
+                long consDisasterRiskAttributeId = disasterRiskAttributeImporter.doImport(property.getObject());
+                abstractConstructionToDisasterRiskAttributeImporter.doImport(consDisasterRiskAttributeId, objectId);
+            }
         }
         for (DmAttributeProperty property : abstractConstruction.getConsDmAttribute()) {
-            if (property.isSetObject())
-                dmAttributeImporter.doImport(property.getObject(), objectId, "construction_consdmattrib_id");
+            if (property.isSetObject()) {
+                long consDmAttributeId = dmAttributeImporter.doImport(property.getObject());
+                abstractConstructionToDmAttributeImporter.doImport(consDmAttributeId, objectId);
+            }
         }
         for (AbstractBoundarySurfaceProperty property : abstractConstruction.getBoundedBySurface()) {
             AbstractBoundarySurface boundarySurface = property.getObject();

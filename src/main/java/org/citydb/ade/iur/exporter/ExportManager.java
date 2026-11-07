@@ -79,6 +79,88 @@ import org.citygml4j.ade.iur.model.uro.PublicLand;
 import org.citygml4j.ade.iur.model.uro.UtilityLink;
 import org.citygml4j.ade.iur.model.uro.UtilityNodeContainer;
 import org.citygml4j.ade.iur.model.uro.Waterway;
+import org.citygml4j.ade.iur.model.urf.AbstractDistrictPlan;
+import org.citygml4j.ade.iur.model.urf.Administration;
+import org.citygml4j.ade.iur.model.urf.Agreement;
+import org.citygml4j.ade.iur.model.urf.AreaClassification;
+import org.citygml4j.ade.iur.model.urf.CensusBlock;
+import org.citygml4j.ade.iur.model.urf.CollectiveFacilitiesForReconstruction;
+import org.citygml4j.ade.iur.model.urf.CollectiveFacilitiesForReconstructionAndRevitalization;
+import org.citygml4j.ade.iur.model.urf.CollectiveFacilitiesForTsunamiDisasterPrevention;
+import org.citygml4j.ade.iur.model.urf.CollectiveGovernmentAndPublicOfficeFacilities;
+import org.citygml4j.ade.iur.model.urf.CollectiveHousingFacilities;
+import org.citygml4j.ade.iur.model.urf.CollectiveUrbanDisasterPreventionFacilities;
+import org.citygml4j.ade.iur.model.urf.DID;
+import org.citygml4j.ade.iur.model.urf.DevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.DisasterDamage;
+import org.citygml4j.ade.iur.model.urf.DisasterPreventionBase;
+import org.citygml4j.ade.iur.model.urf.DisasterPreventionBlockImprovementProject;
+import org.citygml4j.ade.iur.model.urf.DisasterPreventionBlockImprovementZonePlan;
+import org.citygml4j.ade.iur.model.urf.DistributionBusinessPark;
+import org.citygml4j.ade.iur.model.urf.DistributionBusinessZone;
+import org.citygml4j.ade.iur.model.urf.District;
+import org.citygml4j.ade.iur.model.urf.DistrictDevelopmentPlan;
+import org.citygml4j.ade.iur.model.urf.DistrictPlan;
+import org.citygml4j.ade.iur.model.urf.DistrictsAndZones;
+import org.citygml4j.ade.iur.model.urf.ExceptionalFloorAreaRateDistrict;
+import org.citygml4j.ade.iur.model.urf.GlobalHubCityDevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.HeightControlDistrict;
+import org.citygml4j.ade.iur.model.urf.HighLevelUseDistrict;
+import org.citygml4j.ade.iur.model.urf.HighRiseResidentialAttractionDistrict;
+import org.citygml4j.ade.iur.model.urf.HistoricSceneryMaintenanceAndImprovementDistrictPlan;
+import org.citygml4j.ade.iur.model.urf.IndustrialParkDevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.LandReadjustmentProject;
+import org.citygml4j.ade.iur.model.urf.LandscapeZone;
+import org.citygml4j.ade.iur.model.urf.NewHousing;
+import org.citygml4j.ade.iur.model.urf.NewHousingAndUrbanDevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.NewUrbanInfrastructureProject;
+import org.citygml4j.ade.iur.model.urf.OpenSpaceForPublicUse;
+import org.citygml4j.ade.iur.model.urf.Pollution;
+import org.citygml4j.ade.iur.model.urf.PortZone;
+import org.citygml4j.ade.iur.model.urf.PrivateUrbanRenewalProjectPlan;
+import org.citygml4j.ade.iur.model.urf.ProductiveGreenZone;
+import org.citygml4j.ade.iur.model.urf.ProjectPromotionArea;
+import org.citygml4j.ade.iur.model.urf.PublicTransitFacility;
+import org.citygml4j.ade.iur.model.urf.QuasiUrbanPlanningArea;
+import org.citygml4j.ade.iur.model.urf.Recreations;
+import org.citygml4j.ade.iur.model.urf.ResidentialBlockConstructionProject;
+import org.citygml4j.ade.iur.model.urf.ResidentialEnvironmentImprovementDistrict;
+import org.citygml4j.ade.iur.model.urf.RoadsideDistrictImprovementPlan;
+import org.citygml4j.ade.iur.model.urf.RoadsideDistrictPlan;
+import org.citygml4j.ade.iur.model.urf.RuralDistrictImprovementPlan;
+import org.citygml4j.ade.iur.model.urf.ScenicDistrict;
+import org.citygml4j.ade.iur.model.urf.ScenicResource;
+import org.citygml4j.ade.iur.model.urf.ScheduledAreaForUrbanDevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.SedimentDisasterProneArea;
+import org.citygml4j.ade.iur.model.urf.SpecialGreenSpaceConservationDistrict;
+import org.citygml4j.ade.iur.model.urf.SpecialUrbanRenaissanceDistrict;
+import org.citygml4j.ade.iur.model.urf.SpecialUseAttractionDistrict;
+import org.citygml4j.ade.iur.model.urf.SpecialUseDistrict;
+import org.citygml4j.ade.iur.model.urf.SpecialUseRestrictionDistrict;
+import org.citygml4j.ade.iur.model.urf.SpecifiedBlock;
+import org.citygml4j.ade.iur.model.urf.SpecifiedDisasterPreventionBlockImprovementZone;
+import org.citygml4j.ade.iur.model.urf.SpecifiedUrgentUrbanRenewalArea;
+import org.citygml4j.ade.iur.model.urf.SupplyFacility;
+import org.citygml4j.ade.iur.model.urf.ThreeDimensionalExtent;
+import org.citygml4j.ade.iur.model.urf.TrafficFacility;
+import org.citygml4j.ade.iur.model.urf.TreatmentFacility;
+import org.citygml4j.ade.iur.model.urf.TreePlantingDistrict;
+import org.citygml4j.ade.iur.model.urf.UrbanDevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.UrbanDisasterRecoveryPromotionArea;
+import org.citygml4j.ade.iur.model.urf.UrbanFacility;
+import org.citygml4j.ade.iur.model.urf.UrbanFacilityStipulatedByCabinetOrder;
+import org.citygml4j.ade.iur.model.urf.UrbanFunction;
+import org.citygml4j.ade.iur.model.urf.UrbanPlanningArea;
+import org.citygml4j.ade.iur.model.urf.UrbanRedevelopmentProject;
+import org.citygml4j.ade.iur.model.urf.UrbanRedevelopmentPromotionArea;
+import org.citygml4j.ade.iur.model.urf.UrbanRenewalProject;
+import org.citygml4j.ade.iur.model.urf.Urbanization;
+import org.citygml4j.ade.iur.model.urf.UrgentUrbanRenewalArea;
+import org.citygml4j.ade.iur.model.urf.UseDistrict;
+import org.citygml4j.ade.iur.model.urf.WeatherObservation;
+import org.citygml4j.ade.iur.model.urf.ZonalDisasterPreventionFacility;
+import org.citygml4j.ade.iur.model.urf.Zone;
+import org.citydb.ade.iur.exporter.urg.LandUseDiversionExporter;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -116,25 +198,171 @@ public class ExportManager implements ADEExportManager {
 
     @Override
     public void exportObject(ADEModelObject object, long objectId, AbstractObjectType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
-        if (UrbanFunctionModule.v1_4.getModelPackageName().equals(object.getClass().getPackage().getName())) {
-            if (object instanceof CensusBlock)
-                getExporter(CensusBlockExporter.class).doExport((CensusBlock) object, objectId, objectType, projectionFilter);
-            else if (object instanceof DisasterDamage)
-                getExporter(DisasterDamageExporter.class).doExport((DisasterDamage) object, objectId, objectType, projectionFilter);
-            else if (object instanceof DisasterPreventionBase)
-                getExporter(DisasterPreventionBaseExporter.class).doExport((DisasterPreventionBase) object, objectId, objectType, projectionFilter);
-            else if (object instanceof Pollution)
-                getExporter(PollutionExporter.class).doExport((Pollution) object, objectId, objectType, projectionFilter);
-            else if (object instanceof PublicTransportationFacility)
-                getExporter(PublicTransportationFacilityExporter.class).doExport((PublicTransportationFacility) object, objectId, objectType, projectionFilter);
-            else if (object instanceof Recreations)
-                getExporter(RecreationsExporter.class).doExport((Recreations) object, objectId, objectType, projectionFilter);
-            else if (object instanceof Urbanization)
-                getExporter(UrbanizationExporter.class).doExport((Urbanization) object, objectId, objectType, projectionFilter);
-            else if (object instanceof DevelopmentProject)
-                getExporter(DevelopmentProjectExporter.class).doExport((DevelopmentProject) object, objectId, objectType, projectionFilter);
+        if (UrbanFunctionModule.v3_0.getModelPackageName().equals(object.getClass().getPackage().getName())) {
+            if (object instanceof UseDistrict)
+                getExporter(UseDistrictExporter.class).doExport((UseDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecialUseDistrict)
+                getExporter(SpecialUseDistrictExporter.class).doExport((SpecialUseDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecialUseRestrictionDistrict)
+                getExporter(SpecialUseRestrictionDistrictExporter.class).doExport((SpecialUseRestrictionDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ExceptionalFloorAreaRateDistrict)
+                getExporter(ExceptionalFloorAreaRateDistrictExporter.class).doExport((ExceptionalFloorAreaRateDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof HighRiseResidentialAttractionDistrict)
+                getExporter(HighRiseResidentialAttractionDistrictExporter.class).doExport((HighRiseResidentialAttractionDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof HeightControlDistrict)
+                getExporter(HeightControlDistrictExporter.class).doExport((HeightControlDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof HighLevelUseDistrict)
+                getExporter(HighLevelUseDistrictExporter.class).doExport((HighLevelUseDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecifiedBlock)
+                getExporter(SpecifiedBlockExporter.class).doExport((SpecifiedBlock) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecialUrbanRenaissanceDistrict)
+                getExporter(SpecialUrbanRenaissanceDistrictExporter.class).doExport((SpecialUrbanRenaissanceDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ResidentialEnvironmentImprovementDistrict)
+                getExporter(ResidentialEnvironmentImprovementDistrictExporter.class).doExport((ResidentialEnvironmentImprovementDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecialUseAttractionDistrict)
+                getExporter(SpecialUseAttractionDistrictExporter.class).doExport((SpecialUseAttractionDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecifiedDisasterPreventionBlockImprovementZone)
+                getExporter(SpecifiedDisasterPreventionBlockImprovementZoneExporter.class).doExport((SpecifiedDisasterPreventionBlockImprovementZone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof LandscapeZone)
+                getExporter(LandscapeZoneExporter.class).doExport((LandscapeZone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ScenicDistrict)
+                getExporter(ScenicDistrictExporter.class).doExport((ScenicDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof PortZone)
+                getExporter(PortZoneExporter.class).doExport((PortZone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecialGreenSpaceConservationDistrict)
+                getExporter(SpecialGreenSpaceConservationDistrictExporter.class).doExport((SpecialGreenSpaceConservationDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof TreePlantingDistrict)
+                getExporter(TreePlantingDistrictExporter.class).doExport((TreePlantingDistrict) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DistributionBusinessZone)
+                getExporter(DistributionBusinessZoneExporter.class).doExport((DistributionBusinessZone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ProductiveGreenZone)
+                getExporter(ProductiveGreenZoneExporter.class).doExport((ProductiveGreenZone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanRedevelopmentPromotionArea)
+                getExporter(UrbanRedevelopmentPromotionAreaExporter.class).doExport((UrbanRedevelopmentPromotionArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof LandReadjustmentProject)
+                getExporter(LandReadjustmentProjectExporter.class).doExport((LandReadjustmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof NewHousingAndUrbanDevelopmentProject)
+                getExporter(NewHousingAndUrbanDevelopmentProjectExporter.class).doExport((NewHousingAndUrbanDevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof IndustrialParkDevelopmentProject)
+                getExporter(IndustrialParkDevelopmentProjectExporter.class).doExport((IndustrialParkDevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanRedevelopmentProject)
+                getExporter(UrbanRedevelopmentProjectExporter.class).doExport((UrbanRedevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof NewUrbanInfrastructureProject)
+                getExporter(NewUrbanInfrastructureProjectExporter.class).doExport((NewUrbanInfrastructureProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ResidentialBlockConstructionProject)
+                getExporter(ResidentialBlockConstructionProjectExporter.class).doExport((ResidentialBlockConstructionProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DisasterPreventionBlockImprovementProject)
+                getExporter(DisasterPreventionBlockImprovementProjectExporter.class).doExport((DisasterPreventionBlockImprovementProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanRenewalProject)
+                getExporter(UrbanRenewalProjectExporter.class).doExport((UrbanRenewalProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof TrafficFacility)
+                getExporter(TrafficFacilityExporter.class).doExport((TrafficFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof OpenSpaceForPublicUse)
+                getExporter(OpenSpaceForPublicUseExporter.class).doExport((OpenSpaceForPublicUse) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SupplyFacility)
+                getExporter(SupplyFacilityExporter.class).doExport((SupplyFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof TreatmentFacility)
+                getExporter(TreatmentFacilityExporter.class).doExport((TreatmentFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof org.citygml4j.ade.iur.model.urf.Waterway)
+                getExporter(org.citydb.ade.iur.exporter.urf.WaterwayExporter.class).doExport((org.citygml4j.ade.iur.model.urf.Waterway) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveHousingFacilities)
+                getExporter(CollectiveHousingFacilitiesExporter.class).doExport((CollectiveHousingFacilities) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveGovernmentAndPublicOfficeFacilities)
+                getExporter(CollectiveGovernmentAndPublicOfficeFacilitiesExporter.class).doExport((CollectiveGovernmentAndPublicOfficeFacilities) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveUrbanDisasterPreventionFacilities)
+                getExporter(CollectiveUrbanDisasterPreventionFacilitiesExporter.class).doExport((CollectiveUrbanDisasterPreventionFacilities) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DistributionBusinessPark)
+                getExporter(DistributionBusinessParkExporter.class).doExport((DistributionBusinessPark) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanFacilityStipulatedByCabinetOrder)
+                getExporter(UrbanFacilityStipulatedByCabinetOrderExporter.class).doExport((UrbanFacilityStipulatedByCabinetOrder) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveFacilitiesForTsunamiDisasterPrevention)
+                getExporter(CollectiveFacilitiesForTsunamiDisasterPreventionExporter.class).doExport((CollectiveFacilitiesForTsunamiDisasterPrevention) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveFacilitiesForReconstructionAndRevitalization)
+                getExporter(CollectiveFacilitiesForReconstructionAndRevitalizationExporter.class).doExport((CollectiveFacilitiesForReconstructionAndRevitalization) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CollectiveFacilitiesForReconstruction)
+                getExporter(CollectiveFacilitiesForReconstructionExporter.class).doExport((CollectiveFacilitiesForReconstruction) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DistrictPlan)
+                getExporter(DistrictPlanExporter.class).doExport((DistrictPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DisasterPreventionBlockImprovementZonePlan)
+                getExporter(DisasterPreventionBlockImprovementZonePlanExporter.class).doExport((DisasterPreventionBlockImprovementZonePlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof HistoricSceneryMaintenanceAndImprovementDistrictPlan)
+                getExporter(HistoricSceneryMaintenanceAndImprovementDistrictPlanExporter.class).doExport((HistoricSceneryMaintenanceAndImprovementDistrictPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof RoadsideDistrictPlan)
+                getExporter(RoadsideDistrictPlanExporter.class).doExport((RoadsideDistrictPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof RoadsideDistrictImprovementPlan)
+                getExporter(RoadsideDistrictImprovementPlanExporter.class).doExport((RoadsideDistrictImprovementPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof RuralDistrictImprovementPlan)
+                getExporter(RuralDistrictImprovementPlanExporter.class).doExport((RuralDistrictImprovementPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SpecifiedUrgentUrbanRenewalArea)
+                getExporter(SpecifiedUrgentUrbanRenewalAreaExporter.class).doExport((SpecifiedUrgentUrbanRenewalArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanPlanningArea)
+                getExporter(UrbanPlanningAreaExporter.class).doExport((UrbanPlanningArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof QuasiUrbanPlanningArea)
+                getExporter(QuasiUrbanPlanningAreaExporter.class).doExport((QuasiUrbanPlanningArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof AreaClassification)
+                getExporter(AreaClassificationExporter.class).doExport((AreaClassification) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DistrictsAndZones)
+                getExporter(DistrictsAndZonesExporter.class).doExport((DistrictsAndZones) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ProjectPromotionArea)
+                getExporter(ProjectPromotionAreaExporter.class).doExport((ProjectPromotionArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanDisasterRecoveryPromotionArea)
+                getExporter(UrbanDisasterRecoveryPromotionAreaExporter.class).doExport((UrbanDisasterRecoveryPromotionArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanDevelopmentProject)
+                getExporter(UrbanDevelopmentProjectExporter.class).doExport((UrbanDevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ScheduledAreaForUrbanDevelopmentProject)
+                getExporter(ScheduledAreaForUrbanDevelopmentProjectExporter.class).doExport((ScheduledAreaForUrbanDevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrbanFacility)
+                getExporter(UrbanFacilityExporter.class).doExport((UrbanFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof AbstractDistrictPlan)
+                getExporter(AbstractDistrictPlanExporter.class).doExport((AbstractDistrictPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DistrictDevelopmentPlan)
+                getExporter(DistrictDevelopmentPlanExporter.class).doExport((DistrictDevelopmentPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof District)
+                getExporter(DistrictExporter.class).doExport((District) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ZonalDisasterPreventionFacility)
+                getExporter(ZonalDisasterPreventionFacilityExporter.class).doExport((ZonalDisasterPreventionFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof UrgentUrbanRenewalArea)
+                getExporter(UrgentUrbanRenewalAreaExporter.class).doExport((UrgentUrbanRenewalArea) object, objectId, objectType, projectionFilter);
+            else if (object instanceof PrivateUrbanRenewalProjectPlan)
+                getExporter(PrivateUrbanRenewalProjectPlanExporter.class).doExport((PrivateUrbanRenewalProjectPlan) object, objectId, objectType, projectionFilter);
+            else if (object instanceof GlobalHubCityDevelopmentProject)
+                getExporter(GlobalHubCityDevelopmentProjectExporter.class).doExport((GlobalHubCityDevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Agreement)
+                getExporter(AgreementExporter.class).doExport((Agreement) object, objectId, objectType, projectionFilter);
+            else if (object instanceof SedimentDisasterProneArea)
+                getExporter(SedimentDisasterProneAreaExporter.class).doExport((SedimentDisasterProneArea) object, objectId, objectType, projectionFilter);
             else if (object instanceof Zone)
                 getExporter(ZoneExporter.class).doExport((Zone) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ThreeDimensionalExtent)
+                getExporter(ThreeDimensionalExtentExporter.class).doExport((ThreeDimensionalExtent) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Administration)
+                getExporter(AdministrationExporter.class).doExport((Administration) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DisasterDamage)
+                getExporter(DisasterDamageExporter.class).doExport((DisasterDamage) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Pollution)
+                getExporter(PollutionExporter.class).doExport((Pollution) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DisasterPreventionBase)
+                getExporter(DisasterPreventionBaseExporter.class).doExport((DisasterPreventionBase) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Recreations)
+                getExporter(RecreationsExporter.class).doExport((Recreations) object, objectId, objectType, projectionFilter);
+            else if (object instanceof org.citygml4j.ade.iur.model.urf.LandUseDiversion)
+                getExporter(org.citydb.ade.iur.exporter.urf.LandUseDiversionExporter.class).doExport((org.citygml4j.ade.iur.model.urf.LandUseDiversion) object, objectId, objectType, projectionFilter);
+            else if (object instanceof Urbanization)
+                getExporter(UrbanizationExporter.class).doExport((Urbanization) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DID)
+                getExporter(DIDExporter.class).doExport((DID) object, objectId, objectType, projectionFilter);
+            else if (object instanceof CensusBlock)
+                getExporter(CensusBlockExporter.class).doExport((CensusBlock) object, objectId, objectType, projectionFilter);
+            else if (object instanceof DevelopmentProject)
+                getExporter(DevelopmentProjectExporter.class).doExport((DevelopmentProject) object, objectId, objectType, projectionFilter);
+            else if (object instanceof NewHousing)
+                getExporter(NewHousingExporter.class).doExport((NewHousing) object, objectId, objectType, projectionFilter);
+            else if (object instanceof PublicTransitFacility)
+                getExporter(PublicTransitFacilityExporter.class).doExport((PublicTransitFacility) object, objectId, objectType, projectionFilter);
+            else if (object instanceof WeatherObservation)
+                getExporter(WeatherObservationExporter.class).doExport((WeatherObservation) object, objectId, objectType, projectionFilter);
+            else if (object instanceof ScenicResource)
+                getExporter(ScenicResourceExporter.class).doExport((ScenicResource) object, objectId, objectType, projectionFilter);
             else if (object instanceof UrbanFunction)
                 getExporter(UrbanFunctionExporter.class).doExport((UrbanFunction) object, objectId, objectType, projectionFilter);
         } else if (StatisticalGridModule.v1_4.getModelPackageName().equals(object.getClass().getPackage().getName())) {
@@ -192,8 +420,8 @@ public class ExportManager implements ADEExportManager {
                 getExporter(AppurtenanceExporter.class).doExport((Appurtenance) object, objectId, objectType, projectionFilter);
             else if (object instanceof UtilityNodeContainer)
                 getExporter(UtilityNodeContainerExporter.class).doExport((UtilityNodeContainer) object, objectId, objectType, projectionFilter);
-            else if (object instanceof Waterway)
-                getExporter(WaterwayExporter.class).doExport((Waterway) object, objectId, objectType, projectionFilter);
+            else if (object instanceof org.citygml4j.ade.iur.model.uro.Waterway)
+                getExporter(org.citydb.ade.iur.exporter.uro.WaterwayExporter.class).doExport((org.citygml4j.ade.iur.model.uro.Waterway) object, objectId, objectType, projectionFilter);
             else if (object instanceof AbstractConstruction)
                 getExporter(AbstractConstructionExporter.class).doExport((AbstractConstruction) object, objectId, objectType, projectionFilter);
             else if (object instanceof org.citygml4j.ade.iur.model.uro.AbstractBoundarySurface)
@@ -232,8 +460,6 @@ public class ExportManager implements ADEExportManager {
                 getExporter(org.citydb.ade.iur.exporter.urg.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
             else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_1)))
                 getExporter(org.citydb.ade.iur.exporter.uro.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
-            else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2)))
-                getExporter(org.citydb.ade.iur.exporter.urf.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
             else if (adeHookTable.equals(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_3)))
                 getExporter(org.citydb.ade.iur.exporter.urt.CityObjectGroupPropertiesExporter.class).doExport((CityObjectGroup) parent, parentId, parentType, projectionFilter);
         }
@@ -282,28 +508,214 @@ public class ExportManager implements ADEExportManager {
         if (exporter == null) {
             if (UrbanFunctionModuleExporter.class.isAssignableFrom(type)) {
                 // urban function module
-                if (type == UrbanFunctionExporter.class)
-                    exporter = new UrbanFunctionExporter(connection, helper, this);
-                else if (type == DevelopmentProjectExporter.class)
-                    exporter = new DevelopmentProjectExporter(connection, helper, this);
-                else if (type == CensusBlockExporter.class)
-                    exporter = new CensusBlockExporter(connection, helper, this);
-                else if (type == DisasterDamageExporter.class)
-                    exporter = new DisasterDamageExporter(connection, helper, this);
-                else if (type == DisasterPreventionBaseExporter.class)
-                    exporter = new DisasterPreventionBaseExporter(connection, helper, this);
-                else if (type == PollutionExporter.class)
-                    exporter = new PollutionExporter(connection, helper, this);
-                else if (type == PublicTransportationFacilityExporter.class)
-                    exporter = new PublicTransportationFacilityExporter(connection, helper, this);
-                else if (type == RecreationsExporter.class)
-                    exporter = new RecreationsExporter(connection, helper, this);
-                else if (type == UrbanizationExporter.class)
-                    exporter = new UrbanizationExporter(connection, helper, this);
+                if (type == BoundaryExporter.class)
+                    exporter = new BoundaryExporter(connection, helper, this);
+                else if (type == UrbanRoadAttributeExporter.class)
+                    exporter = new UrbanRoadAttributeExporter(connection, helper, this);
+                else if (type == StructureDetailsExporter.class)
+                    exporter = new StructureDetailsExporter(connection, helper, this);
+                else if (type == UrbanRapidTransitRailroadAttributeExporter.class)
+                    exporter = new UrbanRapidTransitRailroadAttributeExporter(connection, helper, this);
+                else if (type == ParkingPlaceAttributeExporter.class)
+                    exporter = new ParkingPlaceAttributeExporter(connection, helper, this);
+                else if (type == VehicleTerminalAttributeExporter.class)
+                    exporter = new VehicleTerminalAttributeExporter(connection, helper, this);
+                else if (type == ParkAttributeExporter.class)
+                    exporter = new ParkAttributeExporter(connection, helper, this);
+                else if (type == WaterWorksAttributeExporter.class)
+                    exporter = new WaterWorksAttributeExporter(connection, helper, this);
+                else if (type == SewerSystemAttributeExporter.class)
+                    exporter = new SewerSystemAttributeExporter(connection, helper, this);
+                else if (type == ObservationPointExporter.class)
+                    exporter = new ObservationPointExporter(connection, helper, this);
+                else if (type == FarmlandConversionTypeExporter.class)
+                    exporter = new FarmlandConversionTypeExporter(connection, helper, this);
+                else if (type == ForestConversionTypeExporter.class)
+                    exporter = new ForestConversionTypeExporter(connection, helper, this);
+                else if (type == PopulationTypeExporter.class)
+                    exporter = new PopulationTypeExporter(connection, helper, this);
+                else if (type == PopulationByAgeAndSexTypeExporter.class)
+                    exporter = new PopulationByAgeAndSexTypeExporter(connection, helper, this);
+                else if (type == DaytimePopulationTypeExporter.class)
+                    exporter = new DaytimePopulationTypeExporter(connection, helper, this);
+                else if (type == EconomicActivityTypeExporter.class)
+                    exporter = new EconomicActivityTypeExporter(connection, helper, this);
+                else if (type == EconomicActivitySumTypeExporter.class)
+                    exporter = new EconomicActivitySumTypeExporter(connection, helper, this);
+                else if (type == ResidentialDevelopmentTypeExporter.class)
+                    exporter = new ResidentialDevelopmentTypeExporter(connection, helper, this);
+                else if (type == UrbanDevelopmentProjectTypeExporter.class)
+                    exporter = new UrbanDevelopmentProjectTypeExporter(connection, helper, this);
+                else if (type == AgriculturalDevelopmentProjectTypeExporter.class)
+                    exporter = new AgriculturalDevelopmentProjectTypeExporter(connection, helper, this);
+                else if (type == WeatherObservationTypeExporter.class)
+                    exporter = new WeatherObservationTypeExporter(connection, helper, this);
+                else if (type == UseDistrictExporter.class)
+                    exporter = new UseDistrictExporter(connection, helper, this);
+                else if (type == SpecialUseDistrictExporter.class)
+                    exporter = new SpecialUseDistrictExporter(connection, helper, this);
+                else if (type == SpecialUseRestrictionDistrictExporter.class)
+                    exporter = new SpecialUseRestrictionDistrictExporter(connection, helper, this);
+                else if (type == ExceptionalFloorAreaRateDistrictExporter.class)
+                    exporter = new ExceptionalFloorAreaRateDistrictExporter(connection, helper, this);
+                else if (type == HighRiseResidentialAttractionDistrictExporter.class)
+                    exporter = new HighRiseResidentialAttractionDistrictExporter(connection, helper, this);
+                else if (type == HeightControlDistrictExporter.class)
+                    exporter = new HeightControlDistrictExporter(connection, helper, this);
+                else if (type == HighLevelUseDistrictExporter.class)
+                    exporter = new HighLevelUseDistrictExporter(connection, helper, this);
+                else if (type == SpecifiedBlockExporter.class)
+                    exporter = new SpecifiedBlockExporter(connection, helper, this);
+                else if (type == SpecialUrbanRenaissanceDistrictExporter.class)
+                    exporter = new SpecialUrbanRenaissanceDistrictExporter(connection, helper, this);
+                else if (type == ResidentialEnvironmentImprovementDistrictExporter.class)
+                    exporter = new ResidentialEnvironmentImprovementDistrictExporter(connection, helper, this);
+                else if (type == SpecialUseAttractionDistrictExporter.class)
+                    exporter = new SpecialUseAttractionDistrictExporter(connection, helper, this);
+                else if (type == SpecifiedDisasterPreventionBlockImprovementZoneExporter.class)
+                    exporter = new SpecifiedDisasterPreventionBlockImprovementZoneExporter(connection, helper, this);
+                else if (type == LandscapeZoneExporter.class)
+                    exporter = new LandscapeZoneExporter(connection, helper, this);
+                else if (type == ScenicDistrictExporter.class)
+                    exporter = new ScenicDistrictExporter(connection, helper, this);
+                else if (type == PortZoneExporter.class)
+                    exporter = new PortZoneExporter(connection, helper, this);
+                else if (type == SpecialGreenSpaceConservationDistrictExporter.class)
+                    exporter = new SpecialGreenSpaceConservationDistrictExporter(connection, helper, this);
+                else if (type == TreePlantingDistrictExporter.class)
+                    exporter = new TreePlantingDistrictExporter(connection, helper, this);
+                else if (type == DistributionBusinessZoneExporter.class)
+                    exporter = new DistributionBusinessZoneExporter(connection, helper, this);
+                else if (type == ProductiveGreenZoneExporter.class)
+                    exporter = new ProductiveGreenZoneExporter(connection, helper, this);
+                else if (type == UrbanRedevelopmentPromotionAreaExporter.class)
+                    exporter = new UrbanRedevelopmentPromotionAreaExporter(connection, helper, this);
+                else if (type == LandReadjustmentProjectExporter.class)
+                    exporter = new LandReadjustmentProjectExporter(connection, helper, this);
+                else if (type == NewHousingAndUrbanDevelopmentProjectExporter.class)
+                    exporter = new NewHousingAndUrbanDevelopmentProjectExporter(connection, helper, this);
+                else if (type == IndustrialParkDevelopmentProjectExporter.class)
+                    exporter = new IndustrialParkDevelopmentProjectExporter(connection, helper, this);
+                else if (type == UrbanRedevelopmentProjectExporter.class)
+                    exporter = new UrbanRedevelopmentProjectExporter(connection, helper, this);
+                else if (type == NewUrbanInfrastructureProjectExporter.class)
+                    exporter = new NewUrbanInfrastructureProjectExporter(connection, helper, this);
+                else if (type == ResidentialBlockConstructionProjectExporter.class)
+                    exporter = new ResidentialBlockConstructionProjectExporter(connection, helper, this);
+                else if (type == DisasterPreventionBlockImprovementProjectExporter.class)
+                    exporter = new DisasterPreventionBlockImprovementProjectExporter(connection, helper, this);
+                else if (type == UrbanRenewalProjectExporter.class)
+                    exporter = new UrbanRenewalProjectExporter(connection, helper, this);
+                else if (type == TrafficFacilityExporter.class)
+                    exporter = new TrafficFacilityExporter(connection, helper, this);
+                else if (type == OpenSpaceForPublicUseExporter.class)
+                    exporter = new OpenSpaceForPublicUseExporter(connection, helper, this);
+                else if (type == SupplyFacilityExporter.class)
+                    exporter = new SupplyFacilityExporter(connection, helper, this);
+                else if (type == TreatmentFacilityExporter.class)
+                    exporter = new TreatmentFacilityExporter(connection, helper, this);
+                else if (type == org.citydb.ade.iur.exporter.urf.WaterwayExporter.class)
+                    exporter = new org.citydb.ade.iur.exporter.urf.WaterwayExporter(connection, helper, this);
+                else if (type == CollectiveHousingFacilitiesExporter.class)
+                    exporter = new CollectiveHousingFacilitiesExporter(connection, helper, this);
+                else if (type == CollectiveGovernmentAndPublicOfficeFacilitiesExporter.class)
+                    exporter = new CollectiveGovernmentAndPublicOfficeFacilitiesExporter(connection, helper, this);
+                else if (type == CollectiveUrbanDisasterPreventionFacilitiesExporter.class)
+                    exporter = new CollectiveUrbanDisasterPreventionFacilitiesExporter(connection, helper, this);
+                else if (type == DistributionBusinessParkExporter.class)
+                    exporter = new DistributionBusinessParkExporter(connection, helper, this);
+                else if (type == UrbanFacilityStipulatedByCabinetOrderExporter.class)
+                    exporter = new UrbanFacilityStipulatedByCabinetOrderExporter(connection, helper, this);
+                else if (type == CollectiveFacilitiesForTsunamiDisasterPreventionExporter.class)
+                    exporter = new CollectiveFacilitiesForTsunamiDisasterPreventionExporter(connection, helper, this);
+                else if (type == CollectiveFacilitiesForReconstructionAndRevitalizationExporter.class)
+                    exporter = new CollectiveFacilitiesForReconstructionAndRevitalizationExporter(connection, helper, this);
+                else if (type == CollectiveFacilitiesForReconstructionExporter.class)
+                    exporter = new CollectiveFacilitiesForReconstructionExporter(connection, helper, this);
+                else if (type == DistrictPlanExporter.class)
+                    exporter = new DistrictPlanExporter(connection, helper, this);
+                else if (type == DisasterPreventionBlockImprovementZonePlanExporter.class)
+                    exporter = new DisasterPreventionBlockImprovementZonePlanExporter(connection, helper, this);
+                else if (type == HistoricSceneryMaintenanceAndImprovementDistrictPlanExporter.class)
+                    exporter = new HistoricSceneryMaintenanceAndImprovementDistrictPlanExporter(connection, helper, this);
+                else if (type == RoadsideDistrictPlanExporter.class)
+                    exporter = new RoadsideDistrictPlanExporter(connection, helper, this);
+                else if (type == RoadsideDistrictImprovementPlanExporter.class)
+                    exporter = new RoadsideDistrictImprovementPlanExporter(connection, helper, this);
+                else if (type == RuralDistrictImprovementPlanExporter.class)
+                    exporter = new RuralDistrictImprovementPlanExporter(connection, helper, this);
+                else if (type == SpecifiedUrgentUrbanRenewalAreaExporter.class)
+                    exporter = new SpecifiedUrgentUrbanRenewalAreaExporter(connection, helper, this);
+                else if (type == UrbanPlanningAreaExporter.class)
+                    exporter = new UrbanPlanningAreaExporter(connection, helper, this);
+                else if (type == QuasiUrbanPlanningAreaExporter.class)
+                    exporter = new QuasiUrbanPlanningAreaExporter(connection, helper, this);
+                else if (type == AreaClassificationExporter.class)
+                    exporter = new AreaClassificationExporter(connection, helper, this);
+                else if (type == DistrictsAndZonesExporter.class)
+                    exporter = new DistrictsAndZonesExporter(connection, helper, this);
+                else if (type == ProjectPromotionAreaExporter.class)
+                    exporter = new ProjectPromotionAreaExporter(connection, helper, this);
+                else if (type == UrbanDisasterRecoveryPromotionAreaExporter.class)
+                    exporter = new UrbanDisasterRecoveryPromotionAreaExporter(connection, helper, this);
+                else if (type == UrbanDevelopmentProjectExporter.class)
+                    exporter = new UrbanDevelopmentProjectExporter(connection, helper, this);
+                else if (type == ScheduledAreaForUrbanDevelopmentProjectExporter.class)
+                    exporter = new ScheduledAreaForUrbanDevelopmentProjectExporter(connection, helper, this);
+                else if (type == UrbanFacilityExporter.class)
+                    exporter = new UrbanFacilityExporter(connection, helper, this);
+                else if (type == AbstractDistrictPlanExporter.class)
+                    exporter = new AbstractDistrictPlanExporter(connection, helper, this);
+                else if (type == DistrictDevelopmentPlanExporter.class)
+                    exporter = new DistrictDevelopmentPlanExporter(connection, helper, this);
+                else if (type == DistrictExporter.class)
+                    exporter = new DistrictExporter(connection, helper, this);
+                else if (type == ZonalDisasterPreventionFacilityExporter.class)
+                    exporter = new ZonalDisasterPreventionFacilityExporter(connection, helper, this);
+                else if (type == UrgentUrbanRenewalAreaExporter.class)
+                    exporter = new UrgentUrbanRenewalAreaExporter(connection, helper, this);
+                else if (type == PrivateUrbanRenewalProjectPlanExporter.class)
+                    exporter = new PrivateUrbanRenewalProjectPlanExporter(connection, helper, this);
+                else if (type == GlobalHubCityDevelopmentProjectExporter.class)
+                    exporter = new GlobalHubCityDevelopmentProjectExporter(connection, helper, this);
+                else if (type == AgreementExporter.class)
+                    exporter = new AgreementExporter(connection, helper, this);
+                else if (type == SedimentDisasterProneAreaExporter.class)
+                    exporter = new SedimentDisasterProneAreaExporter(connection, helper, this);
                 else if (type == ZoneExporter.class)
                     exporter = new ZoneExporter(connection, helper, this);
-                else if (type == org.citydb.ade.iur.exporter.urf.CityObjectGroupPropertiesExporter.class)
-                    exporter = new org.citydb.ade.iur.exporter.urf.CityObjectGroupPropertiesExporter(connection, helper, this);
+                else if (type == ThreeDimensionalExtentExporter.class)
+                    exporter = new ThreeDimensionalExtentExporter(connection, helper, this);
+                else if (type == AdministrationExporter.class)
+                    exporter = new AdministrationExporter(connection, helper, this);
+                else if (type == DisasterDamageExporter.class)
+                    exporter = new DisasterDamageExporter(connection, helper, this);
+                else if (type == PollutionExporter.class)
+                    exporter = new PollutionExporter(connection, helper, this);
+                else if (type == DisasterPreventionBaseExporter.class)
+                    exporter = new DisasterPreventionBaseExporter(connection, helper, this);
+                else if (type == RecreationsExporter.class)
+                    exporter = new RecreationsExporter(connection, helper, this);
+                else if (type == org.citydb.ade.iur.exporter.urf.LandUseDiversionExporter.class)
+                    exporter = new org.citydb.ade.iur.exporter.urf.LandUseDiversionExporter(connection, helper, this);
+                else if (type == UrbanizationExporter.class)
+                    exporter = new UrbanizationExporter(connection, helper, this);
+                else if (type == DIDExporter.class)
+                    exporter = new DIDExporter(connection, helper, this);
+                else if (type == CensusBlockExporter.class)
+                    exporter = new CensusBlockExporter(connection, helper, this);
+                else if (type == DevelopmentProjectExporter.class)
+                    exporter = new DevelopmentProjectExporter(connection, helper, this);
+                else if (type == NewHousingExporter.class)
+                    exporter = new NewHousingExporter(connection, helper, this);
+                else if (type == PublicTransitFacilityExporter.class)
+                    exporter = new PublicTransitFacilityExporter(connection, helper, this);
+                else if (type == WeatherObservationExporter.class)
+                    exporter = new WeatherObservationExporter(connection, helper, this);
+                else if (type == ScenicResourceExporter.class)
+                    exporter = new ScenicResourceExporter(connection, helper, this);
+                else if (type == UrbanFunctionExporter.class)
+                    exporter = new UrbanFunctionExporter(connection, helper, this);
             } else if (StatisticalGridModuleExporter.class.isAssignableFrom(type)) {
                 // statistical grid module
                 if (type == StatisticalGridExporter.class)
@@ -458,6 +870,8 @@ public class ExportManager implements ADEExportManager {
                     exporter = new ThematicShapeExporter(connection, helper, this);
                 else if (type == LengthAttributeExporter.class)
                     exporter = new LengthAttributeExporter(connection, helper, this);
+                else if (type == org.citydb.ade.iur.exporter.uro.WaterwayExporter.class)
+                    exporter = new org.citydb.ade.iur.exporter.uro.WaterwayExporter(connection, helper, this);
                 else if (type == PipeExporter.class)
                     exporter = new PipeExporter(connection, helper, this);
                 else if (type == CableExporter.class)
@@ -470,8 +884,6 @@ public class ExportManager implements ADEExportManager {
                     exporter = new AppurtenanceExporter(connection, helper, this);
                 else if (type == UtilityNodeContainerExporter.class)
                     exporter = new UtilityNodeContainerExporter(connection, helper, this);
-                else if (type == WaterwayExporter.class)
-                    exporter = new WaterwayExporter(connection, helper, this);
                 else if (type == AbstractConstructionExporter.class)
                     exporter = new AbstractConstructionExporter(connection, helper, this);
                 else if (type == AbstractBoundarySurfaceExporter.class)

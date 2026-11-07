@@ -34,40 +34,32 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.LengthAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class LengthAttributeExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public LengthAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.LENGTHATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("length", "length_uom", "mesuretype", "mesuretype_codespace", "phasetype", "phasetype_codespace"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("utilitylink_lengthattribu_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<LengthAttribute> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(LengthAttribute lengthAttribute, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<LengthAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                LengthAttribute lengthAttribute = new LengthAttribute();
+            if (rs.next()) {
                 double lengthValue = rs.getDouble("length");
                 if (!rs.wasNull()) {
                     Length length = new Length(lengthValue);
@@ -88,16 +80,12 @@ public class LengthAttributeExporter implements UrbanObjectModuleExporter {
                     code.setCodeSpace(rs.getString("phasetype_codespace"));
                     lengthAttribute.setPhaseType(code);
                 }
-
-                result.add(lengthAttribute);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

@@ -48,7 +48,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final LandUseToFacilityAttributeImporter landUseToFacilityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final LandUseToDmAttributeImporter landUseToDmAttributeImporter;
     private final IfcAttributeImporter ifcAttributeImporter;
     private final LandUseDataQualityAttributeImporter landUseDataQualityAttributeImporter;
     private final LandUseDetailAttributeImporter landUseDetailAttributeImporter;
@@ -68,7 +70,9 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        landUseToFacilityAttributeImporter = manager.getImporter(LandUseToFacilityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        landUseToDmAttributeImporter = manager.getImporter(LandUseToDmAttributeImporter.class);
         ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
         landUseDataQualityAttributeImporter = manager.getImporter(LandUseDataQualityAttributeImporter.class);
         landUseDetailAttributeImporter = manager.getImporter(LandUseDetailAttributeImporter.class);
@@ -153,15 +157,19 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(LuseFacilityAttributePropertyElement.class)) {
             for (LuseFacilityAttributePropertyElement property : properties.getAll(LuseFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusefacilityattr_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long luseFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    landUseToFacilityAttributeImporter.doImport(luseFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(LuseDmAttributePropertyElement.class)) {
             for (LuseDmAttributePropertyElement property : properties.getAll(LuseDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusedmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long luseDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    landUseToDmAttributeImporter.doImport(luseDmAttributeId, parentId);
+                }
             }
         }
     }

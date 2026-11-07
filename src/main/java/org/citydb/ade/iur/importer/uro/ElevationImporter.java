@@ -53,29 +53,28 @@ public class ElevationImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.ELEVATION)) + " " +
-                "(id, construction_elevation_id, elevationreference, elevationreference_codespace, elevationvalue) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, elevationreference, elevationreference_codespace, elevationvalue) " +
+                "values (?, ?, ?, ?)");
 
         valueJoiner = helper.getAttributeValueJoiner();
     }
 
-    public long doImport(Elevation elevation, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(Elevation elevation) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.ELEVATION_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (elevation.getElevationReference() != null && elevation.getElevationReference().isSetValue()) {
-            ps.setString(3, elevation.getElevationReference().getValue());
-            ps.setString(4, elevation.getElevationReference().getCodeSpace());
+            ps.setString(2, elevation.getElevationReference().getValue());
+            ps.setString(3, elevation.getElevationReference().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (elevation.getElevationValue() != null && elevation.getElevationValue().isSetValue())
-            ps.setString(5, valueJoiner.join(" ", elevation.getElevationValue().getValue()));
+            ps.setString(4, valueJoiner.join(" ", elevation.getElevationValue().getValue()));
         else
-            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(4, Types.VARCHAR);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

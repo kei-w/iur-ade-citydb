@@ -36,21 +36,18 @@ import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.OffsetDepth;
 import org.citygml4j.model.gml.geometry.primitives.DirectPosition;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import java.sql.*;
 
 public class OffsetDepthExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
     private final AttributeValueSplitter valueSplitter;
 
     public OffsetDepthExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
@@ -59,21 +56,17 @@ public class OffsetDepthExporter implements UrbanObjectModuleExporter {
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("pos", "offset_", "offset_uom", "depth", "depth_uom", "mindepth", "mindepth_uom", "maxdepth",
                         "maxdepth_uom"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("utilitynetwor_offsetdepth_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
         valueSplitter = helper.getAttributeValueSplitter();
     }
 
-    public List<OffsetDepth> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(OffsetDepth offsetDepth, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<OffsetDepth> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                OffsetDepth offsetDepth = new OffsetDepth();
+            if (rs.next()) {
                 String pos = rs.getString("pos");
                 if (!rs.wasNull()) {
                     DirectPosition directPosition = new DirectPosition();
@@ -108,16 +101,12 @@ public class OffsetDepthExporter implements UrbanObjectModuleExporter {
                     length.setUom(rs.getString("maxdepth_uom"));
                     offsetDepth.setMaxDepth(length);
                 }
-
-                result.add(offsetDepth);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

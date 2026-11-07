@@ -48,11 +48,15 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final BuildingToFacilityAttributeImporter buildingToFacilityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final BuildingToDmAttributeImporter buildingToDmAttributeImporter;
     private final IfcAttributeImporter ifcAttributeImporter;
     private final IndoorAttributeImporter indoorAttributeImporter;
     private final BuildingAttributeImporter buildingAttributeImporter;
+    private final BuildingToBuildingDisasterRiskAttributeImporter buildingToBuildingDisasterRiskAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final BuildingToKeyValuePairAttributeImporter buildingToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -70,11 +74,15 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        buildingToFacilityAttributeImporter = manager.getImporter(BuildingToFacilityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        buildingToDmAttributeImporter = manager.getImporter(BuildingToDmAttributeImporter.class);
         ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
         indoorAttributeImporter = manager.getImporter(IndoorAttributeImporter.class);
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
+        buildingToBuildingDisasterRiskAttributeImporter = manager.getImporter(BuildingToBuildingDisasterRiskAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        buildingToKeyValuePairAttributeImporter = manager.getImporter(BuildingToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractBuilding parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -198,29 +206,37 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(BldgFacilityAttributePropertyElement.class)) {
             for (BldgFacilityAttributePropertyElement property : properties.getAll(BldgFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgfacilityattr_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bldgFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToFacilityAttributeImporter.doImport(bldgFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(BldgDmAttributePropertyElement.class)) {
             for (BldgDmAttributePropertyElement property : properties.getAll(BldgDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgdmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long bldgDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToDmAttributeImporter.doImport(bldgDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(BuildingDisasterRiskAttributePropertyElement.class)) {
             for (BuildingDisasterRiskAttributePropertyElement property : properties.getAll(BuildingDisasterRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    buildingAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_buildingdisaster_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long buildingDisasterRiskAttributeId = buildingAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToBuildingDisasterRiskAttributeImporter.doImport(buildingDisasterRiskAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(KeyValuePairAttributePropertyElement.class)) {
             for (KeyValuePairAttributePropertyElement property : properties.getAll(KeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId);
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long keyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToKeyValuePairAttributeImporter.doImport(keyValuePairAttributeId, parentId);
+                }
             }
         }
     }

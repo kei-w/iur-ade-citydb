@@ -75,10 +75,6 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
     }
 
     public long doImport(BuildingAttribute buildingAttribute) throws CityGMLImportException, SQLException {
-        return doImport(buildingAttribute, 0, null);
-    }
-
-    public long doImport(BuildingAttribute buildingAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.BUILDINGATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(buildingAttribute.getClass()));
@@ -97,7 +93,7 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
             largeCustomerFacilityAttributeImporter.doImport((LargeCustomerFacilityAttribute) buildingAttribute, objectId);
 
         if (buildingAttribute instanceof BuildingDisasterRiskAttribute)
-            buildingDisasterRiskAttributeImporter.doImport((BuildingDisasterRiskAttribute) buildingAttribute, objectId, parentId, parentColumn);
+            buildingDisasterRiskAttributeImporter.doImport((BuildingDisasterRiskAttribute) buildingAttribute, objectId);
 
         if (buildingAttribute instanceof BuildingDataQualityAttribute)
             buildingDataQualityAttributeImporter.doImport((BuildingDataQualityAttribute) buildingAttribute, objectId);

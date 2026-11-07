@@ -30,48 +30,68 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.Pollution;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
+import java.time.LocalDate;
 
 public class PollutionImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UrbanFunctionImporter urbanFunctionImporter;
+    private final ObservationPointImporter observationPointImporter;
 
     private int batchCounter;
 
     public PollutionImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.POLLUTION)) + " " +
-                "(id, cause, damagedarea, damagedarea_uom) " +
-                "values (?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.POLLUTION)) + " " +
+                "(id, id_, year, cause, damagedarea, damagedarea_uom, observationpoint_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
+        observationPointImporter = manager.getImporter(ObservationPointImporter.class);
     }
 
     public void doImport(Pollution pollution, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(pollution, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        ps.setString(2, pollution.getCause());
+        ps.setString(2, pollution.getIdentifier());
+
+        if (pollution.getYear() != null)
+            ps.setDate(3, Date.valueOf(LocalDate.of(pollution.getYear().getValue(), 1, 1)));
+        else
+            ps.setNull(3, Types.DATE);
+
+        ps.setString(4, pollution.getCause());
 
         if (pollution.getDamagedArea() != null && pollution.getDamagedArea().isSetValue()) {
-            ps.setDouble(3, pollution.getDamagedArea().getValue());
-            ps.setString(4, pollution.getDamagedArea().getUom());
+            ps.setDouble(5, pollution.getDamagedArea().getValue());
+            ps.setString(6, pollution.getDamagedArea().getUom());
         } else {
-            ps.setNull(3, Types.DOUBLE);
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(5, Types.DOUBLE);
+            ps.setNull(6, Types.VARCHAR);
         }
+
+        long observationPointId = 0;
+        if (pollution.getObservationPoint() != null && pollution.getObservationPoint().isSetObject())
+            observationPointId = observationPointImporter.doImport(pollution.getObservationPoint().getObject());
+
+        if (observationPointId != 0)
+            ps.setLong(7, observationPointId);
+        else
+            ps.setNull(7, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

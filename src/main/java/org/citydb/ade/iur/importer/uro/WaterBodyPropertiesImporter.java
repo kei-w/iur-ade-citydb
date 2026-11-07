@@ -48,8 +48,11 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final WaterBodyToFacilityAttributeImporter waterBodyToFacilityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final WaterBodyToDmAttributeImporter waterBodyToDmAttributeImporter;
     private final WaterBodyAttributeImporter waterBodyAttributeImporter;
+    private final WaterBodyToWaterBodyFloodingRiskAttributeImporter waterBodyToWaterBodyFloodingRiskAttributeImporter;
     private final WaterBodyDetailAttributeImporter waterBodyDetailAttributeImporter;
 
     private int batchCounter;
@@ -66,8 +69,11 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        waterBodyToFacilityAttributeImporter = manager.getImporter(WaterBodyToFacilityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        waterBodyToDmAttributeImporter = manager.getImporter(WaterBodyToDmAttributeImporter.class);
         waterBodyAttributeImporter = manager.getImporter(WaterBodyAttributeImporter.class);
+        waterBodyToWaterBodyFloodingRiskAttributeImporter = manager.getImporter(WaterBodyToWaterBodyFloodingRiskAttributeImporter.class);
         waterBodyDetailAttributeImporter = manager.getImporter(WaterBodyDetailAttributeImporter.class);
     }
 
@@ -122,22 +128,28 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(WtrFacilityAttributePropertyElement.class)) {
             for (WtrFacilityAttributePropertyElement property : properties.getAll(WtrFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrfacilityattr_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long wtrFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToFacilityAttributeImporter.doImport(wtrFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(WtrDmAttributePropertyElement.class)) {
             for (WtrDmAttributePropertyElement property : properties.getAll(WtrDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrdmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long wtrDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToDmAttributeImporter.doImport(wtrDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(FloodingRiskAttributePropertyElement.class)) {
             for (FloodingRiskAttributePropertyElement property : properties.getAll(FloodingRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    waterBodyAttributeImporter.doImport(property.getValue().getObject(), parentId);
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long floodingRiskAttributeId = waterBodyAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToWaterBodyFloodingRiskAttributeImporter.doImport(floodingRiskAttributeId, parentId);
+                }
             }
         }
     }

@@ -48,6 +48,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final TransportationComplexToFacilityAttributeImporter transportationComplexToFacilityAttributeImporter;
     private final TransportationDataQualityAttributeImporter transportationDataQualityAttributeImporter;
     private final RailwayRouteAttributeImporter railwayRouteAttributeImporter;
     private final TrackAttributeImporter trackAttributeImporter;
@@ -72,6 +73,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        transportationComplexToFacilityAttributeImporter = manager.getImporter(TransportationComplexToFacilityAttributeImporter.class);
         transportationDataQualityAttributeImporter = manager.getImporter(TransportationDataQualityAttributeImporter.class);
         railwayRouteAttributeImporter = manager.getImporter(RailwayRouteAttributeImporter.class);
         trackAttributeImporter = manager.getImporter(TrackAttributeImporter.class);
@@ -216,8 +218,10 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
 
         if (properties.contains(TranFacilityAttributePropertyElement.class)) {
             for (TranFacilityAttributePropertyElement property : properties.getAll(TranFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_tranfaci_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tranFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    transportationComplexToFacilityAttributeImporter.doImport(tranFacilityAttributeId, parentId);
+                }
             }
         }
     }

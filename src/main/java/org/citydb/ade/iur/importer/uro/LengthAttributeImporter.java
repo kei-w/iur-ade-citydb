@@ -51,38 +51,36 @@ public class LengthAttributeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LENGTHATTRIBUTE)) + " " +
-                "(id, utilitylink_lengthattribu_id, length, length_uom, mesuretype, mesuretype_codespace, phasetype," +
-                "phasetype_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, length, length_uom, mesuretype, mesuretype_codespace, phasetype, phasetype_codespace) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(LengthAttribute lengthAttribute, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(LengthAttribute lengthAttribute) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.LENGTHATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (lengthAttribute.getLength() != null && lengthAttribute.getLength().isSetValue()) {
-            ps.setDouble(3, lengthAttribute.getLength().getValue());
-            ps.setString(4, lengthAttribute.getLength().getUom());
+            ps.setDouble(2, lengthAttribute.getLength().getValue());
+            ps.setString(3, lengthAttribute.getLength().getUom());
         } else {
-            ps.setNull(3, Types.DOUBLE);
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(2, Types.DOUBLE);
+            ps.setNull(3, Types.VARCHAR);
         }
 
         if (lengthAttribute.getMesureType() != null && lengthAttribute.getMesureType().isSetValue()) {
-            ps.setString(5, lengthAttribute.getMesureType().getValue());
-            ps.setString(6, lengthAttribute.getMesureType().getCodeSpace());
+            ps.setString(4, lengthAttribute.getMesureType().getValue());
+            ps.setString(5, lengthAttribute.getMesureType().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         if (lengthAttribute.getPhaseType() != null && lengthAttribute.getPhaseType().isSetValue()) {
-            ps.setString(7, lengthAttribute.getPhaseType().getValue());
-            ps.setString(8, lengthAttribute.getPhaseType().getCodeSpace());
+            ps.setString(6, lengthAttribute.getPhaseType().getValue());
+            ps.setString(7, lengthAttribute.getPhaseType().getCodeSpace());
         } else {
+            ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
-            ps.setNull(8, Types.VARCHAR);
         }
 
         ps.addBatch();

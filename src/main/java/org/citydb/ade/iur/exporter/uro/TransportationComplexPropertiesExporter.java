@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -62,6 +63,7 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
     private final RoadTypeExporter roadTypeExporter;
     private final TrafficVolumeAttributeExporter trafficVolumeAttributeExporter;
     private final RoadStructureAttributeExporter roadStructureAttributeExporter;
+    private final PreparedStatement psTranFacilityAttribute;
 
     public TransportationComplexPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.TRANSPORTATION_COMPLEX);
@@ -74,6 +76,11 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table tranFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSPORT_TO_FACILITYA)));
+        Select tranFacilityAttributeSelect = new Select().addProjection(tranFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tranFacilityAttributes.getColumn("transportation_complex_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tranFacilityAttributes.getColumn("facilityattribute_id")));
+        psTranFacilityAttribute = connection.prepareStatement(tranFacilityAttributeSelect.toString());
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
@@ -110,9 +117,15 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 }
 
                 if (projectionFilter.containsProperty("tranFacilityAttribute", module)) {
-                    for (FacilityAttribute tranFacilityAttribute : facilityAttributeExporter.doExport(parentId, "transpor_complex_tranfaci_id")) {
-                        TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    psTranFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet tranFacilityAttributeRs = psTranFacilityAttribute.executeQuery()) {
+                        while (tranFacilityAttributeRs.next()) {
+                            FacilityAttribute tranFacilityAttribute = facilityAttributeExporter.doExport(tranFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (tranFacilityAttribute != null) {
+                                TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                            }
+                        }
                     }
                 }
 
@@ -185,5 +198,6 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psTranFacilityAttribute.close();
     }
 }

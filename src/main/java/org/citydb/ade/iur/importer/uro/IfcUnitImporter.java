@@ -51,28 +51,27 @@ public class IfcUnitImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.IFCUNIT)) + " " +
-                "(id, ifcproject_unitsincontext_id, dimensions, unittype, perfix, name) " +
-                "values (?, ?, ?, ?, ?, ?)");
+                "(id, dimensions, unittype, perfix, name) " +
+                "values (?, ?, ?, ?, ?)");
     }
 
-    public long doImport(IfcUnit ifcUnit, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(IfcUnit ifcUnit) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.IFCUNIT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (ifcUnit.getDimensions() != null)
-            ps.setInt(3, ifcUnit.getDimensions());
+            ps.setInt(2, ifcUnit.getDimensions());
         else
-            ps.setNull(3, Types.INTEGER);
+            ps.setNull(2, Types.INTEGER);
 
         if (ifcUnit.getUnitType() != null)
-            ps.setString(4, ifcUnit.getUnitType().value());
+            ps.setString(3, ifcUnit.getUnitType().value());
         else
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
 
-        ps.setString(5, ifcUnit.getPerfix());
+        ps.setString(4, ifcUnit.getPerfix());
 
-        ps.setString(6, ifcUnit.getName());
+        ps.setString(5, ifcUnit.getName());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

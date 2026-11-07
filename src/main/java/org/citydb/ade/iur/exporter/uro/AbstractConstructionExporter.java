@@ -86,6 +86,14 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ExportManager manager;
     private final PreparedStatement ps;
+    private final PreparedStatement psConstructionEvent;
+    private final PreparedStatement psElevation;
+    private final PreparedStatement psHeight;
+    private final PreparedStatement psOccupancy;
+    private final PreparedStatement psConsFacilityTypeAttribute;
+    private final PreparedStatement psConsFacilityAttribute;
+    private final PreparedStatement psConsDisasterRiskAttribute;
+    private final PreparedStatement psConsDmAttribute;
     private final PreparedStatement psBoundedBySurface;
     private final PreparedStatement psConstructionInstallation;
     private final ConstructionEventExporter constructionEventExporter;
@@ -131,14 +139,54 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
         ps = connection.prepareStatement(select.toString());
 
         Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table constructionEvents = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_CONSTRUCT)));
+        Select constructionEventSelect = new Select().addProjection(constructionEvents.getColumn("constructionevent_id"))
+                .addSelection(ComparisonFactory.equalTo(constructionEvents.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(constructionEvents.getColumn("constructionevent_id")));
+        psConstructionEvent = connection.prepareStatement(constructionEventSelect.toString());
+        Table elevations = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_ELEVATION)));
+        Select elevationSelect = new Select().addProjection(elevations.getColumn("elevation_id"))
+                .addSelection(ComparisonFactory.equalTo(elevations.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(elevations.getColumn("elevation_id")));
+        psElevation = connection.prepareStatement(elevationSelect.toString());
+        Table heights = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_HEIGHT)));
+        Select heightSelect = new Select().addProjection(heights.getColumn("height_id"))
+                .addSelection(ComparisonFactory.equalTo(heights.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(heights.getColumn("height_id")));
+        psHeight = connection.prepareStatement(heightSelect.toString());
+        Table occupancys = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_OCCUPANCY)));
+        Select occupancySelect = new Select().addProjection(occupancys.getColumn("occupancy_id"))
+                .addSelection(ComparisonFactory.equalTo(occupancys.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(occupancys.getColumn("occupancy_id")));
+        psOccupancy = connection.prepareStatement(occupancySelect.toString());
+        Table consFacilityTypeAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_FACILITYT)));
+        Select consFacilityTypeAttributeSelect = new Select().addProjection(consFacilityTypeAttributes.getColumn("facilitytypeattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(consFacilityTypeAttributes.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(consFacilityTypeAttributes.getColumn("facilitytypeattribute_id")));
+        psConsFacilityTypeAttribute = connection.prepareStatement(consFacilityTypeAttributeSelect.toString());
+        Table consFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_FACILITYA)));
+        Select consFacilityAttributeSelect = new Select().addProjection(consFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(consFacilityAttributes.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(consFacilityAttributes.getColumn("facilityattribute_id")));
+        psConsFacilityAttribute = connection.prepareStatement(consFacilityAttributeSelect.toString());
+        Table consDisasterRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_DISASTERR)));
+        Select consDisasterRiskAttributeSelect = new Select().addProjection(consDisasterRiskAttributes.getColumn("disasterriskattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(consDisasterRiskAttributes.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(consDisasterRiskAttributes.getColumn("disasterriskattribute_id")));
+        psConsDisasterRiskAttribute = connection.prepareStatement(consDisasterRiskAttributeSelect.toString());
+        Table consDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCT_TO_DMATTRIBU)));
+        Select consDmAttributeSelect = new Select().addProjection(consDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(consDmAttributes.getColumn("construction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(consDmAttributes.getColumn("dmattribute_id")));
+        psConsDmAttribute = connection.prepareStatement(consDmAttributeSelect.toString());
         Table boundarySurface = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BOUNDARYSURFACE)));
-        Select boundedBySurfaceSelect = new Select().addProjection(boundarySurface.getColumn("id"), cityObject.getColumn("objectclass_id"))
+        Select boundedBySurfaceSelect = new Select().addProjection(boundarySurface.getColumn("id"), cityObject.getColumn("objectclass_id"), cityObject.getColumn("gmlid"))
                 .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, boundarySurface.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(boundarySurface.getColumn("construction_boundedby_id"), new PlaceHolder<>()))
                 .addOrderBy(new OrderByToken(boundarySurface.getColumn("id")));
         psBoundedBySurface = connection.prepareStatement(boundedBySurfaceSelect.toString());
         Table constructionInstallation = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CONSTRUCTIONINSTALLATI)));
-        Select constructionInstallationSelect = new Select().addProjection(constructionInstallation.getColumn("id"), cityObject.getColumn("objectclass_id"))
+        Select constructionInstallationSelect = new Select().addProjection(constructionInstallation.getColumn("id"), cityObject.getColumn("objectclass_id"), cityObject.getColumn("gmlid"))
                 .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, constructionInstallation.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(constructionInstallation.getColumn("construction_construction_id"), new PlaceHolder<>()))
                 .addOrderBy(new OrderByToken(constructionInstallation.getColumn("id")));
@@ -216,20 +264,50 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
         if (!rs.wasNull())
             abstractConstruction.setDateOfDemolition(dateOfDemolition.toLocalDate());
 
-        for (ConstructionEvent constructionEvent : constructionEventExporter.doExport(objectId))
-            abstractConstruction.getConstructionEvent().add(new ConstructionEventProperty(constructionEvent));
+        psConstructionEvent.setLong(1, objectId);
+        try (ResultSet constructionEventRs = psConstructionEvent.executeQuery()) {
+            while (constructionEventRs.next()) {
+                ConstructionEvent constructionEvent = new ConstructionEvent();
+                constructionEventExporter.doExport(constructionEvent, constructionEventRs.getLong("constructionevent_id"));
+                abstractConstruction.getConstructionEvent().add(new ConstructionEventProperty(constructionEvent));
+            }
+        }
 
-        for (Elevation elevation : elevationExporter.doExport(objectId))
-            abstractConstruction.getElevation().add(new ElevationProperty(elevation));
+        psElevation.setLong(1, objectId);
+        try (ResultSet elevationRs = psElevation.executeQuery()) {
+            while (elevationRs.next()) {
+                Elevation elevation = new Elevation();
+                elevationExporter.doExport(elevation, elevationRs.getLong("elevation_id"));
+                abstractConstruction.getElevation().add(new ElevationProperty(elevation));
+            }
+        }
 
-        for (Height height : heightExporter.doExport(objectId))
-            abstractConstruction.getHeight().add(new HeightProperty(height));
+        psHeight.setLong(1, objectId);
+        try (ResultSet heightRs = psHeight.executeQuery()) {
+            while (heightRs.next()) {
+                Height height = new Height();
+                heightExporter.doExport(height, heightRs.getLong("height_id"));
+                abstractConstruction.getHeight().add(new HeightProperty(height));
+            }
+        }
 
-        for (Occupancy occupancy : occupancyExporter.doExport(objectId))
-            abstractConstruction.getOccupancy().add(new OccupancyProperty(occupancy));
+        psOccupancy.setLong(1, objectId);
+        try (ResultSet occupancyRs = psOccupancy.executeQuery()) {
+            while (occupancyRs.next()) {
+                Occupancy occupancy = new Occupancy();
+                occupancyExporter.doExport(occupancy, occupancyRs.getLong("occupancy_id"));
+                abstractConstruction.getOccupancy().add(new OccupancyProperty(occupancy));
+            }
+        }
 
-        for (FacilityTypeAttribute consFacilityTypeAttribute : facilityTypeAttributeExporter.doExport(objectId, "construction_consfacility_id"))
-            abstractConstruction.getConsFacilityTypeAttribute().add(new FacilityTypeAttributeProperty(consFacilityTypeAttribute));
+        psConsFacilityTypeAttribute.setLong(1, objectId);
+        try (ResultSet consFacilityTypeAttributeRs = psConsFacilityTypeAttribute.executeQuery()) {
+            while (consFacilityTypeAttributeRs.next()) {
+                FacilityTypeAttribute consFacilityTypeAttribute = new FacilityTypeAttribute();
+                facilityTypeAttributeExporter.doExport(consFacilityTypeAttribute, consFacilityTypeAttributeRs.getLong("facilitytypeattribute_id"));
+                abstractConstruction.getConsFacilityTypeAttribute().add(new FacilityTypeAttributeProperty(consFacilityTypeAttribute));
+            }
+        }
 
         long consFacilityIdAttributeId = rs.getLong(prefix + "consfacilityidattribute_id");
         if (consFacilityIdAttributeId != 0) {
@@ -238,8 +316,14 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
                 abstractConstruction.setConsFacilityIdAttribute(new FacilityIdAttributeProperty(consFacilityIdAttribute));
         }
 
-        for (FacilityAttribute consFacilityAttribute : facilityAttributeExporter.doExport(objectId, "construction_consfacility_id"))
-            abstractConstruction.getConsFacilityAttribute().add(new FacilityAttributeProperty(consFacilityAttribute));
+        psConsFacilityAttribute.setLong(1, objectId);
+        try (ResultSet consFacilityAttributeRs = psConsFacilityAttribute.executeQuery()) {
+            while (consFacilityAttributeRs.next()) {
+                FacilityAttribute consFacilityAttribute = facilityAttributeExporter.doExport(consFacilityAttributeRs.getLong("facilityattribute_id"));
+                if (consFacilityAttribute != null)
+                    abstractConstruction.getConsFacilityAttribute().add(new FacilityAttributeProperty(consFacilityAttribute));
+            }
+        }
 
         long consBaseAttributeId = rs.getLong(prefix + "consbaseattribute_id");
         if (consBaseAttributeId != 0) {
@@ -255,11 +339,23 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
                 abstractConstruction.setConsStructureAttribute(new ConstructionStructureAttributeProperty(consStructureAttribute));
         }
 
-        for (DisasterRiskAttribute consDisasterRiskAttribute : disasterRiskAttributeExporter.doExport(objectId, "construction_consdisaster_id"))
-            abstractConstruction.getConsDisasterRiskAttribute().add(new DisasterRiskAttributeProperty(consDisasterRiskAttribute));
+        psConsDisasterRiskAttribute.setLong(1, objectId);
+        try (ResultSet consDisasterRiskAttributeRs = psConsDisasterRiskAttribute.executeQuery()) {
+            while (consDisasterRiskAttributeRs.next()) {
+                DisasterRiskAttribute consDisasterRiskAttribute = disasterRiskAttributeExporter.doExport(consDisasterRiskAttributeRs.getLong("disasterriskattribute_id"));
+                if (consDisasterRiskAttribute != null)
+                    abstractConstruction.getConsDisasterRiskAttribute().add(new DisasterRiskAttributeProperty(consDisasterRiskAttribute));
+            }
+        }
 
-        for (DmAttribute consDmAttribute : dmAttributeExporter.doExport(objectId, "construction_consdmattrib_id"))
-            abstractConstruction.getConsDmAttribute().add(new DmAttributeProperty(consDmAttribute));
+        psConsDmAttribute.setLong(1, objectId);
+        try (ResultSet consDmAttributeRs = psConsDmAttribute.executeQuery()) {
+            while (consDmAttributeRs.next()) {
+                DmAttribute consDmAttribute = dmAttributeExporter.doExport(consDmAttributeRs.getLong("dmattribute_id"));
+                if (consDmAttribute != null)
+                    abstractConstruction.getConsDmAttribute().add(new DmAttributeProperty(consDmAttribute));
+            }
+        }
 
         long consDataQualityAttributeId = rs.getLong(prefix + "consdataqualityattribute_id");
         if (consDataQualityAttributeId != 0) {
@@ -332,6 +428,14 @@ public class AbstractConstructionExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psConstructionEvent.close();
+        psElevation.close();
+        psHeight.close();
+        psOccupancy.close();
+        psConsFacilityTypeAttribute.close();
+        psConsFacilityAttribute.close();
+        psConsDisasterRiskAttribute.close();
+        psConsDmAttribute.close();
         psBoundedBySurface.close();
         psConstructionInstallation.close();
     }

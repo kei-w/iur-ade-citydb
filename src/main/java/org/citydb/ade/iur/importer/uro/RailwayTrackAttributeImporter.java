@@ -47,6 +47,7 @@ public class RailwayTrackAttributeImporter implements UrbanObjectModuleImporter 
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final RailwayTrackAttributeToControlPointImporter railwayTrackAttributeToControlPointImporter;
     private final ControlPointImporter controlPointImporter;
     private final GeometryConverter geometryConverter;
 
@@ -64,6 +65,7 @@ public class RailwayTrackAttributeImporter implements UrbanObjectModuleImporter 
                 "lod3network_brep_id, lod3network_other_geom) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+        railwayTrackAttributeToControlPointImporter = manager.getImporter(RailwayTrackAttributeToControlPointImporter.class);
         controlPointImporter = manager.getImporter(ControlPointImporter.class);
         geometryConverter = helper.getGeometryConverter();
     }
@@ -155,8 +157,10 @@ public class RailwayTrackAttributeImporter implements UrbanObjectModuleImporter 
             helper.executeBatch(schemaMapper.getTableName(ADETable.RAILWAYTRACKATTRIBUTE));
 
         for (ControlPointProperty property : railwayTrackAttribute.getControlPoint()) {
-            if (property.isSetObject())
-                controlPointImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long controlPointId = controlPointImporter.doImport(property.getObject());
+                railwayTrackAttributeToControlPointImporter.doImport(controlPointId, objectId);
+            }
         }
 
         return objectId;

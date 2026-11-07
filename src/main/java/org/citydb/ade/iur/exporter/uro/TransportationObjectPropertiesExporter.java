@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -55,6 +56,7 @@ public class TransportationObjectPropertiesExporter implements UrbanObjectModule
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
     private final VegetationDataQualityAttributeExporter vegetationDataQualityAttributeExporter;
+    private final PreparedStatement psVegFacilityAttribute;
 
     public TransportationObjectPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT);
@@ -65,6 +67,11 @@ public class TransportationObjectPropertiesExporter implements UrbanObjectModule
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table vegFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITYOBJEC_TO_FACILITYA)));
+        Select vegFacilityAttributeSelect = new Select().addProjection(vegFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(vegFacilityAttributes.getColumn("cityobject_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(vegFacilityAttributes.getColumn("facilityattribute_id")));
+        psVegFacilityAttribute = connection.prepareStatement(vegFacilityAttributeSelect.toString());
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
@@ -103,9 +110,15 @@ public class TransportationObjectPropertiesExporter implements UrbanObjectModule
                 }
 
                 if (parent instanceof AbstractVegetationObject && projectionFilter.containsProperty("vegFacilityAttribute", module)) {
-                    for (FacilityAttribute vegFacilityAttribute : facilityAttributeExporter.doExport(parentId, "cityobject_vegfacilityatt_id")) {
-                        VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
-                        ((AbstractVegetationObject) parent).addGenericApplicationPropertyOfVegetationObject(property);
+                    psVegFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet vegFacilityAttributeRs = psVegFacilityAttribute.executeQuery()) {
+                        while (vegFacilityAttributeRs.next()) {
+                            FacilityAttribute vegFacilityAttribute = facilityAttributeExporter.doExport(vegFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (vegFacilityAttribute != null) {
+                                VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
+                                ((AbstractVegetationObject) parent).addGenericApplicationPropertyOfVegetationObject(property);
+                            }
+                        }
                     }
                 }
 
@@ -131,5 +144,6 @@ public class TransportationObjectPropertiesExporter implements UrbanObjectModule
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psVegFacilityAttribute.close();
     }
 }

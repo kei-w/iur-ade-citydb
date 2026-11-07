@@ -46,7 +46,9 @@ public class UtilityNetworkElementImporter implements UrbanObjectModuleImporter 
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final UtilityNetworkElementToOffsetDepthImporter utilityNetworkElementToOffsetDepthImporter;
     private final OffsetDepthImporter offsetDepthImporter;
+    private final UtilityNetworkElementToThematicShapeImporter utilityNetworkElementToThematicShapeImporter;
     private final ThematicShapeImporter thematicShapeImporter;
 
     private int batchCounter;
@@ -61,7 +63,9 @@ public class UtilityNetworkElementImporter implements UrbanObjectModuleImporter 
                 "year, yeartype, yeartype_codespace, administrator, administrator_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+        utilityNetworkElementToOffsetDepthImporter = manager.getImporter(UtilityNetworkElementToOffsetDepthImporter.class);
         offsetDepthImporter = manager.getImporter(OffsetDepthImporter.class);
+        utilityNetworkElementToThematicShapeImporter = manager.getImporter(UtilityNetworkElementToThematicShapeImporter.class);
         thematicShapeImporter = manager.getImporter(ThematicShapeImporter.class);
     }
 
@@ -111,12 +115,16 @@ public class UtilityNetworkElementImporter implements UrbanObjectModuleImporter 
             helper.executeBatch(objectType);
 
         for (OffsetDepthProperty property : utilityNetworkElement.getOffsetDepth()) {
-            if (property.isSetObject())
-                offsetDepthImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long offsetDepthId = offsetDepthImporter.doImport(property.getObject());
+                utilityNetworkElementToOffsetDepthImporter.doImport(offsetDepthId, objectId);
+            }
         }
         for (ThematicShapeProperty property : utilityNetworkElement.getThematicShape()) {
-            if (property.isSetObject())
-                thematicShapeImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long thematicShapeId = thematicShapeImporter.doImport(property.getObject());
+                utilityNetworkElementToThematicShapeImporter.doImport(thematicShapeId, objectId);
+            }
         }
     }
 
