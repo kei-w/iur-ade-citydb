@@ -19,6 +19,18 @@ Change Log
 * The `urf` and `urg` CityObjectGroup property exporters used the `uro` namespace for projection filtering.
 * Repeated ADE properties (disaster risks, key-value pairs) are exported in import order (`ORDER BY id`).
 
+#### Changes (all uro attributes, 2026-11-07)
+* Import/export of every `uro` generic application property of every CityGML feature type defined by the i-UR 2.0 XSD,
+  including GML geometries of DM attributes and the ifc coordinate reference system properties.
+* The ADE Manager output is patched where it cannot represent the schema (multi-valued dates, the
+  `IfcCoordinateReferenceSystemSelect` choice, inline `IfcAxis2Placement3D`, property injections with a wrong base type).
+* Importers, exporters and schema registrations are generated from the schema mapping (`poc/gen` in the PoC workspace).
+
+#### Known limitations
+* `uro:ControlPoint/uro:parameter` is not supported: the 2.0 XSD declares it with the type of `uro:ControlPoint` itself.
+* ADE feature types (`uro:UndergroundBuilding`, `uro:OtherConstruction`, `uro:Waterway`, utility networks, ...) are not
+  supported; `urf`, `urg` and `urt` remain at 1.4.
+
 ### 2.1.0 - 2024-09-19
 
 #### Changes
