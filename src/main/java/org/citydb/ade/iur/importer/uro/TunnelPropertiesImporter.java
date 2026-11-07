@@ -53,6 +53,7 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
 
     private int batchCounter;
@@ -76,6 +77,7 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
     }
 
@@ -188,6 +190,13 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
             for (TunDisasterRiskAttributePropertyElement property : properties.getAll(TunDisasterRiskAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tundisasterriskatt_id");
+            }
+        }
+
+        if (properties.contains(TunFacilityAttributePropertyElement.class)) {
+            for (TunFacilityAttributePropertyElement property : properties.getAll(TunFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tunfacilityattribu_id");
             }
         }
 

@@ -54,6 +54,7 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
 
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final TrafficObjectUsecaseAttributeExporter trafficObjectUsecaseAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
@@ -77,6 +78,7 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
 
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         trafficObjectUsecaseAttributeExporter = manager.getExporter(TrafficObjectUsecaseAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
@@ -109,6 +111,13 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
 
                     TranFacilityTypeAttributePropertyElement property = new TranFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(tranFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                }
+
+                if (projectionFilter.containsProperty("tranFacilityAttribute", module)) {
+                    for (FacilityAttribute tranFacilityAttribute : facilityAttributeExporter.doExport(parentId, "transpor_complex_tranfaci_id")) {
+                        TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    }
                 }
 
                 long tranUsecaseAttributeId = rs.getLong("tranusecaseattribute_id");

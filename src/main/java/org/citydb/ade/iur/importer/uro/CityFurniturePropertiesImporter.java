@@ -47,6 +47,7 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
 
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final CityFurnitureDetailAttributeImporter cityFurnitureDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
@@ -65,6 +66,7 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
 
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         cityFurnitureDetailAttributeImporter = manager.getImporter(CityFurnitureDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
@@ -132,6 +134,13 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.CITY_FURNITURE));
+
+        if (properties.contains(FrnFacilityAttributePropertyElement.class)) {
+            for (FrnFacilityAttributePropertyElement property : properties.getAll(FrnFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frnfacilit_id");
+            }
+        }
 
         if (properties.contains(FrnKeyValuePairAttributePropertyElement.class)) {
             for (FrnKeyValuePairAttributePropertyElement property : properties.getAll(FrnKeyValuePairAttributePropertyElement.class)) {

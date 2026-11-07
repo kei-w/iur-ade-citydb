@@ -51,6 +51,7 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     private final DisasterRiskAttributeExporter disasterRiskAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final WaterBodyDetailAttributeExporter waterBodyDetailAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
@@ -68,6 +69,7 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
         disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         waterBodyDetailAttributeExporter = manager.getExporter(WaterBodyDetailAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
@@ -103,6 +105,13 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
 
                     WtrFacilityTypeAttributePropertyElement property = new WtrFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(wtrFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfWaterBody(property);
+                }
+
+                if (projectionFilter.containsProperty("wtrFacilityAttribute", module)) {
+                    for (FacilityAttribute wtrFacilityAttribute : facilityAttributeExporter.doExport(parentId, "waterbody_wtrfacilityattr_id")) {
+                        WtrFacilityAttributePropertyElement property = new WtrFacilityAttributePropertyElement(new FacilityAttributeProperty(wtrFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfWaterBody(property);
+                    }
                 }
 
                 long waterBodyDetailAttributeId = rs.getLong("waterbodydetailattribute_id");

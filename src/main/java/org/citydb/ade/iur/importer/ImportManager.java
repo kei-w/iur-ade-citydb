@@ -333,6 +333,60 @@ public class ImportManager implements ADEImportManager {
                     importer = new RiverFacilityIdAttributeImporter(connection, helper, this);
                 else if (type == FacilityTypeAttributeImporter.class)
                     importer = new FacilityTypeAttributeImporter(connection, helper, this);
+                else if (type == FacilityAttributeImporter.class)
+                    importer = new FacilityAttributeImporter(connection, helper, this);
+                else if (type == ParkFacilityLongevityPlanAttributeImporter.class)
+                    importer = new ParkFacilityLongevityPlanAttributeImporter(connection, helper, this);
+                else if (type == NumberOfFacilitiesImporter.class)
+                    importer = new NumberOfFacilitiesImporter(connection, helper, this);
+                else if (type == RepairsBeforeParkHealthAssessmentImporter.class)
+                    importer = new RepairsBeforeParkHealthAssessmentImporter(connection, helper, this);
+                else if (type == ParkHealthAssessmentImporter.class)
+                    importer = new ParkHealthAssessmentImporter(connection, helper, this);
+                else if (type == LongevityMeasuresImporter.class)
+                    importer = new LongevityMeasuresImporter(connection, helper, this);
+                else if (type == CountermeasuresCostImporter.class)
+                    importer = new CountermeasuresCostImporter(connection, helper, this);
+                else if (type == PortAttributeImporter.class)
+                    importer = new PortAttributeImporter(connection, helper, this);
+                else if (type == HarborFacilityImporter.class)
+                    importer = new HarborFacilityImporter(connection, helper, this);
+                else if (type == PortProtectiveFacilityImporter.class)
+                    importer = new PortProtectiveFacilityImporter(connection, helper, this);
+                else if (type == MooringFacilityImporter.class)
+                    importer = new MooringFacilityImporter(connection, helper, this);
+                else if (type == PortTransportationFacilityImporter.class)
+                    importer = new PortTransportationFacilityImporter(connection, helper, this);
+                else if (type == NavigationAssistanceFacilityImporter.class)
+                    importer = new NavigationAssistanceFacilityImporter(connection, helper, this);
+                else if (type == CargoHandlingFacilityImporter.class)
+                    importer = new CargoHandlingFacilityImporter(connection, helper, this);
+                else if (type == PortPassengerFacilityImporter.class)
+                    importer = new PortPassengerFacilityImporter(connection, helper, this);
+                else if (type == PortStorageFacilityImporter.class)
+                    importer = new PortStorageFacilityImporter(connection, helper, this);
+                else if (type == ShipServiceFacilityImporter.class)
+                    importer = new ShipServiceFacilityImporter(connection, helper, this);
+                else if (type == PortWasteTreatmentFacilityImporter.class)
+                    importer = new PortWasteTreatmentFacilityImporter(connection, helper, this);
+                else if (type == PortEnvironmentalImprovementFacilityImporter.class)
+                    importer = new PortEnvironmentalImprovementFacilityImporter(connection, helper, this);
+                else if (type == PortPollutionControlFacilityImporter.class)
+                    importer = new PortPollutionControlFacilityImporter(connection, helper, this);
+                else if (type == PortWelfareFacilityImporter.class)
+                    importer = new PortWelfareFacilityImporter(connection, helper, this);
+                else if (type == PortManagementFacilityImporter.class)
+                    importer = new PortManagementFacilityImporter(connection, helper, this);
+                else if (type == CyberportMarinaAndPBSImporter.class)
+                    importer = new CyberportMarinaAndPBSImporter(connection, helper, this);
+                else if (type == FishingPortAttributeImporter.class)
+                    importer = new FishingPortAttributeImporter(connection, helper, this);
+                else if (type == FishingPortFacilityImporter.class)
+                    importer = new FishingPortFacilityImporter(connection, helper, this);
+                else if (type == FishingPortCapacityImporter.class)
+                    importer = new FishingPortCapacityImporter(connection, helper, this);
+                else if (type == MaintenanceHistoryAttributeImporter.class)
+                    importer = new MaintenanceHistoryAttributeImporter(connection, helper, this);
                 else if (type == BridgeStructureAttributeImporter.class)
                     importer = new BridgeStructureAttributeImporter(connection, helper, this);
                 else if (type == BridgeFunctionalAttributeImporter.class)

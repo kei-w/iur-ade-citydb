@@ -56,6 +56,7 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
     private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
 
@@ -78,6 +79,7 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
         buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
     }
@@ -153,6 +155,13 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
 
                     BldgFacilityTypeAttributePropertyElement property = new BldgFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(bldgFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                }
+
+                if (projectionFilter.containsProperty("bldgFacilityAttribute", module)) {
+                    for (FacilityAttribute bldgFacilityAttribute : facilityAttributeExporter.doExport(parentId, "building_bldgfacilityattr_id")) {
+                        BldgFacilityAttributePropertyElement property = new BldgFacilityAttributePropertyElement(new FacilityAttributeProperty(bldgFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                    }
                 }
 
                 long bldgRealEstateIDAttributeId = rs.getLong("bldgrealestateidattribute_id");

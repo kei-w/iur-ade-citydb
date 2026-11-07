@@ -304,6 +304,18 @@ public class ExportManager implements ADEExportManager {
                     exporter = new FacilityIdAttributeExporter(connection, helper, this);
                 else if (type == FacilityTypeAttributeExporter.class)
                     exporter = new FacilityTypeAttributeExporter(connection, helper, this);
+                else if (type == FacilityAttributeExporter.class)
+                    exporter = new FacilityAttributeExporter(connection, helper, this);
+                else if (type == NumberOfFacilitiesExporter.class)
+                    exporter = new NumberOfFacilitiesExporter(connection, helper, this);
+                else if (type == RepairsBeforeParkHealthAssessmentExporter.class)
+                    exporter = new RepairsBeforeParkHealthAssessmentExporter(connection, helper, this);
+                else if (type == ParkHealthAssessmentExporter.class)
+                    exporter = new ParkHealthAssessmentExporter(connection, helper, this);
+                else if (type == LongevityMeasuresExporter.class)
+                    exporter = new LongevityMeasuresExporter(connection, helper, this);
+                else if (type == CountermeasuresCostExporter.class)
+                    exporter = new CountermeasuresCostExporter(connection, helper, this);
                 else if (type == BridgeStructureAttributeExporter.class)
                     exporter = new BridgeStructureAttributeExporter(connection, helper, this);
                 else if (type == BridgeFunctionalAttributeExporter.class)

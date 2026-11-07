@@ -204,6 +204,87 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "FacilityTypeAttribute":
                     typeClassIds.put(FacilityTypeAttribute.class, typeClassId);
                     break;
+                case "FacilityAttribute":
+                    typeClassIds.put(FacilityAttribute.class, typeClassId);
+                    break;
+                case "ParkFacilityLongevityPlanAttribute":
+                    typeClassIds.put(ParkFacilityLongevityPlanAttribute.class, typeClassId);
+                    break;
+                case "NumberOfFacilities":
+                    typeClassIds.put(NumberOfFacilities.class, typeClassId);
+                    break;
+                case "RepairsBeforeParkHealthAssessment":
+                    typeClassIds.put(RepairsBeforeParkHealthAssessment.class, typeClassId);
+                    break;
+                case "ParkHealthAssessment":
+                    typeClassIds.put(ParkHealthAssessment.class, typeClassId);
+                    break;
+                case "LongevityMeasures":
+                    typeClassIds.put(LongevityMeasures.class, typeClassId);
+                    break;
+                case "CountermeasuresCost":
+                    typeClassIds.put(CountermeasuresCost.class, typeClassId);
+                    break;
+                case "PortAttribute":
+                    typeClassIds.put(PortAttribute.class, typeClassId);
+                    break;
+                case "HarborFacility":
+                    typeClassIds.put(HarborFacility.class, typeClassId);
+                    break;
+                case "PortProtectiveFacility":
+                    typeClassIds.put(PortProtectiveFacility.class, typeClassId);
+                    break;
+                case "MooringFacility":
+                    typeClassIds.put(MooringFacility.class, typeClassId);
+                    break;
+                case "PortTransportationFacility":
+                    typeClassIds.put(PortTransportationFacility.class, typeClassId);
+                    break;
+                case "NavigationAssistanceFacility":
+                    typeClassIds.put(NavigationAssistanceFacility.class, typeClassId);
+                    break;
+                case "CargoHandlingFacility":
+                    typeClassIds.put(CargoHandlingFacility.class, typeClassId);
+                    break;
+                case "PortPassengerFacility":
+                    typeClassIds.put(PortPassengerFacility.class, typeClassId);
+                    break;
+                case "PortStorageFacility":
+                    typeClassIds.put(PortStorageFacility.class, typeClassId);
+                    break;
+                case "ShipServiceFacility":
+                    typeClassIds.put(ShipServiceFacility.class, typeClassId);
+                    break;
+                case "PortWasteTreatmentFacility":
+                    typeClassIds.put(PortWasteTreatmentFacility.class, typeClassId);
+                    break;
+                case "PortEnvironmentalImprovementFacility":
+                    typeClassIds.put(PortEnvironmentalImprovementFacility.class, typeClassId);
+                    break;
+                case "PortPollutionControlFacility":
+                    typeClassIds.put(PortPollutionControlFacility.class, typeClassId);
+                    break;
+                case "PortWelfareFacility":
+                    typeClassIds.put(PortWelfareFacility.class, typeClassId);
+                    break;
+                case "PortManagementFacility":
+                    typeClassIds.put(PortManagementFacility.class, typeClassId);
+                    break;
+                case "CyberportMarinaAndPBS":
+                    typeClassIds.put(CyberportMarinaAndPBS.class, typeClassId);
+                    break;
+                case "FishingPortAttribute":
+                    typeClassIds.put(FishingPortAttribute.class, typeClassId);
+                    break;
+                case "FishingPortFacility":
+                    typeClassIds.put(FishingPortFacility.class, typeClassId);
+                    break;
+                case "FishingPortCapacity":
+                    typeClassIds.put(FishingPortCapacity.class, typeClassId);
+                    break;
+                case "MaintenanceHistoryAttribute":
+                    typeClassIds.put(MaintenanceHistoryAttribute.class, typeClassId);
+                    break;
                 case "BridgeStructureAttribute":
                     typeClassIds.put(BridgeStructureAttribute.class, typeClassId);
                     break;

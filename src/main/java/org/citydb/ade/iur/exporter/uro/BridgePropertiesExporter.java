@@ -51,6 +51,7 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
     private final ConstructionBaseAttributeExporter constructionBaseAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final BridgeStructureAttributeExporter bridgeStructureAttributeExporter;
     private final BridgeFunctionalAttributeExporter bridgeFunctionalAttributeExporter;
     private final ConstructionRiskAssessmentAttributeExporter constructionRiskAssessmentAttributeExporter;
@@ -72,6 +73,7 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
         constructionBaseAttributeExporter = manager.getExporter(ConstructionBaseAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         bridgeStructureAttributeExporter = manager.getExporter(BridgeStructureAttributeExporter.class);
         bridgeFunctionalAttributeExporter = manager.getExporter(BridgeFunctionalAttributeExporter.class);
         constructionRiskAssessmentAttributeExporter = manager.getExporter(ConstructionRiskAssessmentAttributeExporter.class);
@@ -110,6 +112,13 @@ public class BridgePropertiesExporter implements UrbanObjectModuleExporter {
 
                     BridFacilityTypeAttributePropertyElement property = new BridFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(bridFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                }
+
+                if (projectionFilter.containsProperty("bridFacilityAttribute", module)) {
+                    for (FacilityAttribute bridFacilityAttribute : facilityAttributeExporter.doExport(parentId, "bridge_bridfacilityattrib_id")) {
+                        BridFacilityAttributePropertyElement property = new BridFacilityAttributePropertyElement(new FacilityAttributeProperty(bridFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBridge(property);
+                    }
                 }
 
                 long bridStructureAttributeId = rs.getLong("bridstructureattribute_id");

@@ -48,6 +48,7 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     private final LandUseDetailAttributeImporter landUseDetailAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
 
@@ -66,6 +67,7 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         landUseDetailAttributeImporter = manager.getImporter(LandUseDetailAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
     }
@@ -132,6 +134,13 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.LAND_USE));
+
+        if (properties.contains(LuseFacilityAttributePropertyElement.class)) {
+            for (LuseFacilityAttributePropertyElement property : properties.getAll(LuseFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusefacilityattr_id");
+            }
+        }
 
         if (properties.contains(LuseKeyValuePairAttributePropertyElement.class)) {
             for (LuseKeyValuePairAttributePropertyElement property : properties.getAll(LuseKeyValuePairAttributePropertyElement.class)) {

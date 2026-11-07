@@ -56,6 +56,7 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
     public TunnelPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
@@ -77,6 +78,7 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
 
@@ -153,6 +155,13 @@ public class TunnelPropertiesExporter implements UrbanObjectModuleExporter {
 
                     TunFacilityTypeAttributePropertyElement property = new TunFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(tunFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                }
+
+                if (projectionFilter.containsProperty("tunFacilityAttribute", module)) {
+                    for (FacilityAttribute tunFacilityAttribute : facilityAttributeExporter.doExport(parentId, "tunnel_tunfacilityattribu_id")) {
+                        TunFacilityAttributePropertyElement property = new TunFacilityAttributePropertyElement(new FacilityAttributeProperty(tunFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractTunnel(property);
+                    }
                 }
 
                 if (projectionFilter.containsProperty("tunKeyValuePairAttribute", module)) {

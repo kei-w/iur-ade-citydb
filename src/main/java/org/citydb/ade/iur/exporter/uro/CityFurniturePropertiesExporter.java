@@ -50,6 +50,7 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
 
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final CityFurnitureDetailAttributeExporter cityFurnitureDetailAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
@@ -66,6 +67,7 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
 
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         cityFurnitureDetailAttributeExporter = manager.getExporter(CityFurnitureDetailAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
@@ -92,6 +94,13 @@ public class CityFurniturePropertiesExporter implements UrbanObjectModuleExporte
 
                     FrnFacilityTypeAttributePropertyElement property = new FrnFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(frnFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfCityFurniture(property);
+                }
+
+                if (projectionFilter.containsProperty("frnFacilityAttribute", module)) {
+                    for (FacilityAttribute frnFacilityAttribute : facilityAttributeExporter.doExport(parentId, "city_furniture_frnfacilit_id")) {
+                        FrnFacilityAttributePropertyElement property = new FrnFacilityAttributePropertyElement(new FacilityAttributeProperty(frnFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfCityFurniture(property);
+                    }
                 }
 
                 long cityFurnitureDetailAttributeId = rs.getLong("cityfurnituredetailattrib_id");

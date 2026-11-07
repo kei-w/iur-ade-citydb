@@ -48,6 +48,7 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
     private final ConstructionBaseAttributeImporter constructionBaseAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final BridgeStructureAttributeImporter bridgeStructureAttributeImporter;
     private final BridgeFunctionalAttributeImporter bridgeFunctionalAttributeImporter;
     private final ConstructionRiskAssessmentAttributeImporter constructionRiskAssessmentAttributeImporter;
@@ -71,6 +72,7 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
         constructionBaseAttributeImporter = manager.getImporter(ConstructionBaseAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         bridgeStructureAttributeImporter = manager.getImporter(BridgeStructureAttributeImporter.class);
         bridgeFunctionalAttributeImporter = manager.getImporter(BridgeFunctionalAttributeImporter.class);
         constructionRiskAssessmentAttributeImporter = manager.getImporter(ConstructionRiskAssessmentAttributeImporter.class);
@@ -183,6 +185,13 @@ public class BridgePropertiesImporter implements UrbanObjectModuleImporter {
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.BRIDGE));
+
+        if (properties.contains(BridFacilityAttributePropertyElement.class)) {
+            for (BridFacilityAttributePropertyElement property : properties.getAll(BridFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "bridge_bridfacilityattrib_id");
+            }
+        }
 
         if (properties.contains(BridDisasterRiskAttributePropertyElement.class)) {
             for (BridDisasterRiskAttributePropertyElement property : properties.getAll(BridDisasterRiskAttributePropertyElement.class)) {

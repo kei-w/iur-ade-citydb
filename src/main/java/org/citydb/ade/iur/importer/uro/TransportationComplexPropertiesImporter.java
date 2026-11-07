@@ -47,6 +47,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
 
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final TrafficObjectUsecaseAttributeImporter trafficObjectUsecaseAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
@@ -72,6 +73,7 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
 
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         trafficObjectUsecaseAttributeImporter = manager.getImporter(TrafficObjectUsecaseAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
@@ -229,6 +231,13 @@ public class TransportationComplexPropertiesImporter implements UrbanObjectModul
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.TRANSPORTATION_COMPLEX));
+
+        if (properties.contains(TranFacilityAttributePropertyElement.class)) {
+            for (TranFacilityAttributePropertyElement property : properties.getAll(TranFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "transpor_complex_tranfaci_id");
+            }
+        }
 
         if (properties.contains(TranKeyValuePairAttributePropertyElement.class)) {
             for (TranKeyValuePairAttributePropertyElement property : properties.getAll(TranKeyValuePairAttributePropertyElement.class)) {

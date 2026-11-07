@@ -53,6 +53,7 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
+    private final FacilityAttributeImporter facilityAttributeImporter;
     private final RealEstateIDAttributeImporter realEstateIDAttributeImporter;
     private final BuildingUsecaseAttributeImporter buildingUsecaseAttributeImporter;
 
@@ -77,6 +78,7 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
+        facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         realEstateIDAttributeImporter = manager.getImporter(RealEstateIDAttributeImporter.class);
         buildingUsecaseAttributeImporter = manager.getImporter(BuildingUsecaseAttributeImporter.class);
     }
@@ -211,6 +213,13 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
             for (BldgKeyValuePairAttributePropertyElement property : properties.getAll(BldgKeyValuePairAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgkeyvaluepair_id");
+            }
+        }
+
+        if (properties.contains(BldgFacilityAttributePropertyElement.class)) {
+            for (BldgFacilityAttributePropertyElement property : properties.getAll(BldgFacilityAttributePropertyElement.class)) {
+                if (property.isSetValue() && property.getValue().isSetObject())
+                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_bldgfacilityattr_id");
             }
         }
     }

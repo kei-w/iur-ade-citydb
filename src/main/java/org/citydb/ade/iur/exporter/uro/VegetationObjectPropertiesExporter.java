@@ -50,6 +50,7 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
 
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
@@ -64,6 +65,7 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
 
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -89,6 +91,13 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
 
                     VegFacilityTypeAttributePropertyElement property = new VegFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(vegFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfVegetationObject(property);
+                }
+
+                if (projectionFilter.containsProperty("vegFacilityAttribute", module)) {
+                    for (FacilityAttribute vegFacilityAttribute : facilityAttributeExporter.doExport(parentId, "cityobject_vegfacilityatt_id")) {
+                        VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfVegetationObject(property);
+                    }
                 }
 
                 long vegDataQualityAttributeId = rs.getLong("vegdataqualityattribute_id");

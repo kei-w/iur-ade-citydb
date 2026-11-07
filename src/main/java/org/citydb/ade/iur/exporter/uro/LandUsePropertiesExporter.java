@@ -51,6 +51,7 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
     private final LandUseDetailAttributeExporter landUseDetailAttributeExporter;
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
+    private final FacilityAttributeExporter facilityAttributeExporter;
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
@@ -67,6 +68,7 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
         landUseDetailAttributeExporter = manager.getExporter(LandUseDetailAttributeExporter.class);
         facilityIdAttributeExporter = manager.getExporter(FacilityIdAttributeExporter.class);
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
+        facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -101,6 +103,13 @@ public class LandUsePropertiesExporter implements UrbanObjectModuleExporter {
 
                     LuseFacilityTypeAttributePropertyElement property = new LuseFacilityTypeAttributePropertyElement(new FacilityTypeAttributeProperty(luseFacilityTypeAttribute));
                     parent.addGenericApplicationPropertyOfLandUse(property);
+                }
+
+                if (projectionFilter.containsProperty("luseFacilityAttribute", module)) {
+                    for (FacilityAttribute luseFacilityAttribute : facilityAttributeExporter.doExport(parentId, "land_use_lusefacilityattr_id")) {
+                        LuseFacilityAttributePropertyElement property = new LuseFacilityAttributePropertyElement(new FacilityAttributeProperty(luseFacilityAttribute));
+                        parent.addGenericApplicationPropertyOfLandUse(property);
+                    }
                 }
 
                 long luseDataQualityAttributeId = rs.getLong("lusedataqualityattribute_id");
