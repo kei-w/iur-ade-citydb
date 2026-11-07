@@ -55,21 +55,21 @@ public class BuildingDetailAttributeImporter implements UrbanObjectModuleImporte
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGDETAILATTRIBUT)) + " " +
-                "(id, areaclassificationtype, areaclassification_codespace, basementfirstusage," +
-                "basementfirstusage_codespace, basementsecondusage, basementsecondusag_codespace, basementusage," +
-                "basementusage_codespace, buildingcoveragerate, buildingfootprintarea, buildingfootprintarea_uom," +
-                "buildingheight, buildingheight_uom, buildingroofedgearea, buildingroofedgearea_uom," +
-                "buildingstructureorgtype, buildingstructureo_codespace, buildingstructuretype," +
-                "buildingstructuret_codespace, detailedusage, detailedusage_codespace, detailedusage2," +
-                "detailedusage2_codespace, detailedusage3, detailedusage3_codespace, developmentarea," +
-                "developmentarea_uom, districtsandzonestype, districtsandzonest_codespace, eaveheight," +
-                "eaveheight_uom, fireproofstructuretype, fireproofstructure_codespace, floorarearate," +
-                "groundfloorusage, groundfloorusage_codespace, implementingbody, landusetype, landusetype_codespace," +
-                "majorusage, majorusage_codespace, majorusage2, majorusage2_codespace, note, orgusage," +
-                "orgusage_codespace, orgusage2, orgusage2_codespace, reference, secondfloorusage," +
-                "secondfloorusage_codespace, serialnumberofbuildingcertif, sitearea, sitearea_uom," +
-                "specifiedbuildingcoveragerat, specifiedfloorarearate, standardfloorarearate, surveyyear," +
-                "thirdfloorusage, thirdfloorusage_codespace, totalfloorarea, totalfloorarea_uom, urbanplantype," +
+                "(id, areaclassificationtype, areaclassification_codespace, basementfirstusage, " +
+                "basementfirstusage_codespace, basementsecondusage, basementsecondusag_codespace, basementusage, " +
+                "basementusage_codespace, buildingcoveragerate, buildingfootprintarea, buildingfootprintarea_uom, " +
+                "buildingheight, buildingheight_uom, buildingroofedgearea, buildingroofedgearea_uom, " +
+                "buildingstructureorgtype, buildingstructureo_codespace, buildingstructuretype, " +
+                "buildingstructuret_codespace, detailedusage, detailedusage_codespace, detailedusage2, " +
+                "detailedusage2_codespace, detailedusage3, detailedusage3_codespace, developmentarea, " +
+                "developmentarea_uom, districtsandzonestype, districtsandzonest_codespace, eaveheight, " +
+                "eaveheight_uom, fireproofstructuretype, fireproofstructure_codespace, floorarearate, " +
+                "groundfloorusage, groundfloorusage_codespace, implementingbody, landusetype, landusetype_codespace, " +
+                "majorusage, majorusage_codespace, majorusage2, majorusage2_codespace, note, orgusage, " +
+                "orgusage_codespace, orgusage2, orgusage2_codespace, reference, secondfloorusage, " +
+                "secondfloorusage_codespace, serialnumberofbuildingcertif, sitearea, sitearea_uom, " +
+                "specifiedbuildingcoveragerat, specifiedfloorarearate, standardfloorarearate, surveyyear, " +
+                "thirdfloorusage, thirdfloorusage_codespace, totalfloorarea, totalfloorarea_uom, urbanplantype, " +
                 "urbanplantype_codespace, vacancy, vacancy_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 

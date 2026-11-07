@@ -29,63 +29,62 @@
 package org.citydb.ade.iur.importer.uro;
 
 import org.citydb.ade.iur.importer.ImportManager;
+import org.citydb.ade.iur.schema.ADESequence;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.ade.iur.schema.ObjectMapper;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.uro.BuildingDisasterRiskAttribute;
-import org.citygml4j.ade.iur.model.uro.BuildingFloodingRiskAttribute;
-import org.citygml4j.ade.iur.model.uro.BuildingLandSlideRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.DisasterRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.FloodingRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.LandSlideRiskAttribute;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleImporter {
+public class DisasterRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final BuildingAttributeImporter buildingAttributeImporter;
-    private final BuildingFloodingRiskAttributeImporter buildingFloodingRiskAttributeImporter;
+    private final FloodingRiskAttributeImporter floodingRiskAttributeImporter;
 
     private int batchCounter;
 
-    public BuildingDisasterRiskAttributeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public DisasterRiskAttributeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
         this.objectMapper = manager.getObjectMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT)) + " " +
-                "(id, objectclass_id, building_buildingdisaster_id, description, description_codespace, areatype, areatype_codespace) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE)) + " " +
+                "(id, objectclass_id, building_bldgdisasterrisk_id, description, description_codespace, areatype, areatype_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?)");
 
-        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
-        buildingFloodingRiskAttributeImporter = manager.getImporter(BuildingFloodingRiskAttributeImporter.class);
+        floodingRiskAttributeImporter = manager.getImporter(FloodingRiskAttributeImporter.class);
     }
 
-    public long doImport(BuildingDisasterRiskAttribute buildingDisasterRiskAttribute, long parentId) throws CityGMLImportException, SQLException {
-        long objectId = buildingAttributeImporter.doImport(buildingDisasterRiskAttribute);
+    public long doImport(DisasterRiskAttribute disasterRiskAttribute, long parentId) throws CityGMLImportException, SQLException {
+        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.DISASTERRISKATTRIB_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, objectMapper.getTypeClassId(buildingDisasterRiskAttribute.getClass()));
+        ps.setLong(2, objectMapper.getTypeClassId(disasterRiskAttribute.getClass()));
         ps.setLong(3, parentId);
 
-        if (buildingDisasterRiskAttribute.getDescription() != null && buildingDisasterRiskAttribute.getDescription().isSetValue()) {
-            ps.setString(4, buildingDisasterRiskAttribute.getDescription().getValue());
-            ps.setString(5, buildingDisasterRiskAttribute.getDescription().getCodeSpace());
+        if (disasterRiskAttribute.getDescription() != null && disasterRiskAttribute.getDescription().isSetValue()) {
+            ps.setString(4, disasterRiskAttribute.getDescription().getValue());
+            ps.setString(5, disasterRiskAttribute.getDescription().getCodeSpace());
         } else {
             ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
         }
 
-        if (buildingDisasterRiskAttribute instanceof BuildingLandSlideRiskAttribute
-                && ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType() != null
-                && ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().isSetValue()) {
-            ps.setString(6, ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().getValue());
-            ps.setString(7, ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).getAreaType().getCodeSpace());
+        if (disasterRiskAttribute instanceof LandSlideRiskAttribute
+                && ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType() != null
+                && ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().isSetValue()) {
+            ps.setString(6, ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().getValue());
+            ps.setString(7, ((LandSlideRiskAttribute) disasterRiskAttribute).getAreaType().getCodeSpace());
         } else {
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
@@ -93,10 +92,10 @@ public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleI
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE));
 
-        if (buildingDisasterRiskAttribute instanceof BuildingFloodingRiskAttribute)
-            buildingFloodingRiskAttributeImporter.doImport((BuildingFloodingRiskAttribute) buildingDisasterRiskAttribute, objectId);
+        if (disasterRiskAttribute instanceof FloodingRiskAttribute)
+            floodingRiskAttributeImporter.doImport((FloodingRiskAttribute) disasterRiskAttribute, objectId);
 
         return objectId;
     }

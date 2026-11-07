@@ -34,16 +34,19 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citygml4j.ade.iur.model.uro.BldgKeyValuePairAttributePropertyElement;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributeProperty;
-import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributePropertyElement;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.gml.basicTypes.Code;
-import org.citygml4j.model.gml.basicTypes.Measure;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
@@ -52,9 +55,9 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
         String tableName = manager.getSchemaMapper().getTableName(ADETable.KEYVALUEPAIRATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace",
-                        "datevalue", "doublevalue", "intvalue", "measuredvalue", "measuredvalue_uom", "stringvalue", "urivalue"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_keyvaluepairattr_id"), new PlaceHolder<>()));
+        Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace"))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_bldgkeyvaluepair_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(table.getColumn("id")));
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -80,34 +83,7 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
                     keyValuePair.setCodeValue(code);
                 }
 
-                Date dateValue = rs.getDate("datevalue");
-                if (!rs.wasNull())
-                    keyValuePair.setDateValue(dateValue.toLocalDate());
-
-                double doubleValue = rs.getDouble("doublevalue");
-                if (!rs.wasNull())
-                    keyValuePair.setDoubleValue(doubleValue);
-
-                int intValue = rs.getInt("intvalue");
-                if (!rs.wasNull())
-                    keyValuePair.setIntValue(intValue);
-
-                double measuredValue = rs.getDouble("measuredvalue");
-                if (!rs.wasNull()) {
-                    Measure measure = new Measure(measuredValue);
-                    measure.setUom(rs.getString("measuredvalue_uom"));
-                    keyValuePair.setMeasuredValue(measure);
-                }
-
-                String stringValue = rs.getString("stringvalue");
-                if (!rs.wasNull())
-                    keyValuePair.setStringValue(stringValue);
-
-                String uriValue = rs.getString("urivalue");
-                if (!rs.wasNull())
-                    keyValuePair.setUriValue(uriValue);
-
-                KeyValuePairAttributePropertyElement property = new KeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePair));
+                BldgKeyValuePairAttributePropertyElement property = new BldgKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(keyValuePair));
                 parent.addGenericApplicationPropertyOfAbstractBuilding(property);
             }
         }

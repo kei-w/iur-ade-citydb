@@ -1,0 +1,173 @@
+/*
+ * 3D City Database - The Open Source CityGML Database
+ * https://www.3dcitydb.org/
+ *
+ * Copyright 2013 - 2024
+ * Chair of Geoinformatics
+ * Technical University of Munich, Germany
+ * https://www.lrg.tum.de/gis/
+ *
+ * The 3D City Database is jointly developed with the following
+ * cooperation partners:
+ *
+ * Virtual City Systems, Berlin <https://vc.systems/>
+ * M.O.S.S. Computer Grafik Systeme GmbH, Taufkirchen <http://www.moss.de/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.citydb.ade.iur.exporter.uro;
+
+import org.citydb.ade.iur.exporter.ExportManager;
+import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.core.ade.exporter.CityGMLExportHelper;
+import org.citydb.core.operation.exporter.CityGMLExportException;
+import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.SplitValue;
+import org.citydb.sqlbuilder.expression.PlaceHolder;
+import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citygml4j.ade.iur.model.uro.DataQualityAttribute;
+import org.citygml4j.ade.iur.model.uro.PublicSurveyDataQualityAttribute;
+import org.citygml4j.ade.iur.model.uro.PublicSurveyDataQualityAttributeProperty;
+import org.citygml4j.model.gml.basicTypes.Code;
+
+import java.sql.*;
+
+public class DataQualityAttributeExporter implements UrbanObjectModuleExporter {
+    private final PreparedStatement ps;
+    private final AttributeValueSplitter valueSplitter;
+    private final PublicSurveyDataQualityAttributeExporter publicSurveyDataQualityAttributeExporter;
+
+    public DataQualityAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.DATAQUALITYATTRIBUTE);
+
+        Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Select select = new Select().addProjection(table.getColumns("appearancesrcdesclod0", "appearancesrcdescl_codespace", "appearancesrcdesclod1",
+                        "appearancesrcdes_codespace_1", "appearancesrcdesclod2", "appearancesrcdes_codespace_2",
+                        "appearancesrcdesclod3", "appearancesrcdes_codespace_3", "appearancesrcdesclod4",
+                        "appearancesrcdes_codespace_4", "geometrysrcdesclod0", "geometrysrcdesclod_codespace",
+                        "geometrysrcdesclod1", "geometrysrcdescl_codespace_1", "geometrysrcdesclod2",
+                        "geometrysrcdescl_codespace_2", "geometrysrcdesclod3", "geometrysrcdescl_codespace_3",
+                        "geometrysrcdesclod4", "geometrysrcdescl_codespace_4", "lod1heighttype",
+                        "lod1heighttype_codespace", "lodtype", "lodtype_codespace", "publicsurveydataqualityat_id",
+                        "thematicsrcdesc", "thematicsrcdesc_codespace", "trandataacquisition"))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
+
+        valueSplitter = helper.getAttributeValueSplitter();
+        publicSurveyDataQualityAttributeExporter = manager.getExporter(PublicSurveyDataQualityAttributeExporter.class);
+    }
+
+    public void doExport(DataQualityAttribute dataQualityAttribute, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesclod0"), rs.getString("appearancesrcdescl_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getAppearanceSrcDescLod0().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesclod1"), rs.getString("appearancesrcdes_codespace_1"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getAppearanceSrcDescLod1().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesclod2"), rs.getString("appearancesrcdes_codespace_2"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getAppearanceSrcDescLod2().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesclod3"), rs.getString("appearancesrcdes_codespace_3"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getAppearanceSrcDescLod3().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("appearancesrcdesclod4"), rs.getString("appearancesrcdes_codespace_4"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getAppearanceSrcDescLod4().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesclod0"), rs.getString("geometrysrcdesclod_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getGeometrySrcDescLod0().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesclod1"), rs.getString("geometrysrcdescl_codespace_1"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getGeometrySrcDescLod1().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesclod2"), rs.getString("geometrysrcdescl_codespace_2"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getGeometrySrcDescLod2().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesclod3"), rs.getString("geometrysrcdescl_codespace_3"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getGeometrySrcDescLod3().add(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("geometrysrcdesclod4"), rs.getString("geometrysrcdescl_codespace_4"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getGeometrySrcDescLod4().add(code);
+                }
+
+                String lod1HeightType = rs.getString("lod1heighttype");
+                if (!rs.wasNull()) {
+                    Code code = new Code(lod1HeightType);
+                    code.setCodeSpace(rs.getString("lod1heighttype_codespace"));
+                    dataQualityAttribute.setLod1HeightType(code);
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("lodtype"), rs.getString("lodtype_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getLodType().add(code);
+                }
+
+                long publicSurveyDataQualityAttributeId = rs.getLong("publicsurveydataqualityat_id");
+                if (publicSurveyDataQualityAttributeId != 0) {
+                    PublicSurveyDataQualityAttribute publicSurveyDataQualityAttribute = new PublicSurveyDataQualityAttribute();
+                    publicSurveyDataQualityAttributeExporter.doExport(publicSurveyDataQualityAttribute, publicSurveyDataQualityAttributeId);
+                    dataQualityAttribute.setPublicSurveyDataQualityAttribute(new PublicSurveyDataQualityAttributeProperty(publicSurveyDataQualityAttribute));
+                }
+
+                for (SplitValue splitValue : valueSplitter.split(rs.getString("thematicsrcdesc"), rs.getString("thematicsrcdesc_codespace"))) {
+                    Code code = new Code(splitValue.result(0));
+                    code.setCodeSpace(splitValue.result(1));
+                    dataQualityAttribute.getThematicSrcDesc().add(code);
+                }
+
+                dataQualityAttribute.setTranDataAcquisition(rs.getString("trandataacquisition"));
+            }
+        }
+    }
+
+    @Override
+    public void close() throws CityGMLExportException, SQLException {
+        ps.close();
+    }
+}

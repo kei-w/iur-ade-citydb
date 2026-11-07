@@ -51,28 +51,32 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final PreparedStatement ps;
     private final String module;
 
-    private final BuildingDataQualityAttributeExporter buildingDataQualityAttributeExporter;
+    private final DataQualityAttributeExporter dataQualityAttributeExporter;
+    private final RealEstateIDAttributeExporter realEstateIDAttributeExporter;
+    private final BuildingUsecaseAttributeExporter buildingUsecaseAttributeExporter;
     private final BuildingDetailAttributeExporter buildingDetailAttributeExporter;
     private final BuildingIDAttributeExporter buildingIDAttributeExporter;
     private final LargeCustomerFacilityAttributeExporter largeCustomerFacilityAttributeExporter;
-    private final BuildingDisasterRiskAttributeExporter buildingDisasterRiskAttributeExporter;
+    private final DisasterRiskAttributeExporter disasterRiskAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
 
     public BuildingPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDING);
-        module = UrbanObjectModule.v2_0.getNamespaceURI();
+        module = UrbanObjectModule.v3_1.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("buildingdataqualityattrib_id", "buildingdetailattribute_id",
-                        "buildingidattribute_id", "largecustomerfacilityattr_id"))
+        Select select = new Select().addProjection(table.getColumns("bldgdataqualityattribute_id", "bldgrealestateidattribute_id",
+                        "bldgusecaseattribute_id", "buildingdetailattribute_id", "buildingidattribute_id", "largecustomerfacilityattr_id"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
-        buildingDataQualityAttributeExporter = manager.getExporter(BuildingDataQualityAttributeExporter.class);
+        dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
+        realEstateIDAttributeExporter = manager.getExporter(RealEstateIDAttributeExporter.class);
+        buildingUsecaseAttributeExporter = manager.getExporter(BuildingUsecaseAttributeExporter.class);
         buildingDetailAttributeExporter = manager.getExporter(BuildingDetailAttributeExporter.class);
         buildingIDAttributeExporter = manager.getExporter(BuildingIDAttributeExporter.class);
         largeCustomerFacilityAttributeExporter = manager.getExporter(LargeCustomerFacilityAttributeExporter.class);
-        buildingDisasterRiskAttributeExporter = manager.getExporter(BuildingDisasterRiskAttributeExporter.class);
+        disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
 
@@ -108,18 +112,36 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
 
-                if (projectionFilter.containsProperty("buildingDisasterRiskAttribute", module))
-                    buildingDisasterRiskAttributeExporter.doExport(parent, parentId);
+                if (projectionFilter.containsProperty("bldgDisasterRiskAttribute", module))
+                    disasterRiskAttributeExporter.doExport(parent, parentId);
 
-                if (projectionFilter.containsProperty("keyValuePairAttribute", module))
+                if (projectionFilter.containsProperty("bldgKeyValuePairAttribute", module))
                     keyValuePairAttributeExporter.doExport(parent, parentId);
 
-                long buildingDataQualityAttributeId = rs.getLong("buildingdataqualityattrib_id");
-                if (buildingDataQualityAttributeId != 0 && projectionFilter.containsProperty("buildingDataQualityAttribute", module)) {
-                    BuildingDataQualityAttribute buildingDataQualityAttribute = new BuildingDataQualityAttribute();
-                    buildingDataQualityAttributeExporter.doExport(buildingDataQualityAttribute, buildingDataQualityAttributeId);
+                long dataQualityAttributeId = rs.getLong("bldgdataqualityattribute_id");
+                if (dataQualityAttributeId != 0 && projectionFilter.containsProperty("bldgDataQualityAttribute", module)) {
+                    DataQualityAttribute dataQualityAttribute = new DataQualityAttribute();
+                    dataQualityAttributeExporter.doExport(dataQualityAttribute, dataQualityAttributeId);
 
-                    BuildingDataQualityAttributePropertyElement property = new BuildingDataQualityAttributePropertyElement(new BuildingDataQualityAttributeProperty(buildingDataQualityAttribute));
+                    BldgDataQualityAttributePropertyElement property = new BldgDataQualityAttributePropertyElement(new DataQualityAttributeProperty(dataQualityAttribute));
+                    parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                }
+
+                long realEstateIDAttributeId = rs.getLong("bldgrealestateidattribute_id");
+                if (realEstateIDAttributeId != 0 && projectionFilter.containsProperty("bldgRealEstateIDAttribute", module)) {
+                    RealEstateIDAttribute realEstateIDAttribute = new RealEstateIDAttribute();
+                    realEstateIDAttributeExporter.doExport(realEstateIDAttribute, realEstateIDAttributeId);
+
+                    BldgRealEstateIDAttributePropertyElement property = new BldgRealEstateIDAttributePropertyElement(new RealEstateIDAttributeProperty(realEstateIDAttribute));
+                    parent.addGenericApplicationPropertyOfAbstractBuilding(property);
+                }
+
+                long buildingUsecaseAttributeId = rs.getLong("bldgusecaseattribute_id");
+                if (buildingUsecaseAttributeId != 0 && projectionFilter.containsProperty("bldgUsecaseAttribute", module)) {
+                    BuildingUsecaseAttribute buildingUsecaseAttribute = new BuildingUsecaseAttribute();
+                    buildingUsecaseAttributeExporter.doExport(buildingUsecaseAttribute, buildingUsecaseAttributeId);
+
+                    BldgUsecaseAttributePropertyElement property = new BldgUsecaseAttributePropertyElement(new BuildingUsecaseAttributeProperty(buildingUsecaseAttribute));
                     parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                 }
             }

@@ -67,27 +67,43 @@ public class BuildingBalloonHandler implements ADEBalloonHandler {
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
                     " WHERE " + tableShortId + ".id = ub.largecustomerfacilityattr_id" +
                     " AND ub.id = ?";
-        } else if (schemaMapper.getTableName(ADETable.BUILDINGDATAQUALITYATT).equalsIgnoreCase(table)) {
+        } else if (schemaMapper.getTableName(ADETable.REALESTATEIDATTRIBUTE).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
-                    " WHERE " + tableShortId + ".id = ub.buildingdataqualityattrib_id" +
+                    " WHERE " + tableShortId + ".id = ub.bldgrealestateidattribute_id" +
                     " AND ub.id = ?";
-        } else if (schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT).equalsIgnoreCase(table)) {
+        } else if (schemaMapper.getTableName(ADETable.BUILDINGUSECASEATTRIBU).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
-                    " WHERE " + tableShortId + ".building_buildingdisaster_id = ub.id" +
+                    " WHERE " + tableShortId + ".id = ub.bldgusecaseattribute_id" +
                     " AND ub.id = ?";
-        } else if (schemaMapper.getTableName(ADETable.BUILDINGFLOODINGRISKAT).equalsIgnoreCase(table)
-                || schemaMapper.getTableName(ADETable.BUILDINGRIVERFLOODINGR).equalsIgnoreCase(table)) {
+        } else if (schemaMapper.getTableName(ADETable.DATAQUALITYATTRIBUTE).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
-                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT) + " ubd, " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
-                    " WHERE " + tableShortId + ".id = ubd.id" +
-                    " AND ubd.building_buildingdisaster_id = ub.id" +
+                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
+                    " WHERE " + tableShortId + ".id = ub.bldgdataqualityattribute_id" +
+                    " AND ub.id = ?";
+        } else if (schemaMapper.getTableName(ADETable.PUBLICSURVEYDATAQUALIT).equalsIgnoreCase(table)) {
+            sqlStatement = "SELECT " + aggregateColumnsClause +
+                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.DATAQUALITYATTRIBUTE) + " udq, " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
+                    " WHERE " + tableShortId + ".id = udq.publicsurveydataqualityat_id" +
+                    " AND udq.id = ub.bldgdataqualityattribute_id" +
+                    " AND ub.id = ?";
+        } else if (schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE).equalsIgnoreCase(table)) {
+            sqlStatement = "SELECT " + aggregateColumnsClause +
+                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
+                    " WHERE " + tableShortId + ".building_bldgdisasterrisk_id = ub.id" +
+                    " AND ub.id = ?";
+        } else if (schemaMapper.getTableName(ADETable.FLOODINGRISKATTRIBUTE).equalsIgnoreCase(table)
+                || schemaMapper.getTableName(ADETable.RIVERFLOODINGRISKATTRI).equalsIgnoreCase(table)) {
+            sqlStatement = "SELECT " + aggregateColumnsClause +
+                    " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.DISASTERRISKATTRIBUTE) + " udr, " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
+                    " WHERE " + tableShortId + ".id = udr.id" +
+                    " AND udr.building_bldgdisasterrisk_id = ub.id" +
                     " AND ub.id = ?";
         } else if (schemaMapper.getTableName(ADETable.KEYVALUEPAIRATTRIBUTE).equalsIgnoreCase(table)) {
             sqlStatement = "SELECT " + aggregateColumnsClause +
                     " FROM " + schemaName + "." + table + " " + tableShortId + ", " + schemaName + "." + schemaMapper.getTableName(ADETable.BUILDING) + " ub" +
-                    " WHERE " + tableShortId + ".building_keyvaluepairattr_id = ub.id" +
+                    " WHERE " + tableShortId + ".building_bldgkeyvaluepair_id = ub.id" +
                     " AND ub.id = ?";
         }
 

@@ -34,59 +34,59 @@ import org.citydb.ade.iur.schema.ObjectMapper;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.uro.BuildingFloodingRiskAttribute;
-import org.citygml4j.ade.iur.model.uro.BuildingRiverFloodingRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.FloodingRiskAttribute;
+import org.citygml4j.ade.iur.model.uro.RiverFloodingRiskAttribute;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class BuildingFloodingRiskAttributeImporter implements UrbanObjectModuleImporter {
+public class FloodingRiskAttributeImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final BuildingRiverFloodingRiskAttributeImporter buildingRiverFloodingRiskAttributeImporter;
+    private final RiverFloodingRiskAttributeImporter riverFloodingRiskAttributeImporter;
 
     private int batchCounter;
 
-    public BuildingFloodingRiskAttributeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public FloodingRiskAttributeImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
         this.objectMapper = manager.getObjectMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGFLOODINGRISKAT)) + " " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.FLOODINGRISKATTRIBUTE)) + " " +
                 "(id, objectclass_id, depth, depth_uom, rank, rank_codespace, rankorg, rankorg_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?)");
 
-        buildingRiverFloodingRiskAttributeImporter = manager.getImporter(BuildingRiverFloodingRiskAttributeImporter.class);
+        riverFloodingRiskAttributeImporter = manager.getImporter(RiverFloodingRiskAttributeImporter.class);
     }
 
-    public void doImport(BuildingFloodingRiskAttribute buildingFloodingRiskAttribute, long objectId) throws CityGMLImportException, SQLException {
+    public void doImport(FloodingRiskAttribute floodingRiskAttribute, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
-        ps.setLong(2, objectMapper.getTypeClassId(buildingFloodingRiskAttribute.getClass()));
+        ps.setLong(2, objectMapper.getTypeClassId(floodingRiskAttribute.getClass()));
 
-        if (buildingFloodingRiskAttribute.getDepth() != null && buildingFloodingRiskAttribute.getDepth().isSetValue()) {
-            ps.setDouble(3, buildingFloodingRiskAttribute.getDepth().getValue());
-            ps.setString(4, buildingFloodingRiskAttribute.getDepth().getUom());
+        if (floodingRiskAttribute.getDepth() != null && floodingRiskAttribute.getDepth().isSetValue()) {
+            ps.setDouble(3, floodingRiskAttribute.getDepth().getValue());
+            ps.setString(4, floodingRiskAttribute.getDepth().getUom());
         } else {
             ps.setNull(3, Types.DOUBLE);
             ps.setNull(4, Types.VARCHAR);
         }
 
-        if (buildingFloodingRiskAttribute.getRank() != null && buildingFloodingRiskAttribute.getRank().isSetValue()) {
-            ps.setString(5, buildingFloodingRiskAttribute.getRank().getValue());
-            ps.setString(6, buildingFloodingRiskAttribute.getRank().getCodeSpace());
+        if (floodingRiskAttribute.getRank() != null && floodingRiskAttribute.getRank().isSetValue()) {
+            ps.setString(5, floodingRiskAttribute.getRank().getValue());
+            ps.setString(6, floodingRiskAttribute.getRank().getCodeSpace());
         } else {
             ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
         }
 
-        if (buildingFloodingRiskAttribute.getRankOrg() != null && buildingFloodingRiskAttribute.getRankOrg().isSetValue()) {
-            ps.setString(7, buildingFloodingRiskAttribute.getRankOrg().getValue());
-            ps.setString(8, buildingFloodingRiskAttribute.getRankOrg().getCodeSpace());
+        if (floodingRiskAttribute.getRankOrg() != null && floodingRiskAttribute.getRankOrg().isSetValue()) {
+            ps.setString(7, floodingRiskAttribute.getRankOrg().getValue());
+            ps.setString(8, floodingRiskAttribute.getRankOrg().getCodeSpace());
         } else {
             ps.setNull(7, Types.VARCHAR);
             ps.setNull(8, Types.VARCHAR);
@@ -94,10 +94,10 @@ public class BuildingFloodingRiskAttributeImporter implements UrbanObjectModuleI
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDINGFLOODINGRISKAT));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.FLOODINGRISKATTRIBUTE));
 
-        if (buildingFloodingRiskAttribute instanceof BuildingRiverFloodingRiskAttribute)
-            buildingRiverFloodingRiskAttributeImporter.doImport((BuildingRiverFloodingRiskAttribute) buildingFloodingRiskAttribute, objectId);
+        if (floodingRiskAttribute instanceof RiverFloodingRiskAttribute)
+            riverFloodingRiskAttributeImporter.doImport((RiverFloodingRiskAttribute) floodingRiskAttribute, objectId);
     }
 
     @Override

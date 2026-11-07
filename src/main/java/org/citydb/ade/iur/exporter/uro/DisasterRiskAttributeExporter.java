@@ -35,6 +35,7 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -50,27 +51,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class BuildingDisasterRiskAttributeExporter implements UrbanObjectModuleExporter {
+public class DisasterRiskAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
     private final PreparedStatement ps;
 
-    public BuildingDisasterRiskAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+    public DisasterRiskAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
         this.objectMapper = manager.getObjectMapper();
 
-        String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGDISASTERRISKAT);
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.DISASTERRISKATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Table flooding = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGFLOODINGRISKAT)));
-        Table riverFlooding = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGRIVERFLOODINGR)));
+        Table flooding = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FLOODINGRISKATTRIBUTE)));
+        Table riverFlooding = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RIVERFLOODINGRISKATTRI)));
         Select select = new Select().addProjection(table.getColumns("id", "objectclass_id", "description", "description_codespace",
                         "areatype", "areatype_codespace"))
                 .addProjection(flooding.getColumns("depth", "depth_uom", "rank", "rank_codespace", "rankorg", "rankorg_codespace"))
                 .addProjection(riverFlooding.getColumns("admintype", "admintype_codespace", "duration", "duration_uom", "scale", "scale_codespace"))
                 .addJoin(JoinFactory.left(flooding, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.left(riverFlooding, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_buildingdisaster_id"), new PlaceHolder<>()));
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_bldgdisasterrisk_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(table.getColumn("id")));
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -84,9 +86,9 @@ public class BuildingDisasterRiskAttributeExporter implements UrbanObjectModuleE
                 if (rs.wasNull())
                     continue;
 
-                BuildingDisasterRiskAttribute buildingDisasterRiskAttribute = objectMapper.createType(objectClassId, BuildingDisasterRiskAttribute.class);
-                if (buildingDisasterRiskAttribute == null) {
-                    helper.logOrThrowErrorMessage("Failed to instantiate building disaster risk attribute (id: " + objectId + ").");
+                DisasterRiskAttribute disasterRiskAttribute = objectMapper.createType(objectClassId, DisasterRiskAttribute.class);
+                if (disasterRiskAttribute == null) {
+                    helper.logOrThrowErrorMessage("Failed to instantiate disaster risk attribute (id: " + objectId + ").");
                     continue;
                 }
 
@@ -94,69 +96,69 @@ public class BuildingDisasterRiskAttributeExporter implements UrbanObjectModuleE
                 if (!rs.wasNull()) {
                     Code code = new Code(description);
                     code.setCodeSpace(rs.getString("description_codespace"));
-                    buildingDisasterRiskAttribute.setDescription(code);
+                    disasterRiskAttribute.setDescription(code);
                 }
 
-                if (buildingDisasterRiskAttribute instanceof BuildingLandSlideRiskAttribute) {
+                if (disasterRiskAttribute instanceof LandSlideRiskAttribute) {
                     String areaType = rs.getString("areatype");
                     if (!rs.wasNull()) {
                         Code code = new Code(areaType);
                         code.setCodeSpace(rs.getString("areatype_codespace"));
-                        ((BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute).setAreaType(code);
+                        ((LandSlideRiskAttribute) disasterRiskAttribute).setAreaType(code);
                     }
                 }
 
-                if (buildingDisasterRiskAttribute instanceof BuildingFloodingRiskAttribute) {
-                    BuildingFloodingRiskAttribute buildingFloodingRiskAttribute = (BuildingFloodingRiskAttribute) buildingDisasterRiskAttribute;
+                if (disasterRiskAttribute instanceof FloodingRiskAttribute) {
+                    FloodingRiskAttribute floodingRiskAttribute = (FloodingRiskAttribute) disasterRiskAttribute;
 
                     double depth = rs.getDouble("depth");
                     if (!rs.wasNull()) {
                         Length length = new Length(depth);
                         length.setUom(rs.getString("depth_uom"));
-                        buildingFloodingRiskAttribute.setDepth(length);
+                        floodingRiskAttribute.setDepth(length);
                     }
 
                     String rank = rs.getString("rank");
                     if (!rs.wasNull()) {
                         Code code = new Code(rank);
                         code.setCodeSpace(rs.getString("rank_codespace"));
-                        buildingFloodingRiskAttribute.setRank(code);
+                        floodingRiskAttribute.setRank(code);
                     }
 
                     String rankOrg = rs.getString("rankorg");
                     if (!rs.wasNull()) {
                         Code code = new Code(rankOrg);
                         code.setCodeSpace(rs.getString("rankorg_codespace"));
-                        buildingFloodingRiskAttribute.setRankOrg(code);
+                        floodingRiskAttribute.setRankOrg(code);
                     }
                 }
 
-                if (buildingDisasterRiskAttribute instanceof BuildingRiverFloodingRiskAttribute) {
-                    BuildingRiverFloodingRiskAttribute buildingRiverFloodingRiskAttribute = (BuildingRiverFloodingRiskAttribute) buildingDisasterRiskAttribute;
+                if (disasterRiskAttribute instanceof RiverFloodingRiskAttribute) {
+                    RiverFloodingRiskAttribute riverFloodingRiskAttribute = (RiverFloodingRiskAttribute) disasterRiskAttribute;
 
                     String adminType = rs.getString("admintype");
                     if (!rs.wasNull()) {
                         Code code = new Code(adminType);
                         code.setCodeSpace(rs.getString("admintype_codespace"));
-                        buildingRiverFloodingRiskAttribute.setAdminType(code);
+                        riverFloodingRiskAttribute.setAdminType(code);
                     }
 
                     double duration = rs.getDouble("duration");
                     if (!rs.wasNull()) {
                         Measure measure = new Measure(duration);
                         measure.setUom(rs.getString("duration_uom"));
-                        buildingRiverFloodingRiskAttribute.setDuration(measure);
+                        riverFloodingRiskAttribute.setDuration(measure);
                     }
 
                     String scale = rs.getString("scale");
                     if (!rs.wasNull()) {
                         Code code = new Code(scale);
                         code.setCodeSpace(rs.getString("scale_codespace"));
-                        buildingRiverFloodingRiskAttribute.setScale(code);
+                        riverFloodingRiskAttribute.setScale(code);
                     }
                 }
 
-                BuildingDisasterRiskAttributePropertyElement property = new BuildingDisasterRiskAttributePropertyElement(new BuildingDisasterRiskAttributeProperty(buildingDisasterRiskAttribute));
+                BldgDisasterRiskAttributePropertyElement property = new BldgDisasterRiskAttributePropertyElement(new DisasterRiskAttributeProperty(disasterRiskAttribute));
                 parent.addGenericApplicationPropertyOfAbstractBuilding(property);
             }
         }

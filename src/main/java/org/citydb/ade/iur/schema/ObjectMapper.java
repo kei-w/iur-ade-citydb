@@ -201,26 +201,38 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "LargeCustomerFacilityAttribute":
                     typeClassIds.put(LargeCustomerFacilityAttribute.class, typeClassId);
                     break;
-                case "BuildingRiverFloodingRiskAttribute":
-                    typeClassIds.put(BuildingRiverFloodingRiskAttribute.class, typeClassId);
+                case "RealEstateIDAttribute":
+                    typeClassIds.put(RealEstateIDAttribute.class, typeClassId);
                     break;
-                case "BuildingTsunamiRiskAttribute":
-                    typeClassIds.put(BuildingTsunamiRiskAttribute.class, typeClassId);
+                case "BuildingUsecaseAttribute":
+                    typeClassIds.put(BuildingUsecaseAttribute.class, typeClassId);
                     break;
-                case "BuildingInlandFloodingRiskAttribute":
-                    typeClassIds.put(BuildingInlandFloodingRiskAttribute.class, typeClassId);
+                case "RiverFloodingRiskAttribute":
+                    typeClassIds.put(RiverFloodingRiskAttribute.class, typeClassId);
                     break;
-                case "BuildingHighTideRiskAttribute":
-                    typeClassIds.put(BuildingHighTideRiskAttribute.class, typeClassId);
+                case "TsunamiRiskAttribute":
+                    typeClassIds.put(TsunamiRiskAttribute.class, typeClassId);
                     break;
-                case "BuildingLandSlideRiskAttribute":
-                    typeClassIds.put(BuildingLandSlideRiskAttribute.class, typeClassId);
+                case "HighTideRiskAttribute":
+                    typeClassIds.put(HighTideRiskAttribute.class, typeClassId);
+                    break;
+                case "InlandFloodingRiskAttribute":
+                    typeClassIds.put(InlandFloodingRiskAttribute.class, typeClassId);
+                    break;
+                case "ReservoirFloodingRiskAttribute":
+                    typeClassIds.put(ReservoirFloodingRiskAttribute.class, typeClassId);
+                    break;
+                case "LandSlideRiskAttribute":
+                    typeClassIds.put(LandSlideRiskAttribute.class, typeClassId);
                     break;
                 case "KeyValuePairAttribute":
                     typeClassIds.put(KeyValuePairAttribute.class, typeClassId);
                     break;
-                case "BuildingDataQualityAttribute":
-                    typeClassIds.put(BuildingDataQualityAttribute.class, typeClassId);
+                case "DataQualityAttribute":
+                    typeClassIds.put(DataQualityAttribute.class, typeClassId);
+                    break;
+                case "PublicSurveyDataQualityAttribute":
+                    typeClassIds.put(PublicSurveyDataQualityAttribute.class, typeClassId);
                     break;
             }
         }

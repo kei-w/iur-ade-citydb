@@ -48,11 +48,13 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
 
-    private final BuildingDataQualityAttributeImporter buildingDataQualityAttributeImporter;
+    private final DataQualityAttributeImporter dataQualityAttributeImporter;
+    private final RealEstateIDAttributeImporter realEstateIDAttributeImporter;
+    private final BuildingUsecaseAttributeImporter buildingUsecaseAttributeImporter;
     private final BuildingDetailAttributeImporter buildingDetailAttributeImporter;
     private final BuildingIDAttributeImporter buildingIDAttributeImporter;
     private final LargeCustomerFacilityAttributeImporter largeCustomerFacilityAttributeImporter;
-    private final BuildingDisasterRiskAttributeImporter buildingDisasterRiskAttributeImporter;
+    private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
 
     private int batchCounter;
@@ -63,33 +65,64 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDING)) + " " +
-                "(id, buildingdataqualityattrib_id, buildingdetailattribute_id, buildingidattribute_id, largecustomerfacilityattr_id) " +
-                "values (?, ?, ?, ?, ?)");
+                "(id, bldgdataqualityattribute_id, bldgrealestateidattribute_id, bldgusecaseattribute_id, " +
+                "buildingdetailattribute_id, buildingidattribute_id, largecustomerfacilityattr_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
 
-        buildingDataQualityAttributeImporter = manager.getImporter(BuildingDataQualityAttributeImporter.class);
+        dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
+        realEstateIDAttributeImporter = manager.getImporter(RealEstateIDAttributeImporter.class);
+        buildingUsecaseAttributeImporter = manager.getImporter(BuildingUsecaseAttributeImporter.class);
         buildingDetailAttributeImporter = manager.getImporter(BuildingDetailAttributeImporter.class);
         buildingIDAttributeImporter = manager.getImporter(BuildingIDAttributeImporter.class);
         largeCustomerFacilityAttributeImporter = manager.getImporter(LargeCustomerFacilityAttributeImporter.class);
-        buildingDisasterRiskAttributeImporter = manager.getImporter(BuildingDisasterRiskAttributeImporter.class);
+        disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractBuilding parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
         ps.setLong(1, parentId);
 
-        long buildingDataQualityAttributeId = 0;
-        if (properties.contains(BuildingDataQualityAttributePropertyElement.class)) {
-            BuildingDataQualityAttributePropertyElement property = properties.getFirst(BuildingDataQualityAttributePropertyElement.class);
+        long dataQualityAttributeId = 0;
+        if (properties.contains(BldgDataQualityAttributePropertyElement.class)) {
+            BldgDataQualityAttributePropertyElement property = properties.getFirst(BldgDataQualityAttributePropertyElement.class);
             if (property.isSetValue() && property.getValue().isSetObject()) {
-                buildingDataQualityAttributeId = buildingDataQualityAttributeImporter.doImport(property.getValue().getObject());
+                dataQualityAttributeId = dataQualityAttributeImporter.doImport(property.getValue().getObject());
                 property.setValue(null);
             }
         }
 
-        if (buildingDataQualityAttributeId != 0)
-            ps.setLong(2, buildingDataQualityAttributeId);
+        if (dataQualityAttributeId != 0)
+            ps.setLong(2, dataQualityAttributeId);
         else
             ps.setNull(2, Types.NULL);
+
+        long realEstateIDAttributeId = 0;
+        if (properties.contains(BldgRealEstateIDAttributePropertyElement.class)) {
+            BldgRealEstateIDAttributePropertyElement property = properties.getFirst(BldgRealEstateIDAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                realEstateIDAttributeId = realEstateIDAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (realEstateIDAttributeId != 0)
+            ps.setLong(3, realEstateIDAttributeId);
+        else
+            ps.setNull(3, Types.NULL);
+
+        long buildingUsecaseAttributeId = 0;
+        if (properties.contains(BldgUsecaseAttributePropertyElement.class)) {
+            BldgUsecaseAttributePropertyElement property = properties.getFirst(BldgUsecaseAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                buildingUsecaseAttributeId = buildingUsecaseAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (buildingUsecaseAttributeId != 0)
+            ps.setLong(4, buildingUsecaseAttributeId);
+        else
+            ps.setNull(4, Types.NULL);
 
         long buildingDetailAttributeId = 0;
         if (properties.contains(BuildingDetailAttributePropertyElement.class)) {
@@ -101,9 +134,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (buildingDetailAttributeId != 0)
-            ps.setLong(3, buildingDetailAttributeId);
+            ps.setLong(5, buildingDetailAttributeId);
         else
-            ps.setNull(3, Types.NULL);
+            ps.setNull(5, Types.NULL);
 
         long buildingIDAttributeId = 0;
         if (properties.contains(BuildingIDAttributePropertyElement.class)) {
@@ -115,9 +148,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (buildingIDAttributeId != 0)
-            ps.setLong(4, buildingIDAttributeId);
+            ps.setLong(6, buildingIDAttributeId);
         else
-            ps.setNull(4, Types.NULL);
+            ps.setNull(6, Types.NULL);
 
         long largeCustomerFacilityAttributeId = 0;
         if (properties.contains(LargeCustomerFacilityAttributePropertyElement.class)) {
@@ -129,23 +162,23 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (largeCustomerFacilityAttributeId != 0)
-            ps.setLong(5, largeCustomerFacilityAttributeId);
+            ps.setLong(7, largeCustomerFacilityAttributeId);
         else
-            ps.setNull(5, Types.NULL);
+            ps.setNull(7, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDING));
 
-        if (properties.contains(BuildingDisasterRiskAttributePropertyElement.class)) {
-            for (BuildingDisasterRiskAttributePropertyElement property : properties.getAll(BuildingDisasterRiskAttributePropertyElement.class)) {
+        if (properties.contains(BldgDisasterRiskAttributePropertyElement.class)) {
+            for (BldgDisasterRiskAttributePropertyElement property : properties.getAll(BldgDisasterRiskAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
-                    buildingDisasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId);
+                    disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId);
             }
         }
 
-        if (properties.contains(KeyValuePairAttributePropertyElement.class)) {
-            for (KeyValuePairAttributePropertyElement property : properties.getAll(KeyValuePairAttributePropertyElement.class)) {
+        if (properties.contains(BldgKeyValuePairAttributePropertyElement.class)) {
+            for (BldgKeyValuePairAttributePropertyElement property : properties.getAll(BldgKeyValuePairAttributePropertyElement.class)) {
                 if (property.isSetValue() && property.getValue().isSetObject())
                     keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId);
             }

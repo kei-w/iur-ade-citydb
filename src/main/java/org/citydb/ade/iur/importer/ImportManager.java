@@ -288,16 +288,22 @@ public class ImportManager implements ADEImportManager {
                     importer = new BuildingDetailAttributeImporter(connection, helper, this);
                 else if (type == LargeCustomerFacilityAttributeImporter.class)
                     importer = new LargeCustomerFacilityAttributeImporter(connection, helper, this);
-                else if (type == BuildingDisasterRiskAttributeImporter.class)
-                    importer = new BuildingDisasterRiskAttributeImporter(connection, helper, this);
-                else if (type == BuildingFloodingRiskAttributeImporter.class)
-                    importer = new BuildingFloodingRiskAttributeImporter(connection, helper, this);
-                else if (type == BuildingRiverFloodingRiskAttributeImporter.class)
-                    importer = new BuildingRiverFloodingRiskAttributeImporter(connection, helper, this);
+                else if (type == RealEstateIDAttributeImporter.class)
+                    importer = new RealEstateIDAttributeImporter(connection, helper, this);
+                else if (type == BuildingUsecaseAttributeImporter.class)
+                    importer = new BuildingUsecaseAttributeImporter(connection, helper, this);
+                else if (type == DisasterRiskAttributeImporter.class)
+                    importer = new DisasterRiskAttributeImporter(connection, helper, this);
+                else if (type == FloodingRiskAttributeImporter.class)
+                    importer = new FloodingRiskAttributeImporter(connection, helper, this);
+                else if (type == RiverFloodingRiskAttributeImporter.class)
+                    importer = new RiverFloodingRiskAttributeImporter(connection, helper, this);
                 else if (type == KeyValuePairAttributeImporter.class)
                     importer = new KeyValuePairAttributeImporter(connection, helper, this);
-                else if (type == BuildingDataQualityAttributeImporter.class)
-                    importer = new BuildingDataQualityAttributeImporter(connection, helper, this);
+                else if (type == DataQualityAttributeImporter.class)
+                    importer = new DataQualityAttributeImporter(connection, helper, this);
+                else if (type == PublicSurveyDataQualityAttributeImporter.class)
+                    importer = new PublicSurveyDataQualityAttributeImporter(connection, helper, this);
             } else if (PublicTransitModuleImporter.class.isAssignableFrom(type)) {
                 // public transit module
                 if (type == AgencyImporter.class)

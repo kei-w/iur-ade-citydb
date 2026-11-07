@@ -259,12 +259,18 @@ public class ExportManager implements ADEExportManager {
                     exporter = new BuildingDetailAttributeExporter(connection, helper, this);
                 else if (type == LargeCustomerFacilityAttributeExporter.class)
                     exporter = new LargeCustomerFacilityAttributeExporter(connection, helper, this);
-                else if (type == BuildingDisasterRiskAttributeExporter.class)
-                    exporter = new BuildingDisasterRiskAttributeExporter(connection, helper, this);
+                else if (type == RealEstateIDAttributeExporter.class)
+                    exporter = new RealEstateIDAttributeExporter(connection, helper, this);
+                else if (type == BuildingUsecaseAttributeExporter.class)
+                    exporter = new BuildingUsecaseAttributeExporter(connection, helper, this);
+                else if (type == DisasterRiskAttributeExporter.class)
+                    exporter = new DisasterRiskAttributeExporter(connection, helper, this);
                 else if (type == KeyValuePairAttributeExporter.class)
                     exporter = new KeyValuePairAttributeExporter(connection, helper, this);
-                else if (type == BuildingDataQualityAttributeExporter.class)
-                    exporter = new BuildingDataQualityAttributeExporter(connection, helper, this);
+                else if (type == DataQualityAttributeExporter.class)
+                    exporter = new DataQualityAttributeExporter(connection, helper, this);
+                else if (type == PublicSurveyDataQualityAttributeExporter.class)
+                    exporter = new PublicSurveyDataQualityAttributeExporter(connection, helper, this);
             } else if (PublicTransitModuleExporter.class.isAssignableFrom(type)) {
                 // public transit module
                 if (type == AgencyExporter.class)
