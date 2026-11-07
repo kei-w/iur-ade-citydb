@@ -34,20 +34,16 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public KeyValuePairAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.KEYVALUEPAIRATTRIBUTE);
@@ -55,20 +51,16 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace", "stringvalue", "intvalue",
                         "doublevalue", "measuredvalue", "measuredvalue_uom", "datevalue", "urivalue"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("building_keyvaluepairattr_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<KeyValuePairAttribute> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(KeyValuePairAttribute keyValuePairAttribute, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<KeyValuePairAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                KeyValuePairAttribute keyValuePairAttribute = new KeyValuePairAttribute();
+            if (rs.next()) {
                 String key = rs.getString("key");
                 if (!rs.wasNull()) {
                     Code code = new Code(key);
@@ -105,16 +97,12 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
                     keyValuePairAttribute.setDateValue(dateValue.toLocalDate());
 
                 keyValuePairAttribute.setUriValue(rs.getString("urivalue"));
-
-                result.add(keyValuePairAttribute);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

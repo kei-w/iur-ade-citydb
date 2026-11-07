@@ -30,30 +30,37 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
+import org.citygml4j.ade.iur.model.urf.Boundary;
+import org.citygml4j.ade.iur.model.urf.BoundaryProperty;
 import org.citygml4j.ade.iur.model.urf.Zone;
 
 import java.sql.*;
 
 public class ZoneImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UrbanFunctionImporter urbanFunctionImporter;
+    private final ZoneToBoundaryImporter zoneToBoundaryImporter;
 
     private int batchCounter;
 
     public ZoneImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.ZONE)) + " " +
-                "(id, objectclass_id, areaapplied, finalpublicationdate) " +
-                "values (?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.ZONE)) + " " +
+                "(id, objectclass_id, location) " +
+                "values (?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
+        zoneToBoundaryImporter = manager.getImporter(ZoneToBoundaryImporter.class);
     }
 
     public void doImport(Zone zone, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
@@ -62,16 +69,24 @@ public class ZoneImporter implements UrbanFunctionModuleImporter {
         ps.setLong(1, objectId);
         ps.setInt(2, objectType.getObjectClassId());
 
-        ps.setString(3, zone.getAreaApplied());
-
-        if (zone.getFinalPublicationDate() != null)
-            ps.setDate(4, Date.valueOf(zone.getFinalPublicationDate()));
-        else
-            ps.setNull(4, Types.DATE);
+        ps.setString(3, zone.getLocationDescription());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
+
+        for (BoundaryProperty property : zone.getBoundary()) {
+            Boundary cityObject = property.getObject();
+            if (cityObject != null) {
+                long cityObjectId = helper.importObject(cityObject);
+                property.unsetObject();
+                zoneToBoundaryImporter.doImport(cityObjectId, objectId);
+            } else {
+                String href = property.getHref();
+                if (href != null && !href.isEmpty())
+                    helper.propagateObjectXlink(schemaMapper.getTableName(ADETable.ZONE_TO_BOUNDARY), objectId, "zone_id", href, "boundary_id");
+            }
+        }
     }
 
     @Override

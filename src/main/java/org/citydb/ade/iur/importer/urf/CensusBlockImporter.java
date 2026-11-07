@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -37,34 +38,34 @@ import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.CensusBlock;
 import org.citygml4j.ade.iur.model.urf.NumberOfHouseholdsProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class CensusBlockImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final NumberOfHouseholdsImporter numberOfHouseholdsImporter;
     private final UrbanFunctionImporter urbanFunctionImporter;
+    private final NumberOfHouseholdsImporter numberOfHouseholdsImporter;
 
     private int batchCounter;
 
     public CensusBlockImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CENSUSBLOCK)) + " " +
-                "(id, daytimepopulation, daytimepopulationdensity, numberofmainhouseholds, numberofordinaryhouseholds) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CENSUSBLOCK)) + " " +
+                "(id, daytimepopulation, daytimepopulationdensity, numberofordinaryhouseholds," +
+                "numberofmainhouseholds) " +
                 "values (?, ?, ?, ?, ?)");
 
-        numberOfHouseholdsImporter = manager.getImporter(NumberOfHouseholdsImporter.class);
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
+        numberOfHouseholdsImporter = manager.getImporter(NumberOfHouseholdsImporter.class);
     }
 
     public void doImport(CensusBlock censusBlock, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(censusBlock, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (censusBlock.getDaytimePopulation() != null)
@@ -77,13 +78,13 @@ public class CensusBlockImporter implements UrbanFunctionModuleImporter {
         else
             ps.setNull(3, Types.DOUBLE);
 
-        if (censusBlock.getNumberOfMainHouseholds() != null)
-            ps.setInt(4, censusBlock.getNumberOfMainHouseholds());
+        if (censusBlock.getNumberOfOrdinaryHouseholds() != null)
+            ps.setInt(4, censusBlock.getNumberOfOrdinaryHouseholds());
         else
             ps.setNull(4, Types.INTEGER);
 
-        if (censusBlock.getNumberOfOrdinaryHouseholds() != null)
-            ps.setInt(5, censusBlock.getNumberOfOrdinaryHouseholds());
+        if (censusBlock.getNumberOfMainHouseholds() != null)
+            ps.setInt(5, censusBlock.getNumberOfMainHouseholds());
         else
             ps.setNull(5, Types.INTEGER);
 
@@ -93,12 +94,11 @@ public class CensusBlockImporter implements UrbanFunctionModuleImporter {
 
         for (NumberOfHouseholdsProperty property : censusBlock.getNumberOfHouseholdsByOwnership()) {
             if (property.isSetObject())
-                numberOfHouseholdsImporter.doImport(property.getObject(), NumberOfHouseholdsImporter.Type.BY_OWNERSHIP, objectId);
+                numberOfHouseholdsImporter.doImport(property.getObject(), objectId, "censusblock_numberofhouse_id");
         }
-
-        for (NumberOfHouseholdsProperty property : censusBlock.getNumberOfHouseholdsByStructure()) {
+        for (NumberOfHouseholdsProperty property : censusBlock.getNumberOfHouseholdsByStruture()) {
             if (property.isSetObject())
-                numberOfHouseholdsImporter.doImport(property.getObject(), NumberOfHouseholdsImporter.Type.BY_STRUCTURE, objectId);
+                numberOfHouseholdsImporter.doImport(property.getObject(), objectId, "censusblock_numberofhouse__2");
         }
     }
 

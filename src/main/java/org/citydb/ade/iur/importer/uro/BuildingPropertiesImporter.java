@@ -46,7 +46,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final PreparedStatement ps;
 
     private final BuildingAttributeImporter buildingAttributeImporter;
+    private final BuildingToBuildingDisasterRiskAttributeImporter buildingToBuildingDisasterRiskAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final BuildingToKeyValuePairAttributeImporter buildingToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -61,7 +63,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
                 "values (?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
+        buildingToBuildingDisasterRiskAttributeImporter = manager.getImporter(BuildingToBuildingDisasterRiskAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        buildingToKeyValuePairAttributeImporter = manager.getImporter(BuildingToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractBuilding parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -129,15 +133,19 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(BuildingDisasterRiskAttributePropertyElement.class)) {
             for (BuildingDisasterRiskAttributePropertyElement property : properties.getAll(BuildingDisasterRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    buildingAttributeImporter.doImport(property.getValue().getObject(), parentId, "building_buildingdisaster_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long buildingDisasterRiskAttributeId = buildingAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToBuildingDisasterRiskAttributeImporter.doImport(buildingDisasterRiskAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(KeyValuePairAttributePropertyElement.class)) {
             for (KeyValuePairAttributePropertyElement property : properties.getAll(KeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId);
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long keyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    buildingToKeyValuePairAttributeImporter.doImport(keyValuePairAttributeId, parentId);
+                }
             }
         }
     }

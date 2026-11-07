@@ -30,19 +30,18 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.Pollution;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class PollutionImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UrbanFunctionImporter urbanFunctionImporter;
 
@@ -50,10 +49,11 @@ public class PollutionImporter implements UrbanFunctionModuleImporter {
 
     public PollutionImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.POLLUTION)) + " " +
-                "(id, cause, damagedarea, damagedarea_uom) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.POLLUTION)) + " " +
+                "(id, damagedarea, damagedarea_uom, cause) " +
                 "values (?, ?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
@@ -61,17 +61,18 @@ public class PollutionImporter implements UrbanFunctionModuleImporter {
 
     public void doImport(Pollution pollution, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(pollution, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        ps.setString(2, pollution.getCause());
-
         if (pollution.getDamagedArea() != null && pollution.getDamagedArea().isSetValue()) {
-            ps.setDouble(3, pollution.getDamagedArea().getValue());
-            ps.setString(4, pollution.getDamagedArea().getUom());
+            ps.setDouble(2, pollution.getDamagedArea().getValue());
+            ps.setString(3, pollution.getDamagedArea().getUom());
         } else {
-            ps.setNull(3, Types.DOUBLE);
-            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(2, Types.DOUBLE);
+            ps.setNull(3, Types.VARCHAR);
         }
+
+        ps.setString(4, pollution.getCause());
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

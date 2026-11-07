@@ -36,10 +36,7 @@ import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.NumberOfHouseholds;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class NumberOfHouseholdsImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
@@ -48,32 +45,27 @@ public class NumberOfHouseholdsImporter implements UrbanFunctionModuleImporter {
 
     private int batchCounter;
 
-    enum Type {
-        BY_OWNERSHIP,
-        BY_STRUCTURE
-    }
-
     public NumberOfHouseholdsImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS_1)) + " " +
-                "(id, censusblock_numberofhouse_id, censusblock_numberofhou_id_1, class, class_codespace, number_) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS_2)) + " " +
+                "(id, censusblock_numberofhouse_id, censusblock_numberofhouse__2, class, class_codespace, number_) " +
                 "values (?, ?, ?, ?, ?, ?)");
     }
 
-    public void doImport(NumberOfHouseholds numberOfHouseholds, Type type, long parentId) throws CityGMLImportException, SQLException {
-        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.NUMBEROFHOUSEHOL_SEQ_1));
+    public long doImport(NumberOfHouseholds numberOfHouseholds, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
+        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.NUMBEROFHOUSEHOLDS_SEQ_2));
         ps.setLong(1, objectId);
-
-        if (type == Type.BY_OWNERSHIP) {
+        if ("censusblock_numberofhouse_id".equals(parentColumn))
             ps.setLong(2, parentId);
-            ps.setNull(3, Types.NULL);
-        } else {
+        else
             ps.setNull(2, Types.NULL);
+        if ("censusblock_numberofhouse__2".equals(parentColumn))
             ps.setLong(3, parentId);
-        }
+        else
+            ps.setNull(3, Types.NULL);
 
         if (numberOfHouseholds.getClassifier() != null && numberOfHouseholds.getClassifier().isSetValue()) {
             ps.setString(4, numberOfHouseholds.getClassifier().getValue());
@@ -90,7 +82,9 @@ public class NumberOfHouseholdsImporter implements UrbanFunctionModuleImporter {
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS_1));
+            helper.executeBatch(schemaMapper.getTableName(ADETable.NUMBEROFHOUSEHOLDS_2));
+
+        return objectId;
     }
 
     @Override

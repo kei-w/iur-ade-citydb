@@ -35,7 +35,6 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -47,15 +46,12 @@ import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class WaterBodyAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public WaterBodyAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
@@ -68,26 +64,17 @@ public class WaterBodyAttributeExporter implements UrbanObjectModuleExporter {
                         "rankorg", "rankorg_codespace", "depth", "depth_uom"))
                 .addProjection(waterBodyRiverFloodingRiskAttribute.getColumns("admintype", "admintype_codespace", "scale", "scale_codespace", "duration", "duration_uom"))
                 .addJoin(JoinFactory.left(waterBodyRiverFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("waterbody_floodingriskatt_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<WaterBodyAttribute> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public WaterBodyAttribute doExport(long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<WaterBodyAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                WaterBodyAttribute waterBodyAttribute = doExport(rs.getLong("id"), rs);
-                if (waterBodyAttribute != null)
-                    result.add(waterBodyAttribute);
-            }
+            return rs.next() ? doExport(objectId, rs) : null;
         }
-
-        return result;
     }
 
     private WaterBodyAttribute doExport(long objectId, ResultSet rs) throws CityGMLExportException, SQLException {
@@ -162,6 +149,6 @@ public class WaterBodyAttributeExporter implements UrbanObjectModuleExporter {
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

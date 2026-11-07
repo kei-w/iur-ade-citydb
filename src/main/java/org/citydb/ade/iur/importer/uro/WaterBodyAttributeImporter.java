@@ -57,61 +57,60 @@ public class WaterBodyAttributeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.WATERBODYATTRIBUTE)) + " " +
-                "(id, objectclass_id, waterbody_floodingriskatt_id, description, description_codespace, rank," +
-                "rank_codespace, rankorg, rankorg_codespace, depth, depth_uom) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, description, description_codespace, rank, rank_codespace, rankorg," +
+                "rankorg_codespace, depth, depth_uom) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         waterBodyRiverFloodingRiskAttributeImporter = manager.getImporter(WaterBodyRiverFloodingRiskAttributeImporter.class);
     }
 
-    public long doImport(WaterBodyAttribute waterBodyAttribute, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(WaterBodyAttribute waterBodyAttribute) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.WATERBODYATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(waterBodyAttribute.getClass()));
-        ps.setLong(3, parentId);
 
         if (waterBodyAttribute instanceof WaterBodyFloodingRiskAttribute) {
             WaterBodyFloodingRiskAttribute waterBodyFloodingRiskAttribute = (WaterBodyFloodingRiskAttribute) waterBodyAttribute;
             if (waterBodyFloodingRiskAttribute.getDescription() != null && waterBodyFloodingRiskAttribute.getDescription().isSetValue()) {
-                ps.setString(4, waterBodyFloodingRiskAttribute.getDescription().getValue());
-                ps.setString(5, waterBodyFloodingRiskAttribute.getDescription().getCodeSpace());
+                ps.setString(3, waterBodyFloodingRiskAttribute.getDescription().getValue());
+                ps.setString(4, waterBodyFloodingRiskAttribute.getDescription().getCodeSpace());
             } else {
+                ps.setNull(3, Types.VARCHAR);
                 ps.setNull(4, Types.VARCHAR);
-                ps.setNull(5, Types.VARCHAR);
             }
 
             if (waterBodyFloodingRiskAttribute.getRank() != null && waterBodyFloodingRiskAttribute.getRank().isSetValue()) {
-                ps.setString(6, waterBodyFloodingRiskAttribute.getRank().getValue());
-                ps.setString(7, waterBodyFloodingRiskAttribute.getRank().getCodeSpace());
+                ps.setString(5, waterBodyFloodingRiskAttribute.getRank().getValue());
+                ps.setString(6, waterBodyFloodingRiskAttribute.getRank().getCodeSpace());
             } else {
+                ps.setNull(5, Types.VARCHAR);
                 ps.setNull(6, Types.VARCHAR);
-                ps.setNull(7, Types.VARCHAR);
             }
 
             if (waterBodyFloodingRiskAttribute.getRankOrg() != null && waterBodyFloodingRiskAttribute.getRankOrg().isSetValue()) {
-                ps.setString(8, waterBodyFloodingRiskAttribute.getRankOrg().getValue());
-                ps.setString(9, waterBodyFloodingRiskAttribute.getRankOrg().getCodeSpace());
+                ps.setString(7, waterBodyFloodingRiskAttribute.getRankOrg().getValue());
+                ps.setString(8, waterBodyFloodingRiskAttribute.getRankOrg().getCodeSpace());
             } else {
+                ps.setNull(7, Types.VARCHAR);
                 ps.setNull(8, Types.VARCHAR);
-                ps.setNull(9, Types.VARCHAR);
             }
 
             if (waterBodyFloodingRiskAttribute.getDepth() != null && waterBodyFloodingRiskAttribute.getDepth().isSetValue()) {
-                ps.setDouble(10, waterBodyFloodingRiskAttribute.getDepth().getValue());
-                ps.setString(11, waterBodyFloodingRiskAttribute.getDepth().getUom());
+                ps.setDouble(9, waterBodyFloodingRiskAttribute.getDepth().getValue());
+                ps.setString(10, waterBodyFloodingRiskAttribute.getDepth().getUom());
             } else {
-                ps.setNull(10, Types.DOUBLE);
-                ps.setNull(11, Types.VARCHAR);
+                ps.setNull(9, Types.DOUBLE);
+                ps.setNull(10, Types.VARCHAR);
             }
         } else {
+            ps.setNull(3, Types.VARCHAR);
             ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
             ps.setNull(8, Types.VARCHAR);
-            ps.setNull(9, Types.VARCHAR);
-            ps.setNull(10, Types.DOUBLE);
-            ps.setNull(11, Types.VARCHAR);
+            ps.setNull(9, Types.DOUBLE);
+            ps.setNull(10, Types.VARCHAR);
         }
 
         ps.addBatch();

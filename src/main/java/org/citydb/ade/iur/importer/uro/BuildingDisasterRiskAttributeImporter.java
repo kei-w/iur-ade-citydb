@@ -56,41 +56,36 @@ public class BuildingDisasterRiskAttributeImporter implements UrbanObjectModuleI
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDINGDISASTERRISKAT)) + " " +
-                "(id, objectclass_id, building_buildingdisaster_id, description, description_codespace, areatype," +
-                "areatype_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, description, description_codespace, areatype, areatype_codespace) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
         buildingFloodingRiskAttributeImporter = manager.getImporter(BuildingFloodingRiskAttributeImporter.class);
     }
 
-    public void doImport(BuildingDisasterRiskAttribute buildingDisasterRiskAttribute, long objectId, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
+    public void doImport(BuildingDisasterRiskAttribute buildingDisasterRiskAttribute, long objectId) throws CityGMLImportException, SQLException {
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(buildingDisasterRiskAttribute.getClass()));
-        if ("building_buildingdisaster_id".equals(parentColumn))
-            ps.setLong(3, parentId);
-        else
-            ps.setNull(3, Types.NULL);
 
         if (buildingDisasterRiskAttribute.getDescription() != null && buildingDisasterRiskAttribute.getDescription().isSetValue()) {
-            ps.setString(4, buildingDisasterRiskAttribute.getDescription().getValue());
-            ps.setString(5, buildingDisasterRiskAttribute.getDescription().getCodeSpace());
+            ps.setString(3, buildingDisasterRiskAttribute.getDescription().getValue());
+            ps.setString(4, buildingDisasterRiskAttribute.getDescription().getCodeSpace());
         } else {
+            ps.setNull(3, Types.VARCHAR);
             ps.setNull(4, Types.VARCHAR);
-            ps.setNull(5, Types.VARCHAR);
         }
 
         if (buildingDisasterRiskAttribute instanceof BuildingLandSlideRiskAttribute) {
             BuildingLandSlideRiskAttribute buildingLandSlideRiskAttribute = (BuildingLandSlideRiskAttribute) buildingDisasterRiskAttribute;
             if (buildingLandSlideRiskAttribute.getAreaType() != null && buildingLandSlideRiskAttribute.getAreaType().isSetValue()) {
-                ps.setString(6, buildingLandSlideRiskAttribute.getAreaType().getValue());
-                ps.setString(7, buildingLandSlideRiskAttribute.getAreaType().getCodeSpace());
+                ps.setString(5, buildingLandSlideRiskAttribute.getAreaType().getValue());
+                ps.setString(6, buildingLandSlideRiskAttribute.getAreaType().getCodeSpace());
             } else {
+                ps.setNull(5, Types.VARCHAR);
                 ps.setNull(6, Types.VARCHAR);
-                ps.setNull(7, Types.VARCHAR);
             }
         } else {
+            ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
-            ps.setNull(7, Types.VARCHAR);
         }
 
         ps.addBatch();

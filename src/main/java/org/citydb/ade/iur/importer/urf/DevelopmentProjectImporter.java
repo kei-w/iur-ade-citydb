@@ -30,6 +30,7 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
@@ -40,6 +41,7 @@ import java.sql.*;
 
 public class DevelopmentProjectImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final ZoneImporter zoneImporter;
 
@@ -47,12 +49,13 @@ public class DevelopmentProjectImporter implements UrbanFunctionModuleImporter {
 
     public DevelopmentProjectImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DEVELOPMENTPROJECT)) + " " +
-                "(id, benefitarea, benefitarea_uom, benefitperiod, completedarea, completedarea_uom, cost, dateofdecision, " +
-                "dateofdesignationfortemporar, mainpurpose, mainpurpose_codespace, ongoingarea, ongoingarea_uom, " +
-                "plannedarea, plannedarea_uom, status, status_codespace) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DEVELOPMENTPROJECT)) + " " +
+                "(id, status, status_codespace, mainpurpose, mainpurpose_codespace, benefitarea, benefitarea_uom," +
+                "benefitperiod, cost, plannedarea, plannedarea_uom, ongoingarea, ongoingarea_uom, completedarea," +
+                "completedarea_uom, dateofdecision, dateofdesignationfortemporar) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         zoneImporter = manager.getImporter(ZoneImporter.class);
@@ -60,46 +63,45 @@ public class DevelopmentProjectImporter implements UrbanFunctionModuleImporter {
 
     public void doImport(DevelopmentProject developmentProject, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         zoneImporter.doImport(developmentProject, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (developmentProject.getBenefitArea() != null && developmentProject.getBenefitArea().isSetValue()) {
-            ps.setDouble(2, developmentProject.getBenefitArea().getValue());
-            ps.setString(3, developmentProject.getBenefitArea().getUom());
+        if (developmentProject.getStatus() != null && developmentProject.getStatus().isSetValue()) {
+            ps.setString(2, developmentProject.getStatus().getValue());
+            ps.setString(3, developmentProject.getStatus().getCodeSpace());
         } else {
-            ps.setNull(2, Types.DOUBLE);
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
         }
 
-        ps.setString(4, developmentProject.getBenefitPeriod());
-
-        if (developmentProject.getCompletedArea() != null && developmentProject.getCompletedArea().isSetValue()) {
-            ps.setDouble(5, developmentProject.getCompletedArea().getValue());
-            ps.setString(6, developmentProject.getCompletedArea().getUom());
+        if (developmentProject.getMainPurpose() != null && developmentProject.getMainPurpose().isSetValue()) {
+            ps.setString(4, developmentProject.getMainPurpose().getValue());
+            ps.setString(5, developmentProject.getMainPurpose().getCodeSpace());
         } else {
-            ps.setNull(5, Types.DOUBLE);
-            ps.setNull(6, Types.VARCHAR);
+            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(5, Types.VARCHAR);
         }
 
-        if (developmentProject.getCost() != null)
-            ps.setInt(7, developmentProject.getCost());
-        else
-            ps.setNull(7, Types.INTEGER);
-
-        if (developmentProject.getDateOfDecision() != null)
-            ps.setDate(8, Date.valueOf(developmentProject.getDateOfDecision()));
-        else
-            ps.setNull(8, Types.DATE);
-
-        if (developmentProject.getDateOfDesignationForTemporaryReplotting() != null)
-            ps.setDate(9, Date.valueOf(developmentProject.getDateOfDesignationForTemporaryReplotting()));
-        else
-            ps.setNull(9, Types.DATE);
-
-        if (developmentProject.getMainPurpose() != null && developmentProject.getMainPurpose().isSetValue()) {
-            ps.setString(10, developmentProject.getMainPurpose().getValue());
-            ps.setString(11, developmentProject.getMainPurpose().getCodeSpace());
+        if (developmentProject.getBenefitArea() != null && developmentProject.getBenefitArea().isSetValue()) {
+            ps.setDouble(6, developmentProject.getBenefitArea().getValue());
+            ps.setString(7, developmentProject.getBenefitArea().getUom());
         } else {
-            ps.setNull(10, Types.VARCHAR);
+            ps.setNull(6, Types.DOUBLE);
+            ps.setNull(7, Types.VARCHAR);
+        }
+
+        ps.setString(8, developmentProject.getBenefitPeriod());
+
+        if (developmentProject.getCost() != null)
+            ps.setInt(9, developmentProject.getCost());
+        else
+            ps.setNull(9, Types.INTEGER);
+
+        if (developmentProject.getPlannedArea() != null && developmentProject.getPlannedArea().isSetValue()) {
+            ps.setDouble(10, developmentProject.getPlannedArea().getValue());
+            ps.setString(11, developmentProject.getPlannedArea().getUom());
+        } else {
+            ps.setNull(10, Types.DOUBLE);
             ps.setNull(11, Types.VARCHAR);
         }
 
@@ -111,21 +113,23 @@ public class DevelopmentProjectImporter implements UrbanFunctionModuleImporter {
             ps.setNull(13, Types.VARCHAR);
         }
 
-        if (developmentProject.getPlannedArea() != null && developmentProject.getPlannedArea().isSetValue()) {
-            ps.setDouble(14, developmentProject.getPlannedArea().getValue());
-            ps.setString(15, developmentProject.getPlannedArea().getUom());
+        if (developmentProject.getCompletedArea() != null && developmentProject.getCompletedArea().isSetValue()) {
+            ps.setDouble(14, developmentProject.getCompletedArea().getValue());
+            ps.setString(15, developmentProject.getCompletedArea().getUom());
         } else {
             ps.setNull(14, Types.DOUBLE);
             ps.setNull(15, Types.VARCHAR);
         }
 
-        if (developmentProject.getStatus() != null && developmentProject.getStatus().isSetValue()) {
-            ps.setString(16, developmentProject.getStatus().getValue());
-            ps.setString(17, developmentProject.getStatus().getCodeSpace());
-        } else {
-            ps.setNull(16, Types.VARCHAR);
-            ps.setNull(17, Types.VARCHAR);
-        }
+        if (developmentProject.getDateOfDecision() != null)
+            ps.setDate(16, Date.valueOf(developmentProject.getDateOfDecision()));
+        else
+            ps.setNull(16, Types.DATE);
+
+        if (developmentProject.getDateOfDesignationForTemporaryReplotting() != null)
+            ps.setDate(17, Date.valueOf(developmentProject.getDateOfDesignationForTemporaryReplotting()));
+        else
+            ps.setNull(17, Types.DATE);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

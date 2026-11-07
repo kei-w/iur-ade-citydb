@@ -30,19 +30,18 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.DisasterDamage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final UrbanFunctionImporter urbanFunctionImporter;
 
@@ -50,11 +49,12 @@ public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
 
     public DisasterDamageImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DISASTERDAMAGE)) + " " +
-                "(id, damagedarea, damagedarea_uom, maximumrainfallperhour, numberofdamagedhouses, " +
-                "numberofhousesfloodedabovefl, numberofhousesfloodedbelowfl, totalrainfall) " +
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DISASTERDAMAGE)) + " " +
+                "(id, damagedarea, damagedarea_uom, numberofdamagedhouses, numberofhousesfloodedabovefl," +
+                "numberofhousesfloodedbelowfl, maximumrainfallperhour, totalrainfall) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
@@ -62,6 +62,7 @@ public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
 
     public void doImport(DisasterDamage disasterDamage, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(disasterDamage, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
         if (disasterDamage.getDamagedArea() != null && disasterDamage.getDamagedArea().isSetValue()) {
@@ -72,23 +73,23 @@ public class DisasterDamageImporter implements UrbanFunctionModuleImporter {
             ps.setNull(3, Types.VARCHAR);
         }
 
-        if (disasterDamage.getMaximumRainfallPerHour() != null)
-            ps.setInt(4, disasterDamage.getMaximumRainfallPerHour());
+        if (disasterDamage.getNumberOfDamagedHouses() != null)
+            ps.setInt(4, disasterDamage.getNumberOfDamagedHouses());
         else
             ps.setNull(4, Types.INTEGER);
 
-        if (disasterDamage.getNumberOfDamagedHouses() != null)
-            ps.setInt(5, disasterDamage.getNumberOfDamagedHouses());
+        if (disasterDamage.getNumberOfHousesFloodedAboveFloorLevel() != null)
+            ps.setInt(5, disasterDamage.getNumberOfHousesFloodedAboveFloorLevel());
         else
             ps.setNull(5, Types.INTEGER);
 
-        if (disasterDamage.getNumberOfHousesFloodedAboveFloorLevel() != null)
-            ps.setInt(6, disasterDamage.getNumberOfHousesFloodedAboveFloorLevel());
+        if (disasterDamage.getNumberOfHousesFloodedBelowFloorLevel() != null)
+            ps.setInt(6, disasterDamage.getNumberOfHousesFloodedBelowFloorLevel());
         else
             ps.setNull(6, Types.INTEGER);
 
-        if (disasterDamage.getNumberOfHousesFloodedBelowFloorLevel() != null)
-            ps.setInt(7, disasterDamage.getNumberOfHousesFloodedBelowFloorLevel());
+        if (disasterDamage.getMaximumRainfallPerHour() != null)
+            ps.setInt(7, disasterDamage.getMaximumRainfallPerHour());
         else
             ps.setNull(7, Types.INTEGER);
 

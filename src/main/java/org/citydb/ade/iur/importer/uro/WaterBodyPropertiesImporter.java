@@ -46,6 +46,7 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
     private final PreparedStatement ps;
 
     private final WaterBodyAttributeImporter waterBodyAttributeImporter;
+    private final WaterBodyToWaterBodyFloodingRiskAttributeImporter waterBodyToWaterBodyFloodingRiskAttributeImporter;
 
     private int batchCounter;
 
@@ -59,6 +60,7 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
                 "values (?)");
 
         waterBodyAttributeImporter = manager.getImporter(WaterBodyAttributeImporter.class);
+        waterBodyToWaterBodyFloodingRiskAttributeImporter = manager.getImporter(WaterBodyToWaterBodyFloodingRiskAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, WaterBody parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -70,8 +72,10 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(FloodingRiskAttributePropertyElement.class)) {
             for (FloodingRiskAttributePropertyElement property : properties.getAll(FloodingRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    waterBodyAttributeImporter.doImport(property.getValue().getObject(), parentId);
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long floodingRiskAttributeId = waterBodyAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToWaterBodyFloodingRiskAttributeImporter.doImport(floodingRiskAttributeId, parentId);
+                }
             }
         }
     }

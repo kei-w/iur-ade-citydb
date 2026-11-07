@@ -37,7 +37,6 @@ import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -56,11 +55,6 @@ import org.citygml4j.model.gml.basicTypes.Measure;
 import org.citygml4j.model.gml.measures.Length;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import java.sql.*;
 
@@ -68,7 +62,6 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
     private final PreparedStatement ps;
-    private final Map<String, PreparedStatement> psByParent = new HashMap<>();
     private final AttributeValueSplitter valueSplitter;
 
     public BuildingAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
@@ -144,69 +137,6 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
-        for (String parentColumn : Arrays.asList("building_buildingdisaster_id")) {
-            Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id"))
-                    .addProjection(buildingIDAttribute.getColumns("buildingid", "branchid", "partid", "prefecture", "prefecture_codespace", "city", "city_codespace"))
-                    .addProjection(buildingDetailAttribute.getColumns("serialnumberofbuildingcertif", "sitearea", "sitearea_uom", "buildingfootprintarea",
-                            "buildingfootprintarea_uom", "buildingroofedgearea", "buildingroofedgearea_uom", "developmentarea",
-                            "developmentarea_uom", "buildingstructuretype", "buildingstructuret_codespace",
-                            "buildingstructureorgtype", "buildingstructureo_codespace", "fireproofstructuretype",
-                            "fireproofstructure_codespace", "implementingbody", "majorusage", "majorusage_codespace",
-                            "majorusage2", "majorusage2_codespace", "orgusage", "orgusage_codespace", "orgusage2",
-                            "orgusage2_codespace", "detailedusage", "detailedusage_codespace", "detailedusage2",
-                            "detailedusage2_codespace", "detailedusage3", "detailedusage3_codespace", "groundfloorusage",
-                            "groundfloorusage_codespace", "secondfloorusage", "secondfloorusage_codespace", "thirdfloorusage",
-                            "thirdfloorusage_codespace", "basementusage", "basementusage_codespace", "basementfirstusage",
-                            "basementfirstusage_codespace", "basementsecondusage", "basementsecondusag_codespace", "vacancy",
-                            "vacancy_codespace", "buildingcoveragerate", "floorarearate", "specifiedbuildingcoveragerat",
-                            "specifiedfloorarearate", "standardfloorarearate", "buildingheight", "buildingheight_uom",
-                            "eaveheight", "eaveheight_uom"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumns("class", "class_codespace", "name", "capacity", "owner", "totalstorefloorarea",
-                            "totalstorefloorarea_uom", "inauguraldate", "keytenants", "availability"))
-                    .addProjection(buildingDisasterRiskAttribute.getColumns("description", "description_codespace", "areatype", "areatype_codespace"))
-                    .addProjection(buildingFloodingRiskAttribute.getColumns("rank", "rank_codespace", "rankorg", "rankorg_codespace", "depth", "depth_uom"))
-                    .addProjection(buildingRiverFloodingRiskAttribute.getColumns("admintype", "admintype_codespace", "scale", "scale_codespace", "duration", "duration_uom"))
-                    .addProjection(buildingDataQualityAttribute.getColumns("srcscale", "srcscale_codespace", "geometrysrcdesc", "geometrysrcdesc_codespace",
-                            "thematicsrcdesc", "thematicsrcdesc_codespace", "appearancesrcdesc", "appearancesrcdesc_codespace",
-                            "lod1heighttype", "lod1heighttype_codespace", "lodtype"))
-                    .addProjection(buildingDetailAttribute.getColumn("totalfloorarea", "buildingdetailattribute_totalfloorarea"))
-                    .addProjection(buildingDetailAttribute.getColumn("totalfloorarea_uom", "buildingdetailattribute_totalfloorarea_uom"))
-                    .addProjection(buildingDetailAttribute.getColumn("urbanplantype", "buildingdetailattribute_urbanplantype"))
-                    .addProjection(buildingDetailAttribute.getColumn("urbanplantype_codespace", "buildingdetailattribute_urbanplantype_codespace"))
-                    .addProjection(buildingDetailAttribute.getColumn("areaclassificationtype", "buildingdetailattribute_areaclassificationtype"))
-                    .addProjection(buildingDetailAttribute.getColumn("areaclassification_codespace", "buildingdetailattribute_areaclassification_codespace"))
-                    .addProjection(buildingDetailAttribute.getColumn("districtsandzonestype", "buildingdetailattribute_districtsandzonestype"))
-                    .addProjection(buildingDetailAttribute.getColumn("districtsandzonest_codespace", "buildingdetailattribute_districtsandzonest_codespace"))
-                    .addProjection(buildingDetailAttribute.getColumn("landusetype", "buildingdetailattribute_landusetype"))
-                    .addProjection(buildingDetailAttribute.getColumn("landusetype_codespace", "buildingdetailattribute_landusetype_codespace"))
-                    .addProjection(buildingDetailAttribute.getColumn("reference", "buildingdetailattribute_reference"))
-                    .addProjection(buildingDetailAttribute.getColumn("note", "buildingdetailattribute_note"))
-                    .addProjection(buildingDetailAttribute.getColumn("surveyyear", "buildingdetailattribute_surveyyear"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("totalfloorarea", "largecustomerfacilityattribute_totalfloorarea"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("totalfloorarea_uom", "largecustomerfacilityattribute_totalfloorarea_uom"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("urbanplantype", "largecustomerfacilityattribute_urbanplantype"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("urbanplantype_codespace", "largecustomerfacilityattribute_urbanplantype_codespace"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("areaclassificationtype", "largecustomerfacilityattribute_areaclassificationtype"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("areaclassification_codespace", "largecustomerfacilityattribute_areaclassification_codespace"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("districtsandzonestype", "largecustomerfacilityattribute_districtsandzonestype"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("districtsandzonest_codespace", "largecustomerfacilityattribute_districtsandzonest_codespace"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("landusetype", "largecustomerfacilityattribute_landusetype"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("landusetype_codespace", "largecustomerfacilityattribute_landusetype_codespace"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("reference", "largecustomerfacilityattribute_reference"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("note", "largecustomerfacilityattribute_note"))
-                    .addProjection(largeCustomerFacilityAttribute.getColumn("surveyyear", "largecustomerfacilityattribute_surveyyear"))
-                    .addJoin(JoinFactory.left(buildingIDAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(buildingDetailAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(largeCustomerFacilityAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(buildingDisasterRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(buildingFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(buildingRiverFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(buildingDataQualityAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addSelection(ComparisonFactory.equalTo(buildingDisasterRiskAttribute.getColumn(parentColumn), new PlaceHolder<>()))
-                    .addOrderBy(new OrderByToken(table.getColumn("id")));
-            psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
-        }
-
         valueSplitter = helper.getAttributeValueSplitter();
     }
 
@@ -216,22 +146,6 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
         try (ResultSet rs = ps.executeQuery()) {
             return rs.next() ? doExport(objectId, rs) : null;
         }
-    }
-
-    public List<BuildingAttribute> doExport(long parentId, String parentColumn) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent.get(parentColumn);
-        ps.setLong(1, parentId);
-
-        List<BuildingAttribute> result = new ArrayList<>();
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                BuildingAttribute buildingAttribute = doExport(rs.getLong("id"), rs);
-                if (buildingAttribute != null)
-                    result.add(buildingAttribute);
-            }
-        }
-
-        return result;
     }
 
     private BuildingAttribute doExport(long objectId, ResultSet rs) throws CityGMLExportException, SQLException {
@@ -697,7 +611,5 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
-        for (PreparedStatement ps : psByParent.values())
-            ps.close();
     }
 }

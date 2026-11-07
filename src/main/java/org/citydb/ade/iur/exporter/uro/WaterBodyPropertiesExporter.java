@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -49,6 +50,7 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     private final String module;
 
     private final WaterBodyAttributeExporter waterBodyAttributeExporter;
+    private final PreparedStatement psFloodingRiskAttribute;
 
     public WaterBodyPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.WATERBODY);
@@ -59,6 +61,11 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table floodingRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.WATERBODY_TO_WATERBODY)));
+        Select floodingRiskAttributeSelect = new Select().addProjection(floodingRiskAttributes.getColumn("waterbodyattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(floodingRiskAttributes.getColumn("waterbody_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(floodingRiskAttributes.getColumn("waterbodyattribute_id")));
+        psFloodingRiskAttribute = connection.prepareStatement(floodingRiskAttributeSelect.toString());
         waterBodyAttributeExporter = manager.getExporter(WaterBodyAttributeExporter.class);
     }
 
@@ -68,10 +75,14 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 if (projectionFilter.containsProperty("floodingRiskAttribute", module)) {
-                    for (WaterBodyAttribute floodingRiskAttribute : waterBodyAttributeExporter.doExport(parentId)) {
-                        if (floodingRiskAttribute instanceof WaterBodyFloodingRiskAttribute) {
-                            FloodingRiskAttributePropertyElement property = new FloodingRiskAttributePropertyElement(new WaterBodyFloodingRiskAttributeProperty((WaterBodyFloodingRiskAttribute) floodingRiskAttribute));
-                            parent.addGenericApplicationPropertyOfWaterBody(property);
+                    psFloodingRiskAttribute.setLong(1, parentId);
+                    try (ResultSet floodingRiskAttributeRs = psFloodingRiskAttribute.executeQuery()) {
+                        while (floodingRiskAttributeRs.next()) {
+                            WaterBodyAttribute floodingRiskAttribute = waterBodyAttributeExporter.doExport(floodingRiskAttributeRs.getLong("waterbodyattribute_id"));
+                            if (floodingRiskAttribute instanceof WaterBodyFloodingRiskAttribute) {
+                                FloodingRiskAttributePropertyElement property = new FloodingRiskAttributePropertyElement(new WaterBodyFloodingRiskAttributeProperty((WaterBodyFloodingRiskAttribute) floodingRiskAttribute));
+                                parent.addGenericApplicationPropertyOfWaterBody(property);
+                            }
                         }
                     }
                 }
@@ -82,5 +93,6 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psFloodingRiskAttribute.close();
     }
 }

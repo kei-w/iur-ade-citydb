@@ -30,53 +30,50 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.urf.PublicTransportationFacility;
+import org.citygml4j.ade.iur.model.urf.ProjectPromotionArea;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
-public class PublicTransportationFacilityImporter implements UrbanFunctionModuleImporter {
+public class ProjectPromotionAreaImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-    private final UrbanFunctionImporter urbanFunctionImporter;
+    private final ZoneImporter zoneImporter;
 
     private int batchCounter;
 
-    public PublicTransportationFacilityImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public ProjectPromotionAreaImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PUBLICTRANSPORTATIONFA)) + " " +
-                "(id, companyname, frequencyofservice, numberofcustomers, routename, sectionname) " +
-                "values (?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PROJECTPROMOTIONAREA)) + " " +
+                "(id, objectclass_id, developmentpolicy, publicfacilitiesplans) " +
+                "values (?, ?, ?, ?)");
 
-        urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
+        zoneImporter = manager.getImporter(ZoneImporter.class);
     }
 
-    public void doImport(PublicTransportationFacility publicTransit, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
-        urbanFunctionImporter.doImport(publicTransit, objectId, objectType, foreignKeys);
+    public void doImport(ProjectPromotionArea projectPromotionArea, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
+        zoneImporter.doImport(projectPromotionArea, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
+        ps.setInt(2, objectType.getObjectClassId());
 
-        ps.setString(2, publicTransit.getCompanyName());
-
-        if (publicTransit.getFrequencyOfService() != null)
-            ps.setInt(3, publicTransit.getFrequencyOfService());
+        if (projectPromotionArea.getDevelopmentPolicy() != null && projectPromotionArea.getDevelopmentPolicy().isSetValue())
+            ps.setString(3, projectPromotionArea.getDevelopmentPolicy().getValue());
         else
-            ps.setNull(3, Types.INTEGER);
+            ps.setNull(3, Types.VARCHAR);
 
-        if (publicTransit.getNumberOfCustomers() != null)
-            ps.setDouble(4, publicTransit.getNumberOfCustomers());
+        if (projectPromotionArea.getPublicFacilitiesPlans() != null && projectPromotionArea.getPublicFacilitiesPlans().isSetValue())
+            ps.setString(4, projectPromotionArea.getPublicFacilitiesPlans().getValue());
         else
-            ps.setNull(4, Types.DOUBLE);
-
-        ps.setString(5, publicTransit.getRouteName());
-        ps.setString(6, publicTransit.getSectionName());
+            ps.setNull(4, Types.VARCHAR);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

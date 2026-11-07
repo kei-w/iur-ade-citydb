@@ -29,62 +29,49 @@
 package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
-import org.citydb.ade.iur.schema.ADESequence;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
+import org.citydb.core.ade.importer.ForeignKeys;
+import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.urf.LegalGrounds;
+import org.citygml4j.ade.iur.model.urf.DistributionBusinessZone;
 
 import java.sql.*;
 
-public class LegalGroundsImporter implements UrbanFunctionModuleImporter {
+public class DistributionBusinessZoneImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final DistrictsAndZonesImporter districtsAndZonesImporter;
 
     private int batchCounter;
 
-    public LegalGroundsImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public DistributionBusinessZoneImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.LEGALGROUNDS)) + " " +
-                "(id, articlesofregulation, articlesofregulati_codespace, date_, nameofregulation, nameofregulation_codespace) " +
-                "values (?, ?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DISTRIBUTIONBUSINESSZO)) + " " +
+                "(id, guidelinepublicationdate) " +
+                "values (?, ?)");
+
+        districtsAndZonesImporter = manager.getImporter(DistrictsAndZonesImporter.class);
     }
 
-    public long doImport(LegalGrounds legalGrounds) throws CityGMLImportException, SQLException {
-        long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.LEGALGROUNDS_SEQ));
+    public void doImport(DistributionBusinessZone distributionBusinessZone, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
+        districtsAndZonesImporter.doImport(distributionBusinessZone, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (legalGrounds.getArticlesOfRegulation() != null && legalGrounds.getArticlesOfRegulation().isSetValue()) {
-            ps.setString(2, legalGrounds.getArticlesOfRegulation().getValue());
-            ps.setString(3, legalGrounds.getArticlesOfRegulation().getCodeSpace());
-        } else {
-            ps.setNull(2, Types.VARCHAR);
-            ps.setNull(3, Types.VARCHAR);
-        }
-
-        if (legalGrounds.getDate() != null)
-            ps.setDate(4, Date.valueOf(legalGrounds.getDate()));
+        if (distributionBusinessZone.getGuidelinePublicationDate() != null)
+            ps.setDate(2, Date.valueOf(distributionBusinessZone.getGuidelinePublicationDate()));
         else
-            ps.setNull(4, Types.DATE);
-
-        if (legalGrounds.getNameOfRegulation() != null && legalGrounds.getNameOfRegulation().isSetValue()) {
-            ps.setString(5, legalGrounds.getNameOfRegulation().getValue());
-            ps.setString(6, legalGrounds.getNameOfRegulation().getCodeSpace());
-        } else {
-            ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
-        }
+            ps.setNull(2, Types.DATE);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.LEGALGROUNDS));
-
-        return objectId;
+            helper.executeBatch(objectType);
     }
 
     @Override

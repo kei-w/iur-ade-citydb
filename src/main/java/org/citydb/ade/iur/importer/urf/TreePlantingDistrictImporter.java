@@ -31,55 +31,47 @@ package org.citydb.ade.iur.importer.urf;
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.ade.iur.schema.SchemaMapper;
-import org.citydb.core.ade.importer.ADEPropertyCollection;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
-import org.citydb.core.database.schema.mapping.FeatureType;
+import org.citydb.core.ade.importer.ForeignKeys;
+import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
-import org.citygml4j.ade.iur.model.urf.FiscalYearOfPublicationProperty;
-import org.citygml4j.ade.iur.model.urf.LanguageProperty;
-import org.citygml4j.model.citygml.cityobjectgroup.CityObjectGroup;
+import org.citygml4j.ade.iur.model.urf.TreePlantingDistrict;
 
 import java.sql.*;
-import java.time.LocalDate;
 
-public class CityObjectGroupPropertiesImporter implements UrbanFunctionModuleImporter {
+public class TreePlantingDistrictImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final DistrictsAndZonesImporter districtsAndZonesImporter;
 
     private int batchCounter;
 
-    public CityObjectGroupPropertiesImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
+    public TreePlantingDistrictImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
         this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2)) + " " +
-                "(id, fiscalyearofpublication, language, language_codespace) " +
-                "values (?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.TREEPLANTINGDISTRICT)) + " " +
+                "(id, minimumgreeningrate) " +
+                "values (?, ?)");
+
+        districtsAndZonesImporter = manager.getImporter(DistrictsAndZonesImporter.class);
     }
 
-    public void doImport(ADEPropertyCollection properties, CityObjectGroup parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
-        ps.setLong(1, parentId);
+    public void doImport(TreePlantingDistrict treePlantingDistrict, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
+        districtsAndZonesImporter.doImport(treePlantingDistrict, objectId, objectType, foreignKeys);
 
-        FiscalYearOfPublicationProperty fiscalYearOfPublication = properties.getFirst(FiscalYearOfPublicationProperty.class);
-        if (fiscalYearOfPublication != null && fiscalYearOfPublication.isSetValue())
-            ps.setDate(2, Date.valueOf(LocalDate.of(fiscalYearOfPublication.getValue().getValue(), 1, 1)));
+        ps.setLong(1, objectId);
+
+        if (treePlantingDistrict.getMinimumGreeningRate() != null)
+            ps.setDouble(2, treePlantingDistrict.getMinimumGreeningRate());
         else
-            ps.setNull(2, Types.DATE);
-
-        LanguageProperty language = properties.getFirst(LanguageProperty.class);
-        if (language != null && language.isSetValue()) {
-            ps.setString(3, language.getValue().getValue());
-            ps.setString(4, language.getValue().getCodeSpace());
-        } else {
-            ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
-        }
+            ps.setNull(2, Types.DOUBLE);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
-            helper.executeBatch(schemaMapper.getTableName(ADETable.CITYOBJECTGROUP_2));
+            helper.executeBatch(objectType);
     }
 
     @Override
