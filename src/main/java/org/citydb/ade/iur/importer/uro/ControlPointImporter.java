@@ -58,29 +58,27 @@ public class ControlPointImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CONTROLPOINT)) + " " +
-                "(id, railwaytrack_controlpoint_id, startpost, endpost, function, function_codespace, parameter_id," +
-                "startpoint, endpoint) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, startpost, endpost, function, function_codespace, parameter_id, startpoint, endpoint) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?)");
 
         controlPointParameterImporter = manager.getImporter(ControlPointParameterImporter.class);
         geometryConverter = helper.getGeometryConverter();
     }
 
-    public long doImport(ControlPoint controlPoint, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(ControlPoint controlPoint) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.CONTROLPOINT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
-        ps.setString(3, controlPoint.getStartPost());
+        ps.setString(2, controlPoint.getStartPost());
 
-        ps.setString(4, controlPoint.getEndPost());
+        ps.setString(3, controlPoint.getEndPost());
 
         if (controlPoint.getFunction() != null && controlPoint.getFunction().isSetValue()) {
-            ps.setString(5, controlPoint.getFunction().getValue());
-            ps.setString(6, controlPoint.getFunction().getCodeSpace());
+            ps.setString(4, controlPoint.getFunction().getValue());
+            ps.setString(5, controlPoint.getFunction().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         long parameterId = 0;
@@ -88,18 +86,18 @@ public class ControlPointImporter implements UrbanObjectModuleImporter {
             parameterId = controlPointParameterImporter.doImport(controlPoint.getParameter().getObject());
 
         if (parameterId != 0)
-            ps.setLong(7, parameterId);
+            ps.setLong(6, parameterId);
         else
-            ps.setNull(7, Types.NULL);
+            ps.setNull(6, Types.NULL);
 
         GeometryObject startPoint = null;
         if (controlPoint.getStartPoint() != null)
             startPoint = geometryConverter.getPoint(controlPoint.getStartPoint());
 
         if (startPoint != null)
-            ps.setObject(8, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(startPoint, connection));
+            ps.setObject(7, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(startPoint, connection));
         else
-            ps.setNull(8, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+            ps.setNull(7, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
                     helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
 
         GeometryObject endPoint = null;
@@ -107,9 +105,9 @@ public class ControlPointImporter implements UrbanObjectModuleImporter {
             endPoint = geometryConverter.getPoint(controlPoint.getEndPoint());
 
         if (endPoint != null)
-            ps.setObject(9, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(endPoint, connection));
+            ps.setObject(8, helper.getDatabaseAdapter().getGeometryConverter().getDatabaseObject(endPoint, connection));
         else
-            ps.setNull(9, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+            ps.setNull(8, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
                     helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
 
         ps.addBatch();

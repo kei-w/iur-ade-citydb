@@ -57,32 +57,31 @@ public class ThematicShapeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.THEMATICSHAPE)) + " " +
-                "(id, utilitynetwo_thematicshap_id, horizontaltype, horizontaltype_codespace, heighttype," +
-                "heighttype_codespace, shape_brep_id, shape_other_geom) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, horizontaltype, horizontaltype_codespace, heighttype, heighttype_codespace, shape_brep_id," +
+                "shape_other_geom) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
 
         geometryConverter = helper.getGeometryConverter();
     }
 
-    public long doImport(ThematicShape thematicShape, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(ThematicShape thematicShape) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.THEMATICSHAPE_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (thematicShape.getHorizontalType() != null && thematicShape.getHorizontalType().isSetValue()) {
-            ps.setString(3, thematicShape.getHorizontalType().getValue());
-            ps.setString(4, thematicShape.getHorizontalType().getCodeSpace());
+            ps.setString(2, thematicShape.getHorizontalType().getValue());
+            ps.setString(3, thematicShape.getHorizontalType().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (thematicShape.getHeightType() != null && thematicShape.getHeightType().isSetValue()) {
-            ps.setString(5, thematicShape.getHeightType().getValue());
-            ps.setString(6, thematicShape.getHeightType().getCodeSpace());
+            ps.setString(4, thematicShape.getHeightType().getValue());
+            ps.setString(5, thematicShape.getHeightType().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         long shapeId = 0;
@@ -99,14 +98,14 @@ public class ThematicShapeImporter implements UrbanObjectModuleImporter {
         }
 
         if (shapeId != 0)
-            ps.setLong(7, shapeId);
+            ps.setLong(6, shapeId);
         else
-            ps.setNull(7, Types.NULL);
+            ps.setNull(6, Types.NULL);
 
         if (shapeGeometry != null)
-            ps.setObject(8, shapeGeometry);
+            ps.setObject(7, shapeGeometry);
         else
-            ps.setNull(8, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
+            ps.setNull(7, helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryType(),
                     helper.getDatabaseAdapter().getGeometryConverter().getNullGeometryTypeName());
 
         ps.addBatch();

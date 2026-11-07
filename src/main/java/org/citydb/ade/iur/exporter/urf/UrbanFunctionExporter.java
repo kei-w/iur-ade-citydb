@@ -29,6 +29,8 @@
 package org.citydb.ade.iur.exporter.urf;
 
 import org.citydb.ade.iur.exporter.ExportManager;
+import org.citydb.ade.iur.exporter.uro.DataQualityAttributeExporter;
+import org.citydb.ade.iur.exporter.uro.KeyValuePairAttributeExporter;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.config.geometry.GeometryObject;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
@@ -38,377 +40,335 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.database.content.GMLConverter;
 import org.citydb.core.operation.exporter.database.content.SurfaceGeometryExporter;
 import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
+import org.citydb.core.operation.exporter.util.GeometrySetter;
 import org.citydb.core.operation.exporter.util.SplitValue;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.UrbanFunctionModule;
-import org.citygml4j.ade.iur.model.urf.LegalGrounds;
-import org.citygml4j.ade.iur.model.urf.LegalGroundsProperty;
 import org.citygml4j.ade.iur.model.urf.TargetProperty;
 import org.citygml4j.ade.iur.model.urf.UrbanFunction;
+import org.citygml4j.ade.iur.model.uro.DataQualityAttribute;
+import org.citygml4j.ade.iur.model.uro.DataQualityAttributeProperty;
+import org.citygml4j.ade.iur.model.uro.KeyValuePairAttribute;
+import org.citygml4j.ade.iur.model.uro.KeyValuePairAttributeProperty;
+import org.citygml4j.model.gml.base.StringOrRef;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
-import org.citygml4j.model.gml.geometry.aggregates.MultiCurveProperty;
-import org.citygml4j.model.gml.geometry.aggregates.MultiPointProperty;
 
 import java.sql.*;
 import java.time.Year;
 
 public class UrbanFunctionExporter implements UrbanFunctionModuleExporter {
     private final CityGMLExportHelper helper;
-    private final ExportManager manager;
-    private final SurfaceGeometryExporter surfaceGeometryExporter;
     private final PreparedStatement ps;
-    private final String module;
-
-    private final GMLConverter gmlConverter;
+    private final PreparedStatement psTarget;
+    private final PreparedStatement psKeyValuePairAttribute;
+    private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final AttributeValueSplitter valueSplitter;
+    private final SurfaceGeometryExporter surfaceGeometryExporter;
+    private final GMLConverter gmlConverter;
 
     public UrbanFunctionExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
-        this.manager = manager;
-
         String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = UrbanFunctionModule.v1_4.getNamespaceURI();
-
-        Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = addProjection(new Select(), table, projectionFilter, "")
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        if (projectionFilter.containsProperty("target", module)) {
-            Table targets = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_CITYOBJEC)));
-            Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(cityObject.getColumn("id", "tid"), cityObject.getColumn("gmlid"))
-                    .addJoin(JoinFactory.left(targets, "urbanfunction_id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(cityObject, "id", ComparisonName.EQUAL_TO, targets.getColumn("cityobject_id")));
-        }
-        ps = connection.prepareStatement(select.toString());
-
+        keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
+        dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
+        valueSplitter = helper.getAttributeValueSplitter();
         surfaceGeometryExporter = helper.getSurfaceGeometryExporter();
         gmlConverter = helper.getGMLConverter();
-        valueSplitter = helper.getAttributeValueSplitter();
-    }
 
-    public Select addProjection(Select select, Table table, CombinedProjectionFilter projectionFilter, String prefix) {
-        select.addProjection(table.getColumn("id", prefix + "id"));
-        if (projectionFilter.containsProperty("class", module))
-            select.addProjection(table.getColumn("class", prefix + "class"), table.getColumn("class_codespace", prefix + "class_codespace"));
-        if (projectionFilter.containsProperty("function", module))
-            select.addProjection(table.getColumn("function", prefix + "function"), table.getColumn("function_codespace", prefix + "function_codespace"));
-        if (projectionFilter.containsProperty("enactmentDate", module))
-            select.addProjection(table.getColumn("enactmentdate", prefix + "enactmentdate"));
-        if (projectionFilter.containsProperty("expirationFiscalYear", module))
-            select.addProjection(table.getColumn("enactmentfiscalyear", prefix + "enactmentfiscalyear"));
-        if (projectionFilter.containsProperty("expirationDate", module))
-            select.addProjection(table.getColumn("expirationdate", prefix + "expirationdate"));
-        if (projectionFilter.containsProperty("expirationFiscalYear", module))
-            select.addProjection(table.getColumn("expirationfiscalyear", prefix + "expirationfiscalyear"));
-        if (projectionFilter.containsProperty("custodian", module))
-            select.addProjection(table.getColumn("custodian", prefix + "custodian"));
-        if (projectionFilter.containsProperty("nominalArea", module))
-            select.addProjection(table.getColumn("nominalarea", prefix + "nominalarea"), table.getColumn("nominalarea_uom", prefix + "nominalarea_uom"));
-        if (projectionFilter.containsProperty("abstract", module))
-            select.addProjection(table.getColumn("abstract", prefix + "abstract"));
-        if (projectionFilter.containsProperty("validity", module))
-            select.addProjection(table.getColumn("validity", prefix + "validity"));
-        if (projectionFilter.containsProperty("urbanPlanType", module))
-            select.addProjection(table.getColumn("urbanplantype", prefix + "urbanplantype"), table.getColumn("urbanplantype_codespace", prefix + "urbanplantype_codespace"));
-        if (projectionFilter.containsProperty("areaClassificationType", module))
-            select.addProjection(table.getColumn("areaclassificationtype", prefix + "areaclassificationtype"), table.getColumn("areaclassification_codespace", prefix + "areaclassification_codespace"));
-        if (projectionFilter.containsProperty("prefecture", module))
-            select.addProjection(table.getColumn("prefecture", prefix + "prefecture"), table.getColumn("prefecture_codespace", prefix + "prefecture_codespace"));
-        if (projectionFilter.containsProperty("city", module))
-            select.addProjection(table.getColumn("city", prefix + "city"), table.getColumn("city_codespace", prefix + "city_codespace"));
-        if (projectionFilter.containsProperty("reference", module))
-            select.addProjection(table.getColumn("reference", prefix + "reference"));
-        if (projectionFilter.containsProperty("note", module))
-            select.addProjection(table.getColumn("note", prefix + "note"));
-        if (projectionFilter.containsProperty("surveyYear", module))
-            select.addProjection(table.getColumn("surveyyear", prefix + "surveyyear"));
-        if (helper.getLodFilter().isEnabled(0)) {
-            if (projectionFilter.containsProperty("lod0MultiPoint", module))
-                select.addProjection(helper.getGeometryColumn(table.getColumn("lod0multipoint"), prefix + "lod0multipoint"));
-            if (projectionFilter.containsProperty("lod0MultiCurve", module))
-                select.addProjection(helper.getGeometryColumn(table.getColumn("lod0multicurve"), prefix + "lod0multicurve"));
-            if (projectionFilter.containsProperty("lod0MultiSurface", module))
-                select.addProjection(table.getColumn("lod0multisurface_id", prefix + "lod0multisurface_id"));
-        }
-        if (projectionFilter.containsProperty("lod-1MultiPoint", module))
-            select.addProjection(helper.getGeometryColumn(table.getColumn("lod_1multipoint"), prefix + "lod_1multipoint"));
-        if (projectionFilter.containsProperty("lod-2MultiPoint", module))
-            select.addProjection(helper.getGeometryColumn(table.getColumn("lod_2multipoint"), prefix + "lod_2multipoint"));
-        if (projectionFilter.containsProperty("lod-1MultiCurve", module))
-            select.addProjection(helper.getGeometryColumn(table.getColumn("lod_1multicurve"), prefix + "lod_1multicurve"));
-        if (projectionFilter.containsProperty("lod-2MultiCurve", module))
-            select.addProjection(helper.getGeometryColumn(table.getColumn("lod_2multicurve"), prefix + "lod_2multicurve"));
-        if (projectionFilter.containsProperty("lod-1MultiSurface", module))
-            select.addProjection(table.getColumn("lod_1multisurface_id", prefix + "lod_1multisurface_id"));
-        if (projectionFilter.containsProperty("lod-2MultiSurface", module))
-            select.addProjection(table.getColumn("lod_2multisurface_id", prefix + "lod_2multisurface_id"));
-        if (projectionFilter.containsProperty("legalGrounds", module)) {
-            Table legalGrounds = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LEGALGROUNDS)));
-            select.addProjection(table.getColumn("legalgrounds_id", prefix + "legalgrounds_id"),
-                            legalGrounds.getColumn("articlesofregulation", prefix + "articlesofregulation"),
-                            legalGrounds.getColumn("articlesofregulati_codespace", prefix + "articlesofregulati_codespace"),
-                            legalGrounds.getColumn("date_", prefix + "date_"),
-                            legalGrounds.getColumn("nameofregulation", prefix + "nameofregulation"),
-                            legalGrounds.getColumn("nameofregulation_codespace", prefix + "nameofregulation_codespace"))
-                    .addJoin(JoinFactory.left(legalGrounds, "id", ComparisonName.EQUAL_TO, table.getColumn("legalgrounds_id")));
-        }
+        Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Select select = new Select()
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        addProjection(select, table, "");
+        ps = connection.prepareStatement(select.toString());
 
-        return select;
+        Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
+        Table targets = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_CITYOBJEC)));
+        Select targetSelect = new Select().addProjection(cityObject.getColumn("gmlid"))
+                .addJoin(JoinFactory.inner(cityObject, "id", ComparisonName.EQUAL_TO, targets.getColumn("cityobject_id")))
+                .addSelection(ComparisonFactory.equalTo(targets.getColumn("urbanfunction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(cityObject.getColumn("id")));
+        psTarget = connection.prepareStatement(targetSelect.toString());
+        Table keyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_KEYVALUEP)));
+        Select keyValuePairAttributeSelect = new Select().addProjection(keyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(keyValuePairAttributes.getColumn("urbanfunction_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(keyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psKeyValuePairAttribute = connection.prepareStatement(keyValuePairAttributeSelect.toString());
     }
 
     public void doExport(UrbanFunction urbanFunction, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    doExport(urbanFunction, projectionFilter, "", rs);
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("target", module)) {
-                    String gmlId = rs.getString(MappingConstants.GMLID);
-                    if (gmlId != null)
-                        urbanFunction.getTargets().add(new TargetProperty("#" + gmlId));
-                }
+            if (rs.next()) {
+                doExport(urbanFunction, objectId, "", rs);
             }
         }
     }
 
-    public void doExport(UrbanFunction urbanFunction, ProjectionFilter projectionFilter, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
-        if (projectionFilter.containsProperty("class", module)) {
-            String classifier = rs.getString(prefix + "class");
-            if (!rs.wasNull()) {
-                Code code = new Code(classifier);
-                code.setCodeSpace(rs.getString(prefix + "class_codespace"));
-                urbanFunction.setClassifier(code);
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("class", prefix + "class"),
+                table.getColumn("class_codespace", prefix + "class_codespace"),
+                table.getColumn("function", prefix + "function"),
+                table.getColumn("function_codespace", prefix + "function_codespace"),
+                table.getColumn("usage", prefix + "usage"),
+                table.getColumn("usage_codespace", prefix + "usage_codespace"),
+                table.getColumn("validfrom", prefix + "validfrom"),
+                table.getColumn("validfromtype", prefix + "validfromtype"),
+                table.getColumn("validfromtype_codespace", prefix + "validfromtype_codespace"),
+                table.getColumn("enactmentfiscalyear", prefix + "enactmentfiscalyear"),
+                table.getColumn("validto", prefix + "validto"),
+                table.getColumn("validtotype", prefix + "validtotype"),
+                table.getColumn("validtotype_codespace", prefix + "validtotype_codespace"),
+                table.getColumn("expirationfiscalyear", prefix + "expirationfiscalyear"),
+                table.getColumn("legalgrounds", prefix + "legalgrounds"),
+                table.getColumn("custodian", prefix + "custodian"),
+                table.getColumn("notificationnumber", prefix + "notificationnumber"),
+                table.getColumn("finalnotificationdate", prefix + "finalnotificationdate"),
+                table.getColumn("finalnotificationnumber", prefix + "finalnotificationnumber"),
+                table.getColumn("urbanplantype", prefix + "urbanplantype"),
+                table.getColumn("urbanplantype_codespace", prefix + "urbanplantype_codespace"),
+                table.getColumn("areaclassificationtype", prefix + "areaclassificationtype"),
+                table.getColumn("areaclassification_codespace", prefix + "areaclassification_codespace"),
+                table.getColumn("nominalarea", prefix + "nominalarea"),
+                table.getColumn("nominalarea_uom", prefix + "nominalarea_uom"),
+                table.getColumn("prefecture", prefix + "prefecture"),
+                table.getColumn("prefecture_codespace", prefix + "prefecture_codespace"),
+                table.getColumn("city", prefix + "city"),
+                table.getColumn("city_codespace", prefix + "city_codespace"),
+                table.getColumn("reference", prefix + "reference"),
+                table.getColumn("reason", prefix + "reason"),
+                table.getColumn("note", prefix + "note"),
+                table.getColumn("surveyyear", prefix + "surveyyear"),
+                table.getColumn("lod_2multisurface_id", prefix + "lod_2multisurface_id"),
+                table.getColumn("lod_1multisurface_id", prefix + "lod_1multisurface_id"),
+                table.getColumn("lod0multisurface_id", prefix + "lod0multisurface_id"),
+                table.getColumn("lod1multisurface_id", prefix + "lod1multisurface_id"),
+                table.getColumn("dataqualityattribute_id", prefix + "dataqualityattribute_id"),
+                helper.getGeometryColumn(table.getColumn("lod_2multicurve"), prefix + "lod_2multicurve"),
+                helper.getGeometryColumn(table.getColumn("lod_1multicurve"), prefix + "lod_1multicurve"),
+                helper.getGeometryColumn(table.getColumn("lod0multicurve"), prefix + "lod0multicurve"),
+                helper.getGeometryColumn(table.getColumn("lod1multicurve"), prefix + "lod1multicurve"),
+                helper.getGeometryColumn(table.getColumn("lod_2multipoint"), prefix + "lod_2multipoint"),
+                helper.getGeometryColumn(table.getColumn("lod_1multipoint"), prefix + "lod_1multipoint"),
+                helper.getGeometryColumn(table.getColumn("lod0multipoint"), prefix + "lod0multipoint"));
+
+        return select;
+    }
+
+    public void doExport(UrbanFunction urbanFunction, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        String classifier = rs.getString(prefix + "class");
+        if (!rs.wasNull()) {
+            Code code = new Code(classifier);
+            code.setCodeSpace(rs.getString(prefix + "class_codespace"));
+            urbanFunction.setClassifier(code);
+        }
+
+        for (SplitValue splitValue : valueSplitter.split(rs.getString(prefix + "function"), rs.getString(prefix + "function_codespace"))) {
+            Code code = new Code(splitValue.result(0));
+            code.setCodeSpace(splitValue.result(1));
+            urbanFunction.getFunction().add(code);
+        }
+
+        for (SplitValue splitValue : valueSplitter.split(rs.getString(prefix + "usage"), rs.getString(prefix + "usage_codespace"))) {
+            Code code = new Code(splitValue.result(0));
+            code.setCodeSpace(splitValue.result(1));
+            urbanFunction.getUsage().add(code);
+        }
+
+        Date validFrom = rs.getDate(prefix + "validfrom");
+        if (!rs.wasNull())
+            urbanFunction.setValidFrom(validFrom.toLocalDate());
+
+        String validFromType = rs.getString(prefix + "validfromtype");
+        if (!rs.wasNull()) {
+            Code code = new Code(validFromType);
+            code.setCodeSpace(rs.getString(prefix + "validfromtype_codespace"));
+            urbanFunction.setValidFromType(code);
+        }
+
+        Date enactmentFiscalYear = rs.getDate(prefix + "enactmentfiscalyear");
+        if (!rs.wasNull())
+            urbanFunction.setEnactmentFiscalYear(Year.of(enactmentFiscalYear.toLocalDate().getYear()));
+
+        Date validTo = rs.getDate(prefix + "validto");
+        if (!rs.wasNull())
+            urbanFunction.setValidTo(validTo.toLocalDate());
+
+        String validToType = rs.getString(prefix + "validtotype");
+        if (!rs.wasNull()) {
+            Code code = new Code(validToType);
+            code.setCodeSpace(rs.getString(prefix + "validtotype_codespace"));
+            urbanFunction.setValidToType(code);
+        }
+
+        Date expirationFiscalYear = rs.getDate(prefix + "expirationfiscalyear");
+        if (!rs.wasNull())
+            urbanFunction.setExpirationFiscalYear(Year.of(expirationFiscalYear.toLocalDate().getYear()));
+
+        urbanFunction.setLegalGrounds(rs.getString(prefix + "legalgrounds"));
+
+        urbanFunction.setCustodian(rs.getString(prefix + "custodian"));
+
+        urbanFunction.setNotificationNumber(rs.getString(prefix + "notificationnumber"));
+
+        Date finalNotificationDate = rs.getDate(prefix + "finalnotificationdate");
+        if (!rs.wasNull())
+            urbanFunction.setFinalNotificationDate(finalNotificationDate.toLocalDate());
+
+        urbanFunction.setFinalNotificationNumber(rs.getString(prefix + "finalnotificationnumber"));
+
+        String urbanPlanType = rs.getString(prefix + "urbanplantype");
+        if (!rs.wasNull()) {
+            Code code = new Code(urbanPlanType);
+            code.setCodeSpace(rs.getString(prefix + "urbanplantype_codespace"));
+            urbanFunction.setUrbanPlanType(code);
+        }
+
+        String areaClassificationType = rs.getString(prefix + "areaclassificationtype");
+        if (!rs.wasNull()) {
+            Code code = new Code(areaClassificationType);
+            code.setCodeSpace(rs.getString(prefix + "areaclassification_codespace"));
+            urbanFunction.setAreaClassificationType(code);
+        }
+
+        double nominalArea = rs.getDouble(prefix + "nominalarea");
+        if (!rs.wasNull()) {
+            Measure measure = new Measure(nominalArea);
+            measure.setUom(rs.getString(prefix + "nominalarea_uom"));
+            urbanFunction.setNominalArea(measure);
+        }
+
+        String prefecture = rs.getString(prefix + "prefecture");
+        if (!rs.wasNull()) {
+            Code code = new Code(prefecture);
+            code.setCodeSpace(rs.getString(prefix + "prefecture_codespace"));
+            urbanFunction.setPrefecture(code);
+        }
+
+        String city = rs.getString(prefix + "city");
+        if (!rs.wasNull()) {
+            Code code = new Code(city);
+            code.setCodeSpace(rs.getString(prefix + "city_codespace"));
+            urbanFunction.setCity(code);
+        }
+
+        urbanFunction.setReference(rs.getString(prefix + "reference"));
+
+        String reason = rs.getString(prefix + "reason");
+        if (!rs.wasNull())
+            urbanFunction.setReason(new StringOrRef(reason));
+
+        String note = rs.getString(prefix + "note");
+        if (!rs.wasNull())
+            urbanFunction.setNote(new StringOrRef(note));
+
+        Date surveyYear = rs.getDate(prefix + "surveyyear");
+        if (!rs.wasNull())
+            urbanFunction.setSurveyYear(Year.of(surveyYear.toLocalDate().getYear()));
+
+        long lodMinus2MultiSurfaceId = rs.getLong(prefix + "lod_2multisurface_id");
+        if (!rs.wasNull())
+            surfaceGeometryExporter.addBatch(lodMinus2MultiSurfaceId, urbanFunction::setLodMinus2MultiSurface);
+
+        long lodMinus1MultiSurfaceId = rs.getLong(prefix + "lod_1multisurface_id");
+        if (!rs.wasNull())
+            surfaceGeometryExporter.addBatch(lodMinus1MultiSurfaceId, urbanFunction::setLodMinus1MultiSurface);
+
+        long lod0MultiSurfaceId = rs.getLong(prefix + "lod0multisurface_id");
+        if (!rs.wasNull())
+            surfaceGeometryExporter.addBatch(lod0MultiSurfaceId, urbanFunction::setLod0MultiSurface);
+
+        long lod1MultiSurfaceId = rs.getLong(prefix + "lod1multisurface_id");
+        if (!rs.wasNull())
+            surfaceGeometryExporter.addBatch(lod1MultiSurfaceId, urbanFunction::setLod1MultiSurface);
+
+        Object lodMinus2MultiCurveObject = rs.getObject(prefix + "lod_2multicurve");
+        if (!rs.wasNull()) {
+            GeometryObject lodMinus2MultiCurve = helper.getDatabaseAdapter().getGeometryConverter().getMultiCurve(lodMinus2MultiCurveObject);
+            if (lodMinus2MultiCurve != null)
+                urbanFunction.setLodMinus2MultiCurve(gmlConverter.getMultiCurveProperty(lodMinus2MultiCurve));
+        }
+
+        Object lodMinus1MultiCurveObject = rs.getObject(prefix + "lod_1multicurve");
+        if (!rs.wasNull()) {
+            GeometryObject lodMinus1MultiCurve = helper.getDatabaseAdapter().getGeometryConverter().getMultiCurve(lodMinus1MultiCurveObject);
+            if (lodMinus1MultiCurve != null)
+                urbanFunction.setLodMinus1MultiCurve(gmlConverter.getMultiCurveProperty(lodMinus1MultiCurve));
+        }
+
+        Object lod0MultiCurveObject = rs.getObject(prefix + "lod0multicurve");
+        if (!rs.wasNull()) {
+            GeometryObject lod0MultiCurve = helper.getDatabaseAdapter().getGeometryConverter().getMultiCurve(lod0MultiCurveObject);
+            if (lod0MultiCurve != null)
+                urbanFunction.setLod0MultiCurve(gmlConverter.getMultiCurveProperty(lod0MultiCurve));
+        }
+
+        Object lod1MultiCurveObject = rs.getObject(prefix + "lod1multicurve");
+        if (!rs.wasNull()) {
+            GeometryObject lod1MultiCurve = helper.getDatabaseAdapter().getGeometryConverter().getMultiCurve(lod1MultiCurveObject);
+            if (lod1MultiCurve != null)
+                urbanFunction.setLod1MultiCurve(gmlConverter.getMultiCurveProperty(lod1MultiCurve));
+        }
+
+        Object lodMinus2MultiPointObject = rs.getObject(prefix + "lod_2multipoint");
+        if (!rs.wasNull()) {
+            GeometryObject lodMinus2MultiPoint = helper.getDatabaseAdapter().getGeometryConverter().getMultiPoint(lodMinus2MultiPointObject);
+            if (lodMinus2MultiPoint != null)
+                urbanFunction.setLodMinus2MultiPoint(gmlConverter.getMultiPointProperty(lodMinus2MultiPoint));
+        }
+
+        Object lodMinus1MultiPointObject = rs.getObject(prefix + "lod_1multipoint");
+        if (!rs.wasNull()) {
+            GeometryObject lodMinus1MultiPoint = helper.getDatabaseAdapter().getGeometryConverter().getMultiPoint(lodMinus1MultiPointObject);
+            if (lodMinus1MultiPoint != null)
+                urbanFunction.setLodMinus1MultiPoint(gmlConverter.getMultiPointProperty(lodMinus1MultiPoint));
+        }
+
+        Object lod0MultiPointObject = rs.getObject(prefix + "lod0multipoint");
+        if (!rs.wasNull()) {
+            GeometryObject lod0MultiPoint = helper.getDatabaseAdapter().getGeometryConverter().getMultiPoint(lod0MultiPointObject);
+            if (lod0MultiPoint != null)
+                urbanFunction.setLod0MultiPoint(gmlConverter.getMultiPointProperty(lod0MultiPoint));
+        }
+
+        psTarget.setLong(1, objectId);
+        try (ResultSet targetRs = psTarget.executeQuery()) {
+            while (targetRs.next()) {
+                TargetProperty targetProperty = new TargetProperty();
+                targetProperty.setHref("#" + targetRs.getString("gmlid"));
+                urbanFunction.getTarget().add(targetProperty);
             }
         }
 
-        if (projectionFilter.containsProperty("function", module)) {
-            for (SplitValue splitValue : valueSplitter.split(rs.getString(prefix + "function"), rs.getString(prefix + "function_codespace"))) {
-                Code function = new Code(splitValue.result(0));
-                function.setCodeSpace(splitValue.result(1));
-                urbanFunction.getFunctions().add(function);
+        psKeyValuePairAttribute.setLong(1, objectId);
+        try (ResultSet keyValuePairAttributeRs = psKeyValuePairAttribute.executeQuery()) {
+            while (keyValuePairAttributeRs.next()) {
+                KeyValuePairAttribute keyValuePairAttribute = new KeyValuePairAttribute();
+                keyValuePairAttributeExporter.doExport(keyValuePairAttribute, keyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+                urbanFunction.getKeyValuePairAttribute().add(new KeyValuePairAttributeProperty(keyValuePairAttribute));
             }
         }
 
-        if (projectionFilter.containsProperty("enactmentDate", module)) {
-            Date enactmentDate = rs.getDate(prefix + "enactmentdate");
-            if (!rs.wasNull())
-                urbanFunction.setEnactmentDate(enactmentDate.toLocalDate());
-        }
-
-        if (projectionFilter.containsProperty("enactmentFiscalYear", module)) {
-            Date enactmentFiscalYear = rs.getDate(prefix + "enactmentfiscalyear");
-            if (!rs.wasNull())
-                urbanFunction.setEnactmentFiscalYear(Year.of(enactmentFiscalYear.toLocalDate().getYear()));
-        }
-
-        if (projectionFilter.containsProperty("expirationDate", module)) {
-            Date expirationDate = rs.getDate(prefix + "expirationdate");
-            if (!rs.wasNull())
-                urbanFunction.setExpirationDate(expirationDate.toLocalDate());
-        }
-
-        if (projectionFilter.containsProperty("expirationFiscalYear", module)) {
-            Date expirationFiscalYear = rs.getDate(prefix + "expirationfiscalyear");
-            if (!rs.wasNull())
-                urbanFunction.setExpirationFiscalYear(Year.of(expirationFiscalYear.toLocalDate().getYear()));
-        }
-
-        if (projectionFilter.containsProperty("custodian", module))
-            urbanFunction.setCustodian(rs.getString(prefix + "custodian"));
-
-        if (projectionFilter.containsProperty("nominalArea", module)) {
-            double nominalArea = rs.getDouble(prefix + "nominalarea");
-            if (!rs.wasNull()) {
-                Measure measure = new Measure(nominalArea);
-                measure.setUom(rs.getString(prefix + "nominalarea_uom"));
-                urbanFunction.setNominalArea(measure);
-            }
-        }
-
-        if (projectionFilter.containsProperty("abstract", module))
-            urbanFunction.setAbstract(rs.getString(prefix + "abstract"));
-
-        if (projectionFilter.containsProperty("validity", module)) {
-            boolean validity = rs.getBoolean(prefix + "validity");
-            if (!rs.wasNull())
-                urbanFunction.setValidity(validity);
-        }
-
-        if (projectionFilter.containsProperty("urbanPlanType", module)) {
-            String urbanPlanType = rs.getString(prefix + "urbanplantype");
-            if (!rs.wasNull()) {
-                Code code = new Code(urbanPlanType);
-                code.setCodeSpace(rs.getString(prefix + "urbanplantype_codespace"));
-                urbanFunction.setUrbanPlanType(code);
-            }
-        }
-
-        if (projectionFilter.containsProperty("areaClassificationType", module)) {
-            String areaClassificationType = rs.getString(prefix + "areaclassificationtype");
-            if (!rs.wasNull()) {
-                Code code = new Code(areaClassificationType);
-                code.setCodeSpace(rs.getString(prefix + "areaclassification_codespace"));
-                urbanFunction.setAreaClassificationType(code);
-            }
-        }
-
-        if (projectionFilter.containsProperty("prefecture", module)) {
-            String prefecture = rs.getString(prefix + "prefecture");
-            if (!rs.wasNull()) {
-                Code code = new Code(prefecture);
-                code.setCodeSpace(rs.getString(prefix + "prefecture_codespace"));
-                urbanFunction.setPrefecture(code);
-            }
-        }
-
-        if (projectionFilter.containsProperty("city", module)) {
-            String city = rs.getString(prefix + "city");
-            if (!rs.wasNull()) {
-                Code code = new Code(city);
-                code.setCodeSpace(rs.getString(prefix + "city_codespace"));
-                urbanFunction.setCity(code);
-            }
-        }
-
-        if (projectionFilter.containsProperty("reference", module))
-            urbanFunction.setReference(rs.getString(prefix + "reference"));
-
-        if (projectionFilter.containsProperty("note", module))
-            urbanFunction.setNote(rs.getString(prefix + "note"));
-
-        if (projectionFilter.containsProperty("surveyYear", module)) {
-            Date surveyYear = rs.getDate(prefix + "surveyyear");
-            if (!rs.wasNull())
-                urbanFunction.setSurveyYear(Year.of(surveyYear.toLocalDate().getYear()));
-        }
-
-        for (int i = 0; i < 3; i++) {
-            if (!projectionFilter.containsProperty("lod" + (i == 0 ? i : "-" + i) + "MultiPoint"))
-                continue;
-
-            if (i == 0 && !helper.getLodFilter().isEnabled(0))
-                continue;
-
-            Object geometry = rs.getObject(prefix + "lod" + (i == 0 ? i : "_" + i) + "multipoint");
-            if (rs.wasNull())
-                continue;
-
-            GeometryObject multiPoint = helper.getDatabaseAdapter().getGeometryConverter().getMultiPoint(geometry);
-            if (multiPoint != null) {
-                MultiPointProperty property = gmlConverter.getMultiPointProperty(multiPoint);
-                if (property != null) {
-                    switch (i) {
-                        case 0:
-                            urbanFunction.setLod0MultiPoint(property);
-                            break;
-                        case 1:
-                            urbanFunction.setLod1MultiPoint(property);
-                            break;
-                        case 2:
-                            urbanFunction.setLod2MultiPoint(property);
-                            break;
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            if (!projectionFilter.containsProperty("lod" + (i == 0 ? i : "-" + i) + "MultiCurve"))
-                continue;
-
-            if (i == 0 && !helper.getLodFilter().isEnabled(0))
-                continue;
-
-            Object geometry = rs.getObject(prefix + "lod" + (i == 0 ? i : "_" + i) + "multicurve");
-            if (rs.wasNull())
-                continue;
-
-            GeometryObject multiCurve = helper.getDatabaseAdapter().getGeometryConverter().getMultiCurve(geometry);
-            if (multiCurve != null) {
-                MultiCurveProperty property = gmlConverter.getMultiCurveProperty(multiCurve);
-                if (property != null) {
-                    switch (i) {
-                        case 0:
-                            urbanFunction.setLod0MultiCurve(property);
-                            break;
-                        case 1:
-                            urbanFunction.setLod1MultiCurve(property);
-                            break;
-                        case 2:
-                            urbanFunction.setLod2MultiCurve(property);
-                            break;
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            if (!projectionFilter.containsProperty("lod" + (i == 0 ? i : "-" + i) + "MultiSurface"))
-                continue;
-
-            if (i == 0 && !helper.getLodFilter().isEnabled(0))
-                continue;
-
-            long surfaceGeometryId = rs.getLong(prefix + "lod" + (i == 0 ? i : "_" + i) + "multisurface_id");
-            if (rs.wasNull())
-                continue;
-
-            switch (i) {
-                case 0:
-                    surfaceGeometryExporter.addBatch(surfaceGeometryId, urbanFunction::setLod0MultiSurface);
-                    break;
-                case 1:
-                    surfaceGeometryExporter.addBatch(surfaceGeometryId, urbanFunction::setLod1MultiSurface);
-                    break;
-                case 2:
-                    surfaceGeometryExporter.addBatch(surfaceGeometryId, urbanFunction::setLod2MultiSurface);
-                    break;
-            }
-        }
-
-        long legalGroundsId = rs.getLong(prefix + "legalgrounds_id");
-        if (legalGroundsId != 0 && projectionFilter.containsProperty("legalGrounds", module)) {
-            LegalGrounds legalGrounds = new LegalGrounds();
-
-            String articlesOfRegulation = rs.getString(prefix + "articlesofregulation");
-            if (!rs.wasNull()) {
-                Code code = new Code(articlesOfRegulation);
-                code.setCodeSpace(rs.getString(prefix + "articlesofregulati_codespace"));
-                legalGrounds.setArticlesOfRegulation(code);
-            }
-
-            Date date = rs.getDate(prefix + "date_");
-            if (!rs.wasNull())
-                legalGrounds.setDate(date.toLocalDate());
-
-            String nameOfRegulation = rs.getString(prefix + "nameofregulation");
-            if (!rs.wasNull()) {
-                Code code = new Code(nameOfRegulation);
-                code.setCodeSpace(rs.getString(prefix + "nameofregulation_codespace"));
-                legalGrounds.setNameOfRegulation(code);
-            }
-
-            urbanFunction.setLegalGrounds(new LegalGroundsProperty(legalGrounds));
+        long dataQualityAttributeId = rs.getLong(prefix + "dataqualityattribute_id");
+        if (dataQualityAttributeId != 0) {
+            DataQualityAttribute dataQualityAttribute = new DataQualityAttribute();
+            dataQualityAttributeExporter.doExport(dataQualityAttribute, dataQualityAttributeId);
+            urbanFunction.setDataQualityAttribute(new DataQualityAttributeProperty(dataQualityAttribute));
         }
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psTarget.close();
+        psKeyValuePairAttribute.close();
     }
 }

@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -49,6 +50,7 @@ public class ReliefComponentPropertiesExporter implements UrbanObjectModuleExpor
     private final String module;
 
     private final DmAttributeExporter dmAttributeExporter;
+    private final PreparedStatement psDemDmAttribute;
 
     public ReliefComponentPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.RELIEF_COMPONENT);
@@ -59,6 +61,11 @@ public class ReliefComponentPropertiesExporter implements UrbanObjectModuleExpor
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table demDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RELIEF_CO_TO_DMATTRIBU)));
+        Select demDmAttributeSelect = new Select().addProjection(demDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(demDmAttributes.getColumn("relief_component_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(demDmAttributes.getColumn("dmattribute_id")));
+        psDemDmAttribute = connection.prepareStatement(demDmAttributeSelect.toString());
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
     }
 
@@ -68,9 +75,15 @@ public class ReliefComponentPropertiesExporter implements UrbanObjectModuleExpor
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 if (projectionFilter.containsProperty("demDmAttribute", module)) {
-                    for (DmAttribute demDmAttribute : dmAttributeExporter.doExport(parentId, "relief_component_demdmatt_id")) {
-                        DemDmAttributePropertyElement property = new DemDmAttributePropertyElement(new DmAttributeProperty(demDmAttribute));
-                        parent.addGenericApplicationPropertyOfReliefComponent(property);
+                    psDemDmAttribute.setLong(1, parentId);
+                    try (ResultSet demDmAttributeRs = psDemDmAttribute.executeQuery()) {
+                        while (demDmAttributeRs.next()) {
+                            DmAttribute demDmAttribute = dmAttributeExporter.doExport(demDmAttributeRs.getLong("dmattribute_id"));
+                            if (demDmAttribute != null) {
+                                DemDmAttributePropertyElement property = new DemDmAttributePropertyElement(new DmAttributeProperty(demDmAttribute));
+                                parent.addGenericApplicationPropertyOfReliefComponent(property);
+                            }
+                        }
                     }
                 }
             }
@@ -80,5 +93,6 @@ public class ReliefComponentPropertiesExporter implements UrbanObjectModuleExpor
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psDemDmAttribute.close();
     }
 }

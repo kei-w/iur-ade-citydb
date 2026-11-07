@@ -49,10 +49,13 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
     private final LandUseDetailAttributeImporter landUseDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final LandUseToDmAttributeImporter landUseToDmAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final LandUseToFacilityAttributeImporter landUseToFacilityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final LandUseToKeyValuePairAttributeImporter landUseToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -70,10 +73,13 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
         landUseDetailAttributeImporter = manager.getImporter(LandUseDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        landUseToDmAttributeImporter = manager.getImporter(LandUseToDmAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        landUseToFacilityAttributeImporter = manager.getImporter(LandUseToFacilityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        landUseToKeyValuePairAttributeImporter = manager.getImporter(LandUseToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, LandUse parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -155,22 +161,28 @@ public class LandUsePropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(LuseDmAttributePropertyElement.class)) {
             for (LuseDmAttributePropertyElement property : properties.getAll(LuseDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusedmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long luseDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    landUseToDmAttributeImporter.doImport(luseDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(LuseFacilityAttributePropertyElement.class)) {
             for (LuseFacilityAttributePropertyElement property : properties.getAll(LuseFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusefacilityattr_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long luseFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    landUseToFacilityAttributeImporter.doImport(luseFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(LuseKeyValuePairAttributePropertyElement.class)) {
             for (LuseKeyValuePairAttributePropertyElement property : properties.getAll(LuseKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "land_use_lusekeyvaluepair_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long luseKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    landUseToKeyValuePairAttributeImporter.doImport(luseKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

@@ -46,13 +46,17 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
     private final PreparedStatement ps;
 
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final WaterBodyToFloodingRiskAttributeImporter waterBodyToFloodingRiskAttributeImporter;
     private final WaterBodyDetailAttributeImporter waterBodyDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final WaterBodyToDmAttributeImporter waterBodyToDmAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final WaterBodyToFacilityAttributeImporter waterBodyToFacilityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final WaterBodyToKeyValuePairAttributeImporter waterBodyToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -67,13 +71,17 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
                 "values (?, ?, ?, ?, ?)");
 
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        waterBodyToFloodingRiskAttributeImporter = manager.getImporter(WaterBodyToFloodingRiskAttributeImporter.class);
         waterBodyDetailAttributeImporter = manager.getImporter(WaterBodyDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        waterBodyToDmAttributeImporter = manager.getImporter(WaterBodyToDmAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        waterBodyToFacilityAttributeImporter = manager.getImporter(WaterBodyToFacilityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        waterBodyToKeyValuePairAttributeImporter = manager.getImporter(WaterBodyToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, WaterBody parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -141,29 +149,37 @@ public class WaterBodyPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(FloodingRiskAttributePropertyElement.class)) {
             for (FloodingRiskAttributePropertyElement property : properties.getAll(FloodingRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_floodingriskatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long floodingRiskAttributeId = disasterRiskAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToFloodingRiskAttributeImporter.doImport(floodingRiskAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(WtrDmAttributePropertyElement.class)) {
             for (WtrDmAttributePropertyElement property : properties.getAll(WtrDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrdmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long wtrDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToDmAttributeImporter.doImport(wtrDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(WtrFacilityAttributePropertyElement.class)) {
             for (WtrFacilityAttributePropertyElement property : properties.getAll(WtrFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrfacilityattr_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long wtrFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToFacilityAttributeImporter.doImport(wtrFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(WtrKeyValuePairAttributePropertyElement.class)) {
             for (WtrKeyValuePairAttributePropertyElement property : properties.getAll(WtrKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "waterbody_wtrkeyvaluepair_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long wtrKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    waterBodyToKeyValuePairAttributeImporter.doImport(wtrKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

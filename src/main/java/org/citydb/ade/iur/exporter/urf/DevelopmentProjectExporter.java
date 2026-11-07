@@ -32,9 +32,7 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
-import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
-import org.citydb.core.query.filter.projection.CombinedProjectionFilter;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
@@ -42,59 +40,37 @@ import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
-import org.citygml4j.ade.iur.model.module.UrbanFunctionModule;
+import org.citygml4j.ade.iur.model.urf.AgriculturalDevelopmentProjectType;
+import org.citygml4j.ade.iur.model.urf.AgriculturalDevelopmentProjectTypeProperty;
 import org.citygml4j.ade.iur.model.urf.DevelopmentProject;
-import org.citygml4j.ade.iur.model.urf.TargetProperty;
-import org.citygml4j.model.gml.basicTypes.Code;
-import org.citygml4j.model.gml.basicTypes.Measure;
+import org.citygml4j.ade.iur.model.urf.ResidentialDevelopmentType;
+import org.citygml4j.ade.iur.model.urf.ResidentialDevelopmentTypeProperty;
+import org.citygml4j.ade.iur.model.urf.UrbanDevelopmentProjectType;
+import org.citygml4j.ade.iur.model.urf.UrbanDevelopmentProjectTypeProperty;
 
 import java.sql.*;
 
 public class DevelopmentProjectExporter implements UrbanFunctionModuleExporter {
-    private final PreparedStatement ps;
-    private final String module;
     private final UrbanFunctionExporter urbanFunctionExporter;
+    private final PreparedStatement ps;
+    private final ResidentialDevelopmentTypeExporter residentialDevelopmentTypeExporter;
+    private final UrbanDevelopmentProjectTypeExporter urbanDevelopmentProjectTypeExporter;
+    private final AgriculturalDevelopmentProjectTypeExporter agriculturalDevelopmentProjectTypeExporter;
 
     public DevelopmentProjectExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.DEVELOPMENTPROJECT);
-        CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = UrbanFunctionModule.v1_4.getNamespaceURI();
-
         urbanFunctionExporter = manager.getExporter(UrbanFunctionExporter.class);
+        residentialDevelopmentTypeExporter = manager.getExporter(ResidentialDevelopmentTypeExporter.class);
+        urbanDevelopmentProjectTypeExporter = manager.getExporter(UrbanDevelopmentProjectTypeExporter.class);
+        agriculturalDevelopmentProjectTypeExporter = manager.getExporter(AgriculturalDevelopmentProjectTypeExporter.class);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table urbanFunction = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNCTION)));
-
-        Select select = new Select().addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+        Select select = new Select()
+                .addJoin(JoinFactory.inner(urbanFunction, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
-        urbanFunctionExporter.addProjection(select, urbanFunction, projectionFilter, "uf");
-        if (projectionFilter.containsProperty("status", module))
-            select.addProjection(table.getColumns("status", "status_codespace"));
-        if (projectionFilter.containsProperty("mainPurpose", module))
-            select.addProjection(table.getColumns("mainpurpose", "mainpurpose_codespace"));
-        if (projectionFilter.containsProperty("benefitArea", module))
-            select.addProjection(table.getColumns("benefitarea", "benefitarea_uom"));
-        if (projectionFilter.containsProperty("benefitPeriod", module))
-            select.addProjection(table.getColumn("benefitperiod"));
-        if (projectionFilter.containsProperty("cost", module))
-            select.addProjection(table.getColumn("cost"));
-        if (projectionFilter.containsProperty("plannedArea", module))
-            select.addProjection(table.getColumns("plannedarea", "plannedarea_uom"));
-        if (projectionFilter.containsProperty("ongoingArea", module))
-            select.addProjection(table.getColumns("ongoingarea", "ongoingarea_uom"));
-        if (projectionFilter.containsProperty("completedArea", module))
-            select.addProjection(table.getColumns("completedarea", "completedarea_uom"));
-        if (projectionFilter.containsProperty("dateOfDecision", module))
-            select.addProjection(table.getColumn("dateofdecision"));
-        if (projectionFilter.containsProperty("dateOfDesignationForTemporaryReplotting", module))
-            select.addProjection(table.getColumn("dateofdesignationfortemporar"));
-        if (projectionFilter.containsProperty("target", module)) {
-            Table targets = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.URBANFUNC_TO_CITYOBJEC)));
-            Table cityObject = new Table(helper.getTableNameWithSchema(MappingConstants.CITYOBJECT));
-            select.addProjection(cityObject.getColumn("gmlid"))
-                    .addJoin(JoinFactory.left(targets, "urbanfunction_id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(cityObject, "id", ComparisonName.EQUAL_TO, targets.getColumn("cityobject_id")));
-        }
+        addProjection(select, table, "");
+        urbanFunctionExporter.addProjection(select, urbanFunction, "uf_");
         ps = connection.prepareStatement(select.toString());
     }
 
@@ -102,96 +78,41 @@ public class DevelopmentProjectExporter implements UrbanFunctionModuleExporter {
         ps.setLong(1, objectId);
 
         try (ResultSet rs = ps.executeQuery()) {
-            boolean isInitialized = false;
-
-            while (rs.next()) {
-                if (!isInitialized) {
-                    urbanFunctionExporter.doExport(developmentProject, projectionFilter, "uf", rs);
-
-                    if (projectionFilter.containsProperty("status", module)) {
-                        String status = rs.getString("status");
-                        if (!rs.wasNull()) {
-                            Code code = new Code(status);
-                            code.setCodeSpace(rs.getString("status_codespace"));
-                            developmentProject.setStatus(code);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("mainPurpose", module)) {
-                        String status = rs.getString("mainpurpose");
-                        if (!rs.wasNull()) {
-                            Code code = new Code(status);
-                            code.setCodeSpace(rs.getString("mainpurpose_codespace"));
-                            developmentProject.setStatus(code);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("benefitArea", module)) {
-                        double benefitArea = rs.getDouble("benefitarea");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(benefitArea);
-                            measure.setUom(rs.getString("benefitarea_uom"));
-                            developmentProject.setBenefitArea(measure);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("benefitPeriod", module))
-                        developmentProject.setBenefitPeriod(rs.getString("benefitperiod"));
-
-                    if (projectionFilter.containsProperty("cost", module)) {
-                        int cost = rs.getInt("cost");
-                        if (!rs.wasNull())
-                            developmentProject.setCost(cost);
-                    }
-
-                    if (projectionFilter.containsProperty("plannedArea", module)) {
-                        double plannedArea = rs.getDouble("plannedarea");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(plannedArea);
-                            measure.setUom(rs.getString("plannedarea_uom"));
-                            developmentProject.setPlannedArea(measure);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("ongoingArea", module)) {
-                        double ongoingArea = rs.getDouble("ongoingarea");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(ongoingArea);
-                            measure.setUom(rs.getString("ongoingarea_uom"));
-                            developmentProject.setOngoingArea(measure);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("completedArea", module)) {
-                        double completedArea = rs.getDouble("completedarea");
-                        if (!rs.wasNull()) {
-                            Measure measure = new Measure(completedArea);
-                            measure.setUom(rs.getString("completedarea_uom"));
-                            developmentProject.setCompletedArea(measure);
-                        }
-                    }
-
-                    if (projectionFilter.containsProperty("dateOfDecision", module)) {
-                        Date dateOfDecision = rs.getDate("dateofdecision");
-                        if (!rs.wasNull())
-                            developmentProject.setDateOfDecision(dateOfDecision.toLocalDate());
-                    }
-
-                    if (projectionFilter.containsProperty("dateOfDesignationForTemporaryReplotting", module)) {
-                        Date dateOfDesignationForTemporaryReplotting = rs.getDate("dateofdesignationfortemporar");
-                        if (!rs.wasNull())
-                            developmentProject.setDateOfDesignationForTemporaryReplotting(dateOfDesignationForTemporaryReplotting.toLocalDate());
-                    }
-
-                    isInitialized = true;
-                }
-
-                if (projectionFilter.containsProperty("target", module)) {
-                    String gmlId = rs.getString("gmlid");
-                    if (gmlId != null)
-                        developmentProject.getTargets().add(new TargetProperty("#" + gmlId));
-                }
+            if (rs.next()) {
+                urbanFunctionExporter.doExport(developmentProject, objectId, "uf_", rs);
+                doExport(developmentProject, objectId, "", rs);
             }
+        }
+    }
+
+    public Select addProjection(Select select, Table table, String prefix) {
+        select.addProjection(table.getColumn("residentialdevelopmenttyp_id", prefix + "residentialdevelopmenttyp_id"),
+                table.getColumn("urbandevelopmenttype_id", prefix + "urbandevelopmenttype_id"),
+                table.getColumn("agriculturaldevelopmentty_id", prefix + "agriculturaldevelopmentty_id"));
+
+        return select;
+    }
+
+    public void doExport(DevelopmentProject developmentProject, long objectId, String prefix, ResultSet rs) throws CityGMLExportException, SQLException {
+        long residentialDevelopmentTypeId = rs.getLong(prefix + "residentialdevelopmenttyp_id");
+        if (residentialDevelopmentTypeId != 0) {
+            ResidentialDevelopmentType residentialDevelopmentType = new ResidentialDevelopmentType();
+            residentialDevelopmentTypeExporter.doExport(residentialDevelopmentType, residentialDevelopmentTypeId);
+            developmentProject.setResidentialDevelopmentType(new ResidentialDevelopmentTypeProperty(residentialDevelopmentType));
+        }
+
+        long urbanDevelopmentTypeId = rs.getLong(prefix + "urbandevelopmenttype_id");
+        if (urbanDevelopmentTypeId != 0) {
+            UrbanDevelopmentProjectType urbanDevelopmentType = new UrbanDevelopmentProjectType();
+            urbanDevelopmentProjectTypeExporter.doExport(urbanDevelopmentType, urbanDevelopmentTypeId);
+            developmentProject.setUrbanDevelopmentType(new UrbanDevelopmentProjectTypeProperty(urbanDevelopmentType));
+        }
+
+        long agriculturalDevelopmentTypeId = rs.getLong(prefix + "agriculturaldevelopmentty_id");
+        if (agriculturalDevelopmentTypeId != 0) {
+            AgriculturalDevelopmentProjectType agriculturalDevelopmentType = new AgriculturalDevelopmentProjectType();
+            agriculturalDevelopmentProjectTypeExporter.doExport(agriculturalDevelopmentType, agriculturalDevelopmentTypeId);
+            developmentProject.setAgriculturalDevelopmentType(new AgriculturalDevelopmentProjectTypeProperty(agriculturalDevelopmentType));
         }
     }
 

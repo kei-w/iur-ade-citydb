@@ -59,77 +59,33 @@ public class DmAttributeImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.DMATTRIBUTE)) + " " +
-                "(id, objectclass_id, construction_consdmattrib_id, building_bldgdmattribute_id," +
-                "bridge_briddmattribute_id, relief_component_demdmatt_id, city_furniture_frndmattri_id," +
-                "land_use_lusedmattribute_id, transpor_complex_trandmat_id, tunnel_tundmattribute_id," +
-                "cityobject_vegdmattribute_id, waterbody_wtrdmattribute_id, dmcode, dmcode_codespace, meshcode," +
-                "meshcode_codespace, dmelement_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, objectclass_id, dmcode, dmcode_codespace, meshcode, meshcode_codespace, dmelement_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
 
         dmElementImporter = manager.getImporter(DmElementImporter.class);
         dmAnnotationImporter = manager.getImporter(DmAnnotationImporter.class);
         dmGeometricAttributeImporter = manager.getImporter(DmGeometricAttributeImporter.class);
     }
 
-    public long doImport(DmAttribute dmAttribute, long parentId, String parentColumn) throws CityGMLImportException, SQLException {
+    public long doImport(DmAttribute dmAttribute) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.DMATTRIBUTE_SEQ));
         ps.setLong(1, objectId);
         ps.setLong(2, objectMapper.getTypeClassId(dmAttribute.getClass()));
-        if ("construction_consdmattrib_id".equals(parentColumn))
-            ps.setLong(3, parentId);
-        else
-            ps.setNull(3, Types.NULL);
-        if ("building_bldgdmattribute_id".equals(parentColumn))
-            ps.setLong(4, parentId);
-        else
-            ps.setNull(4, Types.NULL);
-        if ("bridge_briddmattribute_id".equals(parentColumn))
-            ps.setLong(5, parentId);
-        else
-            ps.setNull(5, Types.NULL);
-        if ("relief_component_demdmatt_id".equals(parentColumn))
-            ps.setLong(6, parentId);
-        else
-            ps.setNull(6, Types.NULL);
-        if ("city_furniture_frndmattri_id".equals(parentColumn))
-            ps.setLong(7, parentId);
-        else
-            ps.setNull(7, Types.NULL);
-        if ("land_use_lusedmattribute_id".equals(parentColumn))
-            ps.setLong(8, parentId);
-        else
-            ps.setNull(8, Types.NULL);
-        if ("transpor_complex_trandmat_id".equals(parentColumn))
-            ps.setLong(9, parentId);
-        else
-            ps.setNull(9, Types.NULL);
-        if ("tunnel_tundmattribute_id".equals(parentColumn))
-            ps.setLong(10, parentId);
-        else
-            ps.setNull(10, Types.NULL);
-        if ("cityobject_vegdmattribute_id".equals(parentColumn))
-            ps.setLong(11, parentId);
-        else
-            ps.setNull(11, Types.NULL);
-        if ("waterbody_wtrdmattribute_id".equals(parentColumn))
-            ps.setLong(12, parentId);
-        else
-            ps.setNull(12, Types.NULL);
 
         if (dmAttribute.getDmCode() != null && dmAttribute.getDmCode().isSetValue()) {
-            ps.setString(13, dmAttribute.getDmCode().getValue());
-            ps.setString(14, dmAttribute.getDmCode().getCodeSpace());
+            ps.setString(3, dmAttribute.getDmCode().getValue());
+            ps.setString(4, dmAttribute.getDmCode().getCodeSpace());
         } else {
-            ps.setNull(13, Types.VARCHAR);
-            ps.setNull(14, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
+            ps.setNull(4, Types.VARCHAR);
         }
 
         if (dmAttribute.getMeshCode() != null && dmAttribute.getMeshCode().isSetValue()) {
-            ps.setString(15, dmAttribute.getMeshCode().getValue());
-            ps.setString(16, dmAttribute.getMeshCode().getCodeSpace());
+            ps.setString(5, dmAttribute.getMeshCode().getValue());
+            ps.setString(6, dmAttribute.getMeshCode().getCodeSpace());
         } else {
-            ps.setNull(15, Types.VARCHAR);
-            ps.setNull(16, Types.VARCHAR);
+            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
         }
 
         long dmElementId = 0;
@@ -137,9 +93,9 @@ public class DmAttributeImporter implements UrbanObjectModuleImporter {
             dmElementId = dmElementImporter.doImport(dmAttribute.getDmElement().getObject());
 
         if (dmElementId != 0)
-            ps.setLong(17, dmElementId);
+            ps.setLong(7, dmElementId);
         else
-            ps.setNull(17, Types.NULL);
+            ps.setNull(7, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -54,6 +55,9 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psVegDmAttribute;
+    private final PreparedStatement psVegFacilityAttribute;
+    private final PreparedStatement psVegKeyValuePairAttribute;
 
     public VegetationObjectPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECT);
@@ -64,6 +68,21 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table vegDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITYOBJEC_TO_DMATTRIBU)));
+        Select vegDmAttributeSelect = new Select().addProjection(vegDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(vegDmAttributes.getColumn("cityobject_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(vegDmAttributes.getColumn("dmattribute_id")));
+        psVegDmAttribute = connection.prepareStatement(vegDmAttributeSelect.toString());
+        Table vegFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITYOBJEC_TO_FACILITYA)));
+        Select vegFacilityAttributeSelect = new Select().addProjection(vegFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(vegFacilityAttributes.getColumn("cityobject_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(vegFacilityAttributes.getColumn("facilityattribute_id")));
+        psVegFacilityAttribute = connection.prepareStatement(vegFacilityAttributeSelect.toString());
+        Table vegKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CITYOBJEC_TO_KEYVALUEP)));
+        Select vegKeyValuePairAttributeSelect = new Select().addProjection(vegKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(vegKeyValuePairAttributes.getColumn("cityobject_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(vegKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psVegKeyValuePairAttribute = connection.prepareStatement(vegKeyValuePairAttributeSelect.toString());
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
@@ -87,16 +106,28 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
                 }
 
                 if (projectionFilter.containsProperty("vegDmAttribute", module)) {
-                    for (DmAttribute vegDmAttribute : dmAttributeExporter.doExport(parentId, "cityobject_vegdmattribute_id")) {
-                        VegDmAttributePropertyElement property = new VegDmAttributePropertyElement(new DmAttributeProperty(vegDmAttribute));
-                        parent.addGenericApplicationPropertyOfVegetationObject(property);
+                    psVegDmAttribute.setLong(1, parentId);
+                    try (ResultSet vegDmAttributeRs = psVegDmAttribute.executeQuery()) {
+                        while (vegDmAttributeRs.next()) {
+                            DmAttribute vegDmAttribute = dmAttributeExporter.doExport(vegDmAttributeRs.getLong("dmattribute_id"));
+                            if (vegDmAttribute != null) {
+                                VegDmAttributePropertyElement property = new VegDmAttributePropertyElement(new DmAttributeProperty(vegDmAttribute));
+                                parent.addGenericApplicationPropertyOfVegetationObject(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("vegFacilityAttribute", module)) {
-                    for (FacilityAttribute vegFacilityAttribute : facilityAttributeExporter.doExport(parentId, "cityobject_vegfacilityatt_id")) {
-                        VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfVegetationObject(property);
+                    psVegFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet vegFacilityAttributeRs = psVegFacilityAttribute.executeQuery()) {
+                        while (vegFacilityAttributeRs.next()) {
+                            FacilityAttribute vegFacilityAttribute = facilityAttributeExporter.doExport(vegFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (vegFacilityAttribute != null) {
+                                VegFacilityAttributePropertyElement property = new VegFacilityAttributePropertyElement(new FacilityAttributeProperty(vegFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfVegetationObject(property);
+                            }
+                        }
                     }
                 }
 
@@ -119,9 +150,15 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
                 }
 
                 if (projectionFilter.containsProperty("vegKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute vegKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "cityobject_vegkeyvaluepai_id")) {
-                        VegKeyValuePairAttributePropertyElement property = new VegKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(vegKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfVegetationObject(property);
+                    psVegKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet vegKeyValuePairAttributeRs = psVegKeyValuePairAttribute.executeQuery()) {
+                        while (vegKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute vegKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(vegKeyValuePairAttribute, vegKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            VegKeyValuePairAttributePropertyElement property = new VegKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(vegKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfVegetationObject(property);
+                        }
                     }
                 }
             }
@@ -131,5 +168,8 @@ public class VegetationObjectPropertiesExporter implements UrbanObjectModuleExpo
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psVegDmAttribute.close();
+        psVegFacilityAttribute.close();
+        psVegKeyValuePairAttribute.close();
     }
 }

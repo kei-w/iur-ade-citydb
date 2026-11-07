@@ -47,10 +47,13 @@ public class VegetationObjectPropertiesImporter implements UrbanObjectModuleImpo
 
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final VegetationObjectToDmAttributeImporter vegetationObjectToDmAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final VegetationObjectToFacilityAttributeImporter vegetationObjectToFacilityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final VegetationObjectToKeyValuePairAttributeImporter vegetationObjectToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -65,10 +68,13 @@ public class VegetationObjectPropertiesImporter implements UrbanObjectModuleImpo
 
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        vegetationObjectToDmAttributeImporter = manager.getImporter(VegetationObjectToDmAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        vegetationObjectToFacilityAttributeImporter = manager.getImporter(VegetationObjectToFacilityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        vegetationObjectToKeyValuePairAttributeImporter = manager.getImporter(VegetationObjectToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractVegetationObject parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -122,22 +128,28 @@ public class VegetationObjectPropertiesImporter implements UrbanObjectModuleImpo
 
         if (properties.contains(VegDmAttributePropertyElement.class)) {
             for (VegDmAttributePropertyElement property : properties.getAll(VegDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "cityobject_vegdmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long vegDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    vegetationObjectToDmAttributeImporter.doImport(vegDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(VegFacilityAttributePropertyElement.class)) {
             for (VegFacilityAttributePropertyElement property : properties.getAll(VegFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "cityobject_vegfacilityatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long vegFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    vegetationObjectToFacilityAttributeImporter.doImport(vegFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(VegKeyValuePairAttributePropertyElement.class)) {
             for (VegKeyValuePairAttributePropertyElement property : properties.getAll(VegKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "cityobject_vegkeyvaluepai_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long vegKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    vegetationObjectToKeyValuePairAttributeImporter.doImport(vegKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

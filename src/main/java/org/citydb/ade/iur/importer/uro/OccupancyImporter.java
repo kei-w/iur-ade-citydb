@@ -51,35 +51,33 @@ public class OccupancyImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.OCCUPANCY)) + " " +
-                "(id, construction_occupancy_id, interval, interval_codespace, numberofoccupants, occupanttype," +
-                "occupanttype_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?)");
+                "(id, interval, interval_codespace, numberofoccupants, occupanttype, occupanttype_codespace) " +
+                "values (?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(Occupancy occupancy, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(Occupancy occupancy) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.OCCUPANCY_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (occupancy.getInterval() != null && occupancy.getInterval().isSetValue()) {
-            ps.setString(3, occupancy.getInterval().getValue());
-            ps.setString(4, occupancy.getInterval().getCodeSpace());
+            ps.setString(2, occupancy.getInterval().getValue());
+            ps.setString(3, occupancy.getInterval().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (occupancy.getNumberOfOccupants() != null)
-            ps.setInt(5, occupancy.getNumberOfOccupants());
+            ps.setInt(4, occupancy.getNumberOfOccupants());
         else
-            ps.setNull(5, Types.INTEGER);
+            ps.setNull(4, Types.INTEGER);
 
         if (occupancy.getOccupantType() != null && occupancy.getOccupantType().isSetValue()) {
-            ps.setString(6, occupancy.getOccupantType().getValue());
-            ps.setString(7, occupancy.getOccupantType().getCodeSpace());
+            ps.setString(5, occupancy.getOccupantType().getValue());
+            ps.setString(6, occupancy.getOccupantType().getCodeSpace());
         } else {
+            ps.setNull(5, Types.VARCHAR);
             ps.setNull(6, Types.VARCHAR);
-            ps.setNull(7, Types.VARCHAR);
         }
 
         ps.addBatch();

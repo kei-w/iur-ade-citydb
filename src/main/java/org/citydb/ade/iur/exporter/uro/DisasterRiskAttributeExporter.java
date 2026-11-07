@@ -35,7 +35,6 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -48,18 +47,12 @@ import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import java.sql.*;
 
 public class DisasterRiskAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
-    private final Map<String, PreparedStatement> psByParent = new HashMap<>();
+    private final PreparedStatement ps;
 
     public DisasterRiskAttributeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         this.helper = helper;
@@ -69,33 +62,22 @@ public class DisasterRiskAttributeExporter implements UrbanObjectModuleExporter 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table floodingRiskAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.FLOODINGRISKATTRIBUTE)));
         Table riverFloodingRiskAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RIVERFLOODINGRISKATTRI)));
-        for (String parentColumn : Arrays.asList("construction_consdisaster_id", "building_bldgdisasterrisk_id", "bridge_briddisasterriskat_id", "tunnel_tundisasterriskatt_id", "waterbody_floodingriskatt_id")) {
-            Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "description", "description_codespace", "areatype", "areatype_codespace"))
-                    .addProjection(floodingRiskAttribute.getColumns("rank", "rank_codespace", "rankorg", "rankorg_codespace", "depth", "depth_uom"))
-                    .addProjection(riverFloodingRiskAttribute.getColumns("admintype", "admintype_codespace", "scale", "scale_codespace", "duration", "duration_uom"))
-                    .addJoin(JoinFactory.left(floodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(riverFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addSelection(ComparisonFactory.equalTo("construction_consdisaster_id".equals(parentColumn) || "building_bldgdisasterrisk_id".equals(parentColumn) || "bridge_briddisasterriskat_id".equals(parentColumn) || "tunnel_tundisasterriskatt_id".equals(parentColumn) ? table.getColumn(parentColumn) : floodingRiskAttribute.getColumn(parentColumn), new PlaceHolder<>()))
-                    .addOrderBy(new OrderByToken(table.getColumn("id")));
-            psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
-        }
+        Select select = new Select().addProjection(table.getColumns("id", "objectclass_id", "description", "description_codespace", "areatype", "areatype_codespace"))
+                .addProjection(floodingRiskAttribute.getColumns("rank", "rank_codespace", "rankorg", "rankorg_codespace", "depth", "depth_uom"))
+                .addProjection(riverFloodingRiskAttribute.getColumns("admintype", "admintype_codespace", "scale", "scale_codespace", "duration", "duration_uom"))
+                .addJoin(JoinFactory.left(floodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addJoin(JoinFactory.left(riverFloodingRiskAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<DisasterRiskAttribute> doExport(long parentId, String parentColumn) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent.get(parentColumn);
-        ps.setLong(1, parentId);
+    public DisasterRiskAttribute doExport(long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<DisasterRiskAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                DisasterRiskAttribute disasterRiskAttribute = doExport(rs.getLong("id"), rs);
-                if (disasterRiskAttribute != null)
-                    result.add(disasterRiskAttribute);
-            }
+            return rs.next() ? doExport(objectId, rs) : null;
         }
-
-        return result;
     }
 
     private DisasterRiskAttribute doExport(long objectId, ResultSet rs) throws CityGMLExportException, SQLException {
@@ -181,7 +163,6 @@ public class DisasterRiskAttributeExporter implements UrbanObjectModuleExporter 
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        for (PreparedStatement ps : psByParent.values())
-            ps.close();
+        ps.close();
     }
 }

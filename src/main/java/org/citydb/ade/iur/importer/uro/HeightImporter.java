@@ -51,43 +51,42 @@ public class HeightImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.HEIGHT)) + " " +
-                "(id, construction_height_id, highreference, highreference_codespace, lowreference," +
-                "lowreference_codespace, status, value, value_uom) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, highreference, highreference_codespace, lowreference, lowreference_codespace, status, value," +
+                "value_uom) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(Height height, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(Height height) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.HEIGHT_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (height.getHighReference() != null && height.getHighReference().isSetValue()) {
-            ps.setString(3, height.getHighReference().getValue());
-            ps.setString(4, height.getHighReference().getCodeSpace());
+            ps.setString(2, height.getHighReference().getValue());
+            ps.setString(3, height.getHighReference().getCodeSpace());
         } else {
+            ps.setNull(2, Types.VARCHAR);
             ps.setNull(3, Types.VARCHAR);
-            ps.setNull(4, Types.VARCHAR);
         }
 
         if (height.getLowReference() != null && height.getLowReference().isSetValue()) {
-            ps.setString(5, height.getLowReference().getValue());
-            ps.setString(6, height.getLowReference().getCodeSpace());
+            ps.setString(4, height.getLowReference().getValue());
+            ps.setString(5, height.getLowReference().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         if (height.getStatus() != null)
-            ps.setString(7, height.getStatus().value());
+            ps.setString(6, height.getStatus().value());
         else
-            ps.setNull(7, Types.VARCHAR);
+            ps.setNull(6, Types.VARCHAR);
 
         if (height.getValue() != null && height.getValue().isSetValue()) {
-            ps.setDouble(8, height.getValue().getValue());
-            ps.setString(9, height.getValue().getUom());
+            ps.setDouble(7, height.getValue().getValue());
+            ps.setString(8, height.getValue().getUom());
         } else {
-            ps.setNull(8, Types.DOUBLE);
-            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(7, Types.DOUBLE);
+            ps.setNull(8, Types.VARCHAR);
         }
 
         ps.addBatch();

@@ -1,0 +1,112 @@
+/*
+ * 3D City Database - The Open Source CityGML Database
+ * https://www.3dcitydb.org/
+ *
+ * Copyright 2013 - 2024
+ * Chair of Geoinformatics
+ * Technical University of Munich, Germany
+ * https://www.lrg.tum.de/gis/
+ *
+ * The 3D City Database is jointly developed with the following
+ * cooperation partners:
+ *
+ * Virtual City Systems, Berlin <https://vc.systems/>
+ * M.O.S.S. Computer Grafik Systeme GmbH, Taufkirchen <http://www.moss.de/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.citydb.ade.iur.exporter.urf;
+
+import org.citydb.ade.iur.exporter.ExportManager;
+import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.core.ade.exporter.CityGMLExportHelper;
+import org.citydb.core.operation.exporter.CityGMLExportException;
+import org.citydb.sqlbuilder.expression.PlaceHolder;
+import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citygml4j.ade.iur.model.urf.UrbanDevelopmentProjectType;
+import org.citygml4j.model.gml.basicTypes.Measure;
+
+import java.sql.*;
+
+public class UrbanDevelopmentProjectTypeExporter implements UrbanFunctionModuleExporter {
+    private final PreparedStatement ps;
+
+    public UrbanDevelopmentProjectTypeExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
+        String tableName = manager.getSchemaMapper().getTableName(ADETable.URBANDEVELOPMENTPROJEC);
+
+        Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Select select = new Select().addProjection(table.getColumns("id_", "dateofdecision", "projectname", "plannedarea", "plannedarea_uom", "ongoingarea",
+                        "ongoingarea_uom", "costuptolastfiscalyear", "cost", "completedarea", "completedarea_uom",
+                        "projectperiod", "note"))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
+
+    }
+
+    public void doExport(UrbanDevelopmentProjectType urbanDevelopmentProjectType, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                urbanDevelopmentProjectType.setId(rs.getString("id_"));
+
+                Date dateOfDecision = rs.getDate("dateofdecision");
+                if (!rs.wasNull())
+                    urbanDevelopmentProjectType.setDateOfDecision(dateOfDecision.toLocalDate());
+
+                urbanDevelopmentProjectType.setProjectName(rs.getString("projectname"));
+
+                double plannedArea = rs.getDouble("plannedarea");
+                if (!rs.wasNull()) {
+                    Measure measure = new Measure(plannedArea);
+                    measure.setUom(rs.getString("plannedarea_uom"));
+                    urbanDevelopmentProjectType.setPlannedArea(measure);
+                }
+
+                double ongoingArea = rs.getDouble("ongoingarea");
+                if (!rs.wasNull()) {
+                    Measure measure = new Measure(ongoingArea);
+                    measure.setUom(rs.getString("ongoingarea_uom"));
+                    urbanDevelopmentProjectType.setOngoingArea(measure);
+                }
+
+                double costUpToLastFiscalYear = rs.getDouble("costuptolastfiscalyear");
+                if (!rs.wasNull())
+                    urbanDevelopmentProjectType.setCostUpToLastFiscalYear(costUpToLastFiscalYear);
+
+                double cost = rs.getDouble("cost");
+                if (!rs.wasNull())
+                    urbanDevelopmentProjectType.setCost(cost);
+
+                double completedArea = rs.getDouble("completedarea");
+                if (!rs.wasNull()) {
+                    Measure measure = new Measure(completedArea);
+                    measure.setUom(rs.getString("completedarea_uom"));
+                    urbanDevelopmentProjectType.setCompletedArea(measure);
+                }
+
+                urbanDevelopmentProjectType.setProjectPeriod(rs.getString("projectperiod"));
+
+                urbanDevelopmentProjectType.setNote(rs.getString("note"));
+            }
+        }
+    }
+
+    @Override
+    public void close() throws CityGMLExportException, SQLException {
+        ps.close();
+    }
+}

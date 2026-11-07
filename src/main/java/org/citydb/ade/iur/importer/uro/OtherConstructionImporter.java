@@ -62,18 +62,27 @@ public class OtherConstructionImporter implements UrbanObjectModuleImporter {
     private final CityGMLImportHelper helper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final OtherConstructionToConstructionEventImporter otherConstructionToConstructionEventImporter;
     private final ConstructionEventImporter constructionEventImporter;
+    private final OtherConstructionToElevationImporter otherConstructionToElevationImporter;
     private final ElevationImporter elevationImporter;
+    private final OtherConstructionToHeightImporter otherConstructionToHeightImporter;
     private final HeightImporter heightImporter;
+    private final OtherConstructionToOccupancyImporter otherConstructionToOccupancyImporter;
     private final OccupancyImporter occupancyImporter;
+    private final OtherConstructionToFacilityTypeAttributeImporter otherConstructionToFacilityTypeAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
+    private final OtherConstructionToFacilityAttributeImporter otherConstructionToFacilityAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
     private final ConstructionBaseAttributeImporter constructionBaseAttributeImporter;
     private final ConstructionStructureAttributeImporter constructionStructureAttributeImporter;
+    private final OtherConstructionToDisasterRiskAttributeImporter otherConstructionToDisasterRiskAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final OtherConstructionToDmAttributeImporter otherConstructionToDmAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
+    private final OtherConstructionToKeyValuePairAttributeImporter otherConstructionToKeyValuePairAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
     private final AttributeValueJoiner valueJoiner;
     private final GeometryConverter geometryConverter;
@@ -95,18 +104,27 @@ public class OtherConstructionImporter implements UrbanObjectModuleImporter {
                 "usage_codespace) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+        otherConstructionToConstructionEventImporter = manager.getImporter(OtherConstructionToConstructionEventImporter.class);
         constructionEventImporter = manager.getImporter(ConstructionEventImporter.class);
+        otherConstructionToElevationImporter = manager.getImporter(OtherConstructionToElevationImporter.class);
         elevationImporter = manager.getImporter(ElevationImporter.class);
+        otherConstructionToHeightImporter = manager.getImporter(OtherConstructionToHeightImporter.class);
         heightImporter = manager.getImporter(HeightImporter.class);
+        otherConstructionToOccupancyImporter = manager.getImporter(OtherConstructionToOccupancyImporter.class);
         occupancyImporter = manager.getImporter(OccupancyImporter.class);
+        otherConstructionToFacilityTypeAttributeImporter = manager.getImporter(OtherConstructionToFacilityTypeAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
+        otherConstructionToFacilityAttributeImporter = manager.getImporter(OtherConstructionToFacilityAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
         constructionBaseAttributeImporter = manager.getImporter(ConstructionBaseAttributeImporter.class);
         constructionStructureAttributeImporter = manager.getImporter(ConstructionStructureAttributeImporter.class);
+        otherConstructionToDisasterRiskAttributeImporter = manager.getImporter(OtherConstructionToDisasterRiskAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        otherConstructionToDmAttributeImporter = manager.getImporter(OtherConstructionToDmAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
+        otherConstructionToKeyValuePairAttributeImporter = manager.getImporter(OtherConstructionToKeyValuePairAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
         valueJoiner = helper.getAttributeValueJoiner();
         geometryConverter = helper.getGeometryConverter();
@@ -317,40 +335,58 @@ public class OtherConstructionImporter implements UrbanObjectModuleImporter {
             helper.executeBatch(objectType);
 
         for (ConstructionEventProperty property : otherConstruction.getConstructionEvent()) {
-            if (property.isSetObject())
-                constructionEventImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long constructionEventId = constructionEventImporter.doImport(property.getObject());
+                otherConstructionToConstructionEventImporter.doImport(constructionEventId, objectId);
+            }
         }
         for (ElevationProperty property : otherConstruction.getElevation()) {
-            if (property.isSetObject())
-                elevationImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long elevationId = elevationImporter.doImport(property.getObject());
+                otherConstructionToElevationImporter.doImport(elevationId, objectId);
+            }
         }
         for (HeightProperty property : otherConstruction.getHeight()) {
-            if (property.isSetObject())
-                heightImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long heightId = heightImporter.doImport(property.getObject());
+                otherConstructionToHeightImporter.doImport(heightId, objectId);
+            }
         }
         for (OccupancyProperty property : otherConstruction.getOccupancy()) {
-            if (property.isSetObject())
-                occupancyImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long occupancyId = occupancyImporter.doImport(property.getObject());
+                otherConstructionToOccupancyImporter.doImport(occupancyId, objectId);
+            }
         }
         for (FacilityTypeAttributeProperty property : otherConstruction.getConsFacilityTypeAttribute()) {
-            if (property.isSetObject())
-                facilityTypeAttributeImporter.doImport(property.getObject(), objectId, "construction_consfacility_id");
+            if (property.isSetObject()) {
+                long consFacilityTypeAttributeId = facilityTypeAttributeImporter.doImport(property.getObject());
+                otherConstructionToFacilityTypeAttributeImporter.doImport(consFacilityTypeAttributeId, objectId);
+            }
         }
         for (FacilityAttributeProperty property : otherConstruction.getConsFacilityAttribute()) {
-            if (property.isSetObject())
-                facilityAttributeImporter.doImport(property.getObject(), objectId, "construction_consfacility_id");
+            if (property.isSetObject()) {
+                long consFacilityAttributeId = facilityAttributeImporter.doImport(property.getObject());
+                otherConstructionToFacilityAttributeImporter.doImport(consFacilityAttributeId, objectId);
+            }
         }
         for (DisasterRiskAttributeProperty property : otherConstruction.getConsDisasterRiskAttribute()) {
-            if (property.isSetObject())
-                disasterRiskAttributeImporter.doImport(property.getObject(), objectId, "construction_consdisaster_id");
+            if (property.isSetObject()) {
+                long consDisasterRiskAttributeId = disasterRiskAttributeImporter.doImport(property.getObject());
+                otherConstructionToDisasterRiskAttributeImporter.doImport(consDisasterRiskAttributeId, objectId);
+            }
         }
         for (DmAttributeProperty property : otherConstruction.getConsDmAttribute()) {
-            if (property.isSetObject())
-                dmAttributeImporter.doImport(property.getObject(), objectId, "construction_consdmattrib_id");
+            if (property.isSetObject()) {
+                long consDmAttributeId = dmAttributeImporter.doImport(property.getObject());
+                otherConstructionToDmAttributeImporter.doImport(consDmAttributeId, objectId);
+            }
         }
         for (KeyValuePairAttributeProperty property : otherConstruction.getConsKeyValuePairAttribute()) {
-            if (property.isSetObject())
-                keyValuePairAttributeImporter.doImport(property.getObject(), objectId, "construction_conskeyvalue_id");
+            if (property.isSetObject()) {
+                long consKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getObject());
+                otherConstructionToKeyValuePairAttributeImporter.doImport(consKeyValuePairAttributeId, objectId);
+            }
         }
         for (AbstractBoundarySurfaceProperty property : otherConstruction.getBoundedBySurface()) {
             AbstractBoundarySurface boundarySurface = property.getObject();

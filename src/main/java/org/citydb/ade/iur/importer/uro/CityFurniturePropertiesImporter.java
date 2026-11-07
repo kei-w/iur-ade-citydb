@@ -48,10 +48,13 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
     private final CityFurnitureDetailAttributeImporter cityFurnitureDetailAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final CityFurnitureToDmAttributeImporter cityFurnitureToDmAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final CityFurnitureToFacilityAttributeImporter cityFurnitureToFacilityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final CityFurnitureToKeyValuePairAttributeImporter cityFurnitureToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -68,10 +71,13 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
         cityFurnitureDetailAttributeImporter = manager.getImporter(CityFurnitureDetailAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        cityFurnitureToDmAttributeImporter = manager.getImporter(CityFurnitureToDmAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        cityFurnitureToFacilityAttributeImporter = manager.getImporter(CityFurnitureToFacilityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        cityFurnitureToKeyValuePairAttributeImporter = manager.getImporter(CityFurnitureToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, CityFurniture parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -139,22 +145,28 @@ public class CityFurniturePropertiesImporter implements UrbanObjectModuleImporte
 
         if (properties.contains(FrnDmAttributePropertyElement.class)) {
             for (FrnDmAttributePropertyElement property : properties.getAll(FrnDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frndmattri_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long frnDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    cityFurnitureToDmAttributeImporter.doImport(frnDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(FrnFacilityAttributePropertyElement.class)) {
             for (FrnFacilityAttributePropertyElement property : properties.getAll(FrnFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frnfacilit_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long frnFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    cityFurnitureToFacilityAttributeImporter.doImport(frnFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(FrnKeyValuePairAttributePropertyElement.class)) {
             for (FrnKeyValuePairAttributePropertyElement property : properties.getAll(FrnKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "city_furniture_frnkeyvalu_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long frnKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    cityFurnitureToKeyValuePairAttributeImporter.doImport(frnKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

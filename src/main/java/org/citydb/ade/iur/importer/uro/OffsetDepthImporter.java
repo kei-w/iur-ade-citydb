@@ -53,53 +53,51 @@ public class OffsetDepthImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.OFFSETDEPTH)) + " " +
-                "(id, utilitynetwor_offsetdepth_id, pos, offset_, offset_uom, depth, depth_uom, mindepth," +
-                "mindepth_uom, maxdepth, maxdepth_uom) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, pos, offset_, offset_uom, depth, depth_uom, mindepth, mindepth_uom, maxdepth, maxdepth_uom) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         valueJoiner = helper.getAttributeValueJoiner();
     }
 
-    public long doImport(OffsetDepth offsetDepth, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(OffsetDepth offsetDepth) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.OFFSETDEPTH_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (offsetDepth.getPos() != null && offsetDepth.getPos().isSetValue())
-            ps.setString(3, valueJoiner.join(" ", offsetDepth.getPos().getValue()));
+            ps.setString(2, valueJoiner.join(" ", offsetDepth.getPos().getValue()));
         else
-            ps.setNull(3, Types.VARCHAR);
+            ps.setNull(2, Types.VARCHAR);
 
         if (offsetDepth.getOffset() != null && offsetDepth.getOffset().isSetValue()) {
-            ps.setDouble(4, offsetDepth.getOffset().getValue());
-            ps.setString(5, offsetDepth.getOffset().getUom());
+            ps.setDouble(3, offsetDepth.getOffset().getValue());
+            ps.setString(4, offsetDepth.getOffset().getUom());
         } else {
-            ps.setNull(4, Types.DOUBLE);
-            ps.setNull(5, Types.VARCHAR);
+            ps.setNull(3, Types.DOUBLE);
+            ps.setNull(4, Types.VARCHAR);
         }
 
         if (offsetDepth.getDepth() != null && offsetDepth.getDepth().isSetValue()) {
-            ps.setDouble(6, offsetDepth.getDepth().getValue());
-            ps.setString(7, offsetDepth.getDepth().getUom());
+            ps.setDouble(5, offsetDepth.getDepth().getValue());
+            ps.setString(6, offsetDepth.getDepth().getUom());
         } else {
-            ps.setNull(6, Types.DOUBLE);
-            ps.setNull(7, Types.VARCHAR);
+            ps.setNull(5, Types.DOUBLE);
+            ps.setNull(6, Types.VARCHAR);
         }
 
         if (offsetDepth.getMinDepth() != null && offsetDepth.getMinDepth().isSetValue()) {
-            ps.setDouble(8, offsetDepth.getMinDepth().getValue());
-            ps.setString(9, offsetDepth.getMinDepth().getUom());
+            ps.setDouble(7, offsetDepth.getMinDepth().getValue());
+            ps.setString(8, offsetDepth.getMinDepth().getUom());
         } else {
-            ps.setNull(8, Types.DOUBLE);
-            ps.setNull(9, Types.VARCHAR);
+            ps.setNull(7, Types.DOUBLE);
+            ps.setNull(8, Types.VARCHAR);
         }
 
         if (offsetDepth.getMaxDepth() != null && offsetDepth.getMaxDepth().isSetValue()) {
-            ps.setDouble(10, offsetDepth.getMaxDepth().getValue());
-            ps.setString(11, offsetDepth.getMaxDepth().getUom());
+            ps.setDouble(9, offsetDepth.getMaxDepth().getValue());
+            ps.setString(10, offsetDepth.getMaxDepth().getUom());
         } else {
-            ps.setNull(10, Types.DOUBLE);
-            ps.setNull(11, Types.VARCHAR);
+            ps.setNull(9, Types.DOUBLE);
+            ps.setNull(10, Types.VARCHAR);
         }
 
         ps.addBatch();

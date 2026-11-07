@@ -31,11 +31,17 @@ package org.citydb.ade.iur.exporter.uro;
 import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
+import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
+import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
+import org.citydb.sqlbuilder.select.join.JoinFactory;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
+import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
 import org.citygml4j.ade.iur.model.uro.OffsetDepth;
 import org.citygml4j.ade.iur.model.uro.OffsetDepthProperty;
 import org.citygml4j.ade.iur.model.uro.ThematicShape;
@@ -48,6 +54,8 @@ import java.time.Year;
 import java.sql.*;
 
 public class UtilityNetworkElementExporter implements UrbanObjectModuleExporter {
+    private final PreparedStatement psOffsetDepth;
+    private final PreparedStatement psThematicShape;
     private final OffsetDepthExporter offsetDepthExporter;
     private final ThematicShapeExporter thematicShapeExporter;
     private final AttributeValueSplitter valueSplitter;
@@ -57,6 +65,16 @@ public class UtilityNetworkElementExporter implements UrbanObjectModuleExporter 
         thematicShapeExporter = manager.getExporter(ThematicShapeExporter.class);
         valueSplitter = helper.getAttributeValueSplitter();
 
+        Table offsetDepths = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.UTILITYNE_TO_OFFSETDEP)));
+        Select offsetDepthSelect = new Select().addProjection(offsetDepths.getColumn("offsetdepth_id"))
+                .addSelection(ComparisonFactory.equalTo(offsetDepths.getColumn("utilitynetworkelement_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(offsetDepths.getColumn("offsetdepth_id")));
+        psOffsetDepth = connection.prepareStatement(offsetDepthSelect.toString());
+        Table thematicShapes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.UTILITYNE_TO_THEMATICS)));
+        Select thematicShapeSelect = new Select().addProjection(thematicShapes.getColumn("thematicshape_id"))
+                .addSelection(ComparisonFactory.equalTo(thematicShapes.getColumn("utilitynetworkelement_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(thematicShapes.getColumn("thematicshape_id")));
+        psThematicShape = connection.prepareStatement(thematicShapeSelect.toString());
     }
 
     public Select addProjection(Select select, Table table, String prefix) {
@@ -106,14 +124,28 @@ public class UtilityNetworkElementExporter implements UrbanObjectModuleExporter 
             utilityNetworkElement.setAdministrator(code);
         }
 
-        for (OffsetDepth offsetDepth : offsetDepthExporter.doExport(objectId))
-            utilityNetworkElement.getOffsetDepth().add(new OffsetDepthProperty(offsetDepth));
+        psOffsetDepth.setLong(1, objectId);
+        try (ResultSet offsetDepthRs = psOffsetDepth.executeQuery()) {
+            while (offsetDepthRs.next()) {
+                OffsetDepth offsetDepth = new OffsetDepth();
+                offsetDepthExporter.doExport(offsetDepth, offsetDepthRs.getLong("offsetdepth_id"));
+                utilityNetworkElement.getOffsetDepth().add(new OffsetDepthProperty(offsetDepth));
+            }
+        }
 
-        for (ThematicShape thematicShape : thematicShapeExporter.doExport(objectId))
-            utilityNetworkElement.getThematicShape().add(new ThematicShapeProperty(thematicShape));
+        psThematicShape.setLong(1, objectId);
+        try (ResultSet thematicShapeRs = psThematicShape.executeQuery()) {
+            while (thematicShapeRs.next()) {
+                ThematicShape thematicShape = new ThematicShape();
+                thematicShapeExporter.doExport(thematicShape, thematicShapeRs.getLong("thematicshape_id"));
+                utilityNetworkElement.getThematicShape().add(new ThematicShapeProperty(thematicShape));
+            }
+        }
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
+        psOffsetDepth.close();
+        psThematicShape.close();
     }
 }

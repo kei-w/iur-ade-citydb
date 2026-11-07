@@ -38,6 +38,7 @@ import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.util.Util;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -93,6 +94,7 @@ public class IfcAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
     private final ExportManager manager;
+    private final PreparedStatement psUnitsInContext;
     private final PreparedStatement ps;
     private final IfcClassificationExporter ifcClassificationExporter;
     private IfcCoordinateReferenceSystemSelectExporter ifcCoordinateReferenceSystemSelectExporter;
@@ -133,6 +135,11 @@ public class IfcAttributeExporter implements UrbanObjectModuleExporter {
         Table ifcSpace = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.IFCSPACE)));
         Table ifcProject = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.IFCPROJECT)));
         Table ifcSpaceBaseQuantity = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.IFCSPACEBASEQUANTITY)));
+        Table unitsInContexts = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.IFCPROJEC_TO_IFCUNIT)));
+        Select unitsInContextSelect = new Select().addProjection(unitsInContexts.getColumn("ifcunit_id"))
+                .addSelection(ComparisonFactory.equalTo(unitsInContexts.getColumn("ifcproject_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(unitsInContexts.getColumn("ifcunit_id")));
+        psUnitsInContext = connection.prepareStatement(unitsInContextSelect.toString());
         Select select = new Select().addProjection(table.getColumns("id", "objectclass_id"))
                 .addProjection(ifcClassificationReference.getColumns("location", "itemreference", "itemreference_codespace", "referencedsource_id"))
                 .addProjection(ifcCoordinateReferenceSystem.getColumns("geodeticdatum", "verticaldatum"))
@@ -929,8 +936,14 @@ public class IfcAttributeExporter implements UrbanObjectModuleExporter {
                 ifcProject.setRepresentationContexts(new IfcGeometricRepresentationContextProperty(representationContexts));
             }
 
-            for (IfcUnit unitsInContext : ifcUnitExporter.doExport(objectId))
-                ifcProject.getUnitsInContext().add(new IfcUnitProperty(unitsInContext));
+            psUnitsInContext.setLong(1, objectId);
+            try (ResultSet unitsInContextRs = psUnitsInContext.executeQuery()) {
+                while (unitsInContextRs.next()) {
+                    IfcUnit unitsInContext = new IfcUnit();
+                    ifcUnitExporter.doExport(unitsInContext, unitsInContextRs.getLong("ifcunit_id"));
+                    ifcProject.getUnitsInContext().add(new IfcUnitProperty(unitsInContext));
+                }
+            }
         }
 
         if (ifcAttribute instanceof IfcSpaceBaseQuantity) {
@@ -1047,5 +1060,7 @@ public class IfcAttributeExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psUnitsInContext.close();
+
     }
 }

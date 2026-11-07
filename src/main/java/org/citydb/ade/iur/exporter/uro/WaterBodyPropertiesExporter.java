@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -56,6 +57,10 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityIdAttributeExporter facilityIdAttributeExporter;
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psFloodingRiskAttribute;
+    private final PreparedStatement psWtrDmAttribute;
+    private final PreparedStatement psWtrFacilityAttribute;
+    private final PreparedStatement psWtrKeyValuePairAttribute;
 
     public WaterBodyPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.WATERBODY);
@@ -67,6 +72,26 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table floodingRiskAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.WATERBODY_TO_FLOODINGR)));
+        Select floodingRiskAttributeSelect = new Select().addProjection(floodingRiskAttributes.getColumn("floodingriskattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(floodingRiskAttributes.getColumn("waterbody_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(floodingRiskAttributes.getColumn("floodingriskattribute_id")));
+        psFloodingRiskAttribute = connection.prepareStatement(floodingRiskAttributeSelect.toString());
+        Table wtrDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.WATERBODY_TO_DMATTRIBU)));
+        Select wtrDmAttributeSelect = new Select().addProjection(wtrDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(wtrDmAttributes.getColumn("waterbody_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(wtrDmAttributes.getColumn("dmattribute_id")));
+        psWtrDmAttribute = connection.prepareStatement(wtrDmAttributeSelect.toString());
+        Table wtrFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.WATERBODY_TO_FACILITYA)));
+        Select wtrFacilityAttributeSelect = new Select().addProjection(wtrFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(wtrFacilityAttributes.getColumn("waterbody_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(wtrFacilityAttributes.getColumn("facilityattribute_id")));
+        psWtrFacilityAttribute = connection.prepareStatement(wtrFacilityAttributeSelect.toString());
+        Table wtrKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.WATERBODY_TO_KEYVALUEP)));
+        Select wtrKeyValuePairAttributeSelect = new Select().addProjection(wtrKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(wtrKeyValuePairAttributes.getColumn("waterbody_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(wtrKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psWtrKeyValuePairAttribute = connection.prepareStatement(wtrKeyValuePairAttributeSelect.toString());
         disasterRiskAttributeExporter = manager.getExporter(DisasterRiskAttributeExporter.class);
         waterBodyDetailAttributeExporter = manager.getExporter(WaterBodyDetailAttributeExporter.class);
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
@@ -83,10 +108,14 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 if (projectionFilter.containsProperty("floodingRiskAttribute", module)) {
-                    for (DisasterRiskAttribute floodingRiskAttribute : disasterRiskAttributeExporter.doExport(parentId, "waterbody_floodingriskatt_id")) {
-                        if (floodingRiskAttribute instanceof FloodingRiskAttribute) {
-                            FloodingRiskAttributePropertyElement property = new FloodingRiskAttributePropertyElement(new FloodingRiskAttributeProperty((FloodingRiskAttribute) floodingRiskAttribute));
-                            parent.addGenericApplicationPropertyOfWaterBody(property);
+                    psFloodingRiskAttribute.setLong(1, parentId);
+                    try (ResultSet floodingRiskAttributeRs = psFloodingRiskAttribute.executeQuery()) {
+                        while (floodingRiskAttributeRs.next()) {
+                            DisasterRiskAttribute floodingRiskAttribute = disasterRiskAttributeExporter.doExport(floodingRiskAttributeRs.getLong("floodingriskattribute_id"));
+                            if (floodingRiskAttribute instanceof FloodingRiskAttribute) {
+                                FloodingRiskAttributePropertyElement property = new FloodingRiskAttributePropertyElement(new FloodingRiskAttributeProperty((FloodingRiskAttribute) floodingRiskAttribute));
+                                parent.addGenericApplicationPropertyOfWaterBody(property);
+                            }
                         }
                     }
                 }
@@ -110,16 +139,28 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("wtrDmAttribute", module)) {
-                    for (DmAttribute wtrDmAttribute : dmAttributeExporter.doExport(parentId, "waterbody_wtrdmattribute_id")) {
-                        WtrDmAttributePropertyElement property = new WtrDmAttributePropertyElement(new DmAttributeProperty(wtrDmAttribute));
-                        parent.addGenericApplicationPropertyOfWaterBody(property);
+                    psWtrDmAttribute.setLong(1, parentId);
+                    try (ResultSet wtrDmAttributeRs = psWtrDmAttribute.executeQuery()) {
+                        while (wtrDmAttributeRs.next()) {
+                            DmAttribute wtrDmAttribute = dmAttributeExporter.doExport(wtrDmAttributeRs.getLong("dmattribute_id"));
+                            if (wtrDmAttribute != null) {
+                                WtrDmAttributePropertyElement property = new WtrDmAttributePropertyElement(new DmAttributeProperty(wtrDmAttribute));
+                                parent.addGenericApplicationPropertyOfWaterBody(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("wtrFacilityAttribute", module)) {
-                    for (FacilityAttribute wtrFacilityAttribute : facilityAttributeExporter.doExport(parentId, "waterbody_wtrfacilityattr_id")) {
-                        WtrFacilityAttributePropertyElement property = new WtrFacilityAttributePropertyElement(new FacilityAttributeProperty(wtrFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfWaterBody(property);
+                    psWtrFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet wtrFacilityAttributeRs = psWtrFacilityAttribute.executeQuery()) {
+                        while (wtrFacilityAttributeRs.next()) {
+                            FacilityAttribute wtrFacilityAttribute = facilityAttributeExporter.doExport(wtrFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (wtrFacilityAttribute != null) {
+                                WtrFacilityAttributePropertyElement property = new WtrFacilityAttributePropertyElement(new FacilityAttributeProperty(wtrFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfWaterBody(property);
+                            }
+                        }
                     }
                 }
 
@@ -142,9 +183,15 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
                 }
 
                 if (projectionFilter.containsProperty("wtrKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute wtrKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "waterbody_wtrkeyvaluepair_id")) {
-                        WtrKeyValuePairAttributePropertyElement property = new WtrKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(wtrKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfWaterBody(property);
+                    psWtrKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet wtrKeyValuePairAttributeRs = psWtrKeyValuePairAttribute.executeQuery()) {
+                        while (wtrKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute wtrKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(wtrKeyValuePairAttribute, wtrKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            WtrKeyValuePairAttributePropertyElement property = new WtrKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(wtrKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfWaterBody(property);
+                        }
                     }
                 }
             }
@@ -154,5 +201,9 @@ public class WaterBodyPropertiesExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psFloodingRiskAttribute.close();
+        psWtrDmAttribute.close();
+        psWtrFacilityAttribute.close();
+        psWtrKeyValuePairAttribute.close();
     }
 }

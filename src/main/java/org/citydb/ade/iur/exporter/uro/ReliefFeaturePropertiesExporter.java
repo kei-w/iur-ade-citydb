@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -50,6 +51,7 @@ public class ReliefFeaturePropertiesExporter implements UrbanObjectModuleExporte
 
     private final DataQualityAttributeExporter dataQualityAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
+    private final PreparedStatement psDemKeyValuePairAttribute;
 
     public ReliefFeaturePropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.RELIEF_FEATURE);
@@ -60,6 +62,11 @@ public class ReliefFeaturePropertiesExporter implements UrbanObjectModuleExporte
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table demKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RELIEF_FE_TO_KEYVALUEP)));
+        Select demKeyValuePairAttributeSelect = new Select().addProjection(demKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(demKeyValuePairAttributes.getColumn("relief_feature_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(demKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psDemKeyValuePairAttribute = connection.prepareStatement(demKeyValuePairAttributeSelect.toString());
         dataQualityAttributeExporter = manager.getExporter(DataQualityAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
@@ -79,9 +86,15 @@ public class ReliefFeaturePropertiesExporter implements UrbanObjectModuleExporte
                 }
 
                 if (projectionFilter.containsProperty("demKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute demKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "relief_feature_demkeyvalu_id")) {
-                        DemKeyValuePairAttributePropertyElement property = new DemKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(demKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfReliefFeature(property);
+                    psDemKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet demKeyValuePairAttributeRs = psDemKeyValuePairAttribute.executeQuery()) {
+                        while (demKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute demKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(demKeyValuePairAttribute, demKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            DemKeyValuePairAttributePropertyElement property = new DemKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(demKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfReliefFeature(property);
+                        }
                     }
                 }
             }
@@ -91,5 +104,6 @@ public class ReliefFeaturePropertiesExporter implements UrbanObjectModuleExporte
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psDemKeyValuePairAttribute.close();
     }
 }

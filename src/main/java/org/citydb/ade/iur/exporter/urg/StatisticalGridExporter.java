@@ -65,7 +65,7 @@ public class StatisticalGridExporter implements StatisticalGridModuleExporter {
 
         String tableName = manager.getSchemaMapper().getTableName(ADETable.STATISTICALGRID);
         CombinedProjectionFilter projectionFilter = helper.getCombinedProjectionFilter(tableName);
-        module = UrbanFunctionModule.v1_4.getNamespaceURI();
+        module = UrbanFunctionModule.v3_2.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = addProjection(new Select(), table, projectionFilter, "")

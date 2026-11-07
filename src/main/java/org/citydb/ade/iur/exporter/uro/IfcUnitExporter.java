@@ -34,39 +34,31 @@ import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.IfcUnit;
 import org.citygml4j.ade.iur.model.uro.IfcUnitEnum;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.sql.*;
 
 public class IfcUnitExporter implements UrbanObjectModuleExporter {
-    private final PreparedStatement psByParent;
+    private final PreparedStatement ps;
 
     public IfcUnitExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.IFCUNIT);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("dimensions", "unittype", "prefix", "name"))
-                .addSelection(ComparisonFactory.equalTo(table.getColumn("ifcproject_unitsincontext_id"), new PlaceHolder<>()))
-                .addOrderBy(new OrderByToken(table.getColumn("id")));
-        psByParent = connection.prepareStatement(select.toString());
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
     }
 
-    public List<IfcUnit> doExport(long parentId) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent;
-        ps.setLong(1, parentId);
+    public void doExport(IfcUnit ifcUnit, long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<IfcUnit> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                IfcUnit ifcUnit = new IfcUnit();
+            if (rs.next()) {
                 int dimensions = rs.getInt("dimensions");
                 if (!rs.wasNull())
                     ifcUnit.setDimensions(dimensions);
@@ -78,16 +70,12 @@ public class IfcUnitExporter implements UrbanObjectModuleExporter {
                 ifcUnit.setPrefix(rs.getString("prefix"));
 
                 ifcUnit.setName(rs.getString("name"));
-
-                result.add(ifcUnit);
             }
         }
-
-        return result;
     }
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        psByParent.close();
+        ps.close();
     }
 }

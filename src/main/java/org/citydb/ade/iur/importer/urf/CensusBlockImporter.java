@@ -30,76 +30,80 @@ package org.citydb.ade.iur.importer.urf;
 
 import org.citydb.ade.iur.importer.ImportManager;
 import org.citydb.ade.iur.schema.ADETable;
+import org.citydb.ade.iur.schema.SchemaMapper;
 import org.citydb.core.ade.importer.CityGMLImportHelper;
 import org.citydb.core.ade.importer.ForeignKeys;
 import org.citydb.core.database.schema.mapping.AbstractObjectType;
 import org.citydb.core.operation.importer.CityGMLImportException;
 import org.citygml4j.ade.iur.model.urf.CensusBlock;
-import org.citygml4j.ade.iur.model.urf.NumberOfHouseholdsProperty;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 
 public class CensusBlockImporter implements UrbanFunctionModuleImporter {
     private final CityGMLImportHelper helper;
+    private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
-
-    private final NumberOfHouseholdsImporter numberOfHouseholdsImporter;
     private final UrbanFunctionImporter urbanFunctionImporter;
+    private final PopulationTypeImporter populationTypeImporter;
+    private final DaytimePopulationTypeImporter daytimePopulationTypeImporter;
+    private final EconomicActivityTypeImporter economicActivityTypeImporter;
 
     private int batchCounter;
 
     public CensusBlockImporter(Connection connection, CityGMLImportHelper helper, ImportManager manager) throws CityGMLImportException, SQLException {
         this.helper = helper;
+        this.schemaMapper = manager.getSchemaMapper();
 
         ps = connection.prepareStatement("insert into " +
-                helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.CENSUSBLOCK)) + " " +
-                "(id, daytimepopulation, daytimepopulationdensity, numberofmainhouseholds, numberofordinaryhouseholds) " +
-                "values (?, ?, ?, ?, ?)");
+                helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.CENSUSBLOCK)) + " " +
+                "(id, townname, blockname, populationtype_id, daytimepopulationtype_id, economicactivitytype_id) " +
+                "values (?, ?, ?, ?, ?, ?)");
 
-        numberOfHouseholdsImporter = manager.getImporter(NumberOfHouseholdsImporter.class);
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
+        populationTypeImporter = manager.getImporter(PopulationTypeImporter.class);
+        daytimePopulationTypeImporter = manager.getImporter(DaytimePopulationTypeImporter.class);
+        economicActivityTypeImporter = manager.getImporter(EconomicActivityTypeImporter.class);
     }
 
     public void doImport(CensusBlock censusBlock, long objectId, AbstractObjectType<?> objectType, ForeignKeys foreignKeys) throws CityGMLImportException, SQLException {
         urbanFunctionImporter.doImport(censusBlock, objectId, objectType, foreignKeys);
+
         ps.setLong(1, objectId);
 
-        if (censusBlock.getDaytimePopulation() != null)
-            ps.setInt(2, censusBlock.getDaytimePopulation());
-        else
-            ps.setNull(2, Types.INTEGER);
+        ps.setString(2, censusBlock.getTownName());
 
-        if (censusBlock.getDaytimePopulationDensity() != null)
-            ps.setDouble(3, censusBlock.getDaytimePopulationDensity());
-        else
-            ps.setNull(3, Types.DOUBLE);
+        ps.setString(3, censusBlock.getBlockName());
 
-        if (censusBlock.getNumberOfMainHouseholds() != null)
-            ps.setInt(4, censusBlock.getNumberOfMainHouseholds());
-        else
-            ps.setNull(4, Types.INTEGER);
+        long populationTypeId = 0;
+        if (censusBlock.getPopulationType() != null && censusBlock.getPopulationType().isSetObject())
+            populationTypeId = populationTypeImporter.doImport(censusBlock.getPopulationType().getObject());
 
-        if (censusBlock.getNumberOfOrdinaryHouseholds() != null)
-            ps.setInt(5, censusBlock.getNumberOfOrdinaryHouseholds());
+        if (populationTypeId != 0)
+            ps.setLong(4, populationTypeId);
         else
-            ps.setNull(5, Types.INTEGER);
+            ps.setNull(4, Types.NULL);
+
+        long daytimePopulationTypeId = 0;
+        if (censusBlock.getDaytimePopulationType() != null && censusBlock.getDaytimePopulationType().isSetObject())
+            daytimePopulationTypeId = daytimePopulationTypeImporter.doImport(censusBlock.getDaytimePopulationType().getObject());
+
+        if (daytimePopulationTypeId != 0)
+            ps.setLong(5, daytimePopulationTypeId);
+        else
+            ps.setNull(5, Types.NULL);
+
+        long economicActivityTypeId = 0;
+        if (censusBlock.getEconomicActivityType() != null && censusBlock.getEconomicActivityType().isSetObject())
+            economicActivityTypeId = economicActivityTypeImporter.doImport(censusBlock.getEconomicActivityType().getObject());
+
+        if (economicActivityTypeId != 0)
+            ps.setLong(6, economicActivityTypeId);
+        else
+            ps.setNull(6, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(objectType);
-
-        for (NumberOfHouseholdsProperty property : censusBlock.getNumberOfHouseholdsByOwnership()) {
-            if (property.isSetObject())
-                numberOfHouseholdsImporter.doImport(property.getObject(), NumberOfHouseholdsImporter.Type.BY_OWNERSHIP, objectId);
-        }
-
-        for (NumberOfHouseholdsProperty property : censusBlock.getNumberOfHouseholdsByStructure()) {
-            if (property.isSetObject())
-                numberOfHouseholdsImporter.doImport(property.getObject(), NumberOfHouseholdsImporter.Type.BY_STRUCTURE, objectId);
-        }
     }
 
     @Override

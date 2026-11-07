@@ -32,12 +32,14 @@ import org.citydb.ade.iur.exporter.ExportManager;
 import org.citydb.ade.iur.schema.ADETable;
 import org.citydb.core.ade.exporter.CityGMLExportHelper;
 import org.citydb.core.database.schema.mapping.AbstractType;
+import org.citydb.core.database.schema.mapping.MappingConstants;
 import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.operation.exporter.util.AttributeValueSplitter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -54,6 +56,7 @@ import java.sql.*;
 public class UtilityLinkExporter implements UrbanObjectModuleExporter {
     private final UtilityNetworkElementExporter utilityNetworkElementExporter;
     private final PreparedStatement ps;
+    private final PreparedStatement psLengthAttribute;
     private final LengthAttributeExporter lengthAttributeExporter;
     private final AttributeValueSplitter valueSplitter;
 
@@ -71,6 +74,12 @@ public class UtilityLinkExporter implements UrbanObjectModuleExporter {
         addProjection(select, table, "");
         utilityNetworkElementExporter.addProjection(select, utilityNetworkElement, "une_");
         ps = connection.prepareStatement(select.toString());
+
+        Table lengthAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.UTILITYLI_TO_LENGTHATT)));
+        Select lengthAttributeSelect = new Select().addProjection(lengthAttributes.getColumn("lengthattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(lengthAttributes.getColumn("utilitylink_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(lengthAttributes.getColumn("lengthattribute_id")));
+        psLengthAttribute = connection.prepareStatement(lengthAttributeSelect.toString());
     }
 
     public void doExport(UtilityLink utilityLink, long objectId, AbstractType<?> objectType, ProjectionFilter projectionFilter) throws CityGMLExportException, SQLException {
@@ -158,8 +167,14 @@ public class UtilityLinkExporter implements UrbanObjectModuleExporter {
             utilityLink.setMaterial(code);
         }
 
-        for (LengthAttribute lengthAttribute : lengthAttributeExporter.doExport(objectId))
-            utilityLink.getLengthAttribute().add(new LengthAttributeProperty(lengthAttribute));
+        psLengthAttribute.setLong(1, objectId);
+        try (ResultSet lengthAttributeRs = psLengthAttribute.executeQuery()) {
+            while (lengthAttributeRs.next()) {
+                LengthAttribute lengthAttribute = new LengthAttribute();
+                lengthAttributeExporter.doExport(lengthAttribute, lengthAttributeRs.getLong("lengthattribute_id"));
+                utilityLink.getLengthAttribute().add(new LengthAttributeProperty(lengthAttribute));
+            }
+        }
 
         if (utilityLink instanceof Duct) {
             Duct duct = (Duct) utilityLink;
@@ -176,5 +191,6 @@ public class UtilityLinkExporter implements UrbanObjectModuleExporter {
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psLengthAttribute.close();
     }
 }

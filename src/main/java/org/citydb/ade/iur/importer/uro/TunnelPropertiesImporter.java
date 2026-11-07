@@ -48,12 +48,16 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
     private final ConstructionBaseAttributeImporter constructionBaseAttributeImporter;
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final DisasterRiskAttributeImporter disasterRiskAttributeImporter;
+    private final TunnelToDisasterRiskAttributeImporter tunnelToDisasterRiskAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
+    private final TunnelToDmAttributeImporter tunnelToDmAttributeImporter;
     private final FacilityAttributeImporter facilityAttributeImporter;
+    private final TunnelToFacilityAttributeImporter tunnelToFacilityAttributeImporter;
     private final FacilityIdAttributeImporter facilityIdAttributeImporter;
     private final FacilityTypeAttributeImporter facilityTypeAttributeImporter;
     private final TunnelFunctionalAttributeImporter tunnelFunctionalAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final TunnelToKeyValuePairAttributeImporter tunnelToKeyValuePairAttributeImporter;
     private final ConstructionRiskAssessmentAttributeImporter constructionRiskAssessmentAttributeImporter;
     private final TunnelStructureAttributeImporter tunnelStructureAttributeImporter;
 
@@ -73,12 +77,16 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
         constructionBaseAttributeImporter = manager.getImporter(ConstructionBaseAttributeImporter.class);
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         disasterRiskAttributeImporter = manager.getImporter(DisasterRiskAttributeImporter.class);
+        tunnelToDisasterRiskAttributeImporter = manager.getImporter(TunnelToDisasterRiskAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        tunnelToDmAttributeImporter = manager.getImporter(TunnelToDmAttributeImporter.class);
         facilityAttributeImporter = manager.getImporter(FacilityAttributeImporter.class);
+        tunnelToFacilityAttributeImporter = manager.getImporter(TunnelToFacilityAttributeImporter.class);
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
         tunnelFunctionalAttributeImporter = manager.getImporter(TunnelFunctionalAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        tunnelToKeyValuePairAttributeImporter = manager.getImporter(TunnelToKeyValuePairAttributeImporter.class);
         constructionRiskAssessmentAttributeImporter = manager.getImporter(ConstructionRiskAssessmentAttributeImporter.class);
         tunnelStructureAttributeImporter = manager.getImporter(TunnelStructureAttributeImporter.class);
     }
@@ -190,29 +198,37 @@ public class TunnelPropertiesImporter implements UrbanObjectModuleImporter {
 
         if (properties.contains(TunDisasterRiskAttributePropertyElement.class)) {
             for (TunDisasterRiskAttributePropertyElement property : properties.getAll(TunDisasterRiskAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    disasterRiskAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tundisasterriskatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tunDisasterRiskAttributeId = disasterRiskAttributeImporter.doImport(property.getValue().getObject());
+                    tunnelToDisasterRiskAttributeImporter.doImport(tunDisasterRiskAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(TunDmAttributePropertyElement.class)) {
             for (TunDmAttributePropertyElement property : properties.getAll(TunDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tundmattribute_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tunDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    tunnelToDmAttributeImporter.doImport(tunDmAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(TunFacilityAttributePropertyElement.class)) {
             for (TunFacilityAttributePropertyElement property : properties.getAll(TunFacilityAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    facilityAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tunfacilityattribu_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tunFacilityAttributeId = facilityAttributeImporter.doImport(property.getValue().getObject());
+                    tunnelToFacilityAttributeImporter.doImport(tunFacilityAttributeId, parentId);
+                }
             }
         }
 
         if (properties.contains(TunKeyValuePairAttributePropertyElement.class)) {
             for (TunKeyValuePairAttributePropertyElement property : properties.getAll(TunKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "tunnel_tunkeyvaluepairatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long tunKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    tunnelToKeyValuePairAttributeImporter.doImport(tunKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }

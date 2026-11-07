@@ -39,7 +39,6 @@ import org.citydb.core.operation.exporter.database.content.SurfaceGeometryExport
 import org.citydb.core.operation.exporter.util.GeometrySetter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
-import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
@@ -52,18 +51,12 @@ import org.citygml4j.ade.iur.model.uro.DmGeometricAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.measures.Length;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import java.sql.*;
 
 public class DmAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
     private final ObjectMapper objectMapper;
-    private final Map<String, PreparedStatement> psByParent = new HashMap<>();
+    private final PreparedStatement ps;
     private final DmElementExporter dmElementExporter;
     private final SurfaceGeometryExporter surfaceGeometryExporter;
     private final GMLConverter gmlConverter;
@@ -76,48 +69,37 @@ public class DmAttributeExporter implements UrbanObjectModuleExporter {
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table dmAnnotation = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DMANNOTATION)));
         Table dmGeometricAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DMGEOMETRICATTRIBUTE)));
-        for (String parentColumn : Arrays.asList("construction_consdmattrib_id", "building_bldgdmattribute_id", "bridge_briddmattribute_id", "relief_component_demdmatt_id", "city_furniture_frndmattri_id", "land_use_lusedmattribute_id", "transpor_complex_trandmat_id", "tunnel_tundmattribute_id", "cityobject_vegdmattribute_id", "waterbody_wtrdmattribute_id")) {
-            Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "dmcode", "dmcode_codespace", "meshcode", "meshcode_codespace",
-                            "dmelement_id"))
-                    .addProjection(dmAnnotation.getColumns("label", "isvertical", "size_", "orientation", "linewidth", "spacing", "lod0anchorpoint_brep_id"))
-                    .addProjection(dmGeometricAttribute.getColumns("maplevel", "maplevel_codespace", "visibility", "is3d", "isinstallation", "isedited",
-                            "issupplementarysymbol", "angle", "elevation", "elevation_uom", "lod0geometry_brep_id"))
-                    .addProjection(dmAnnotation.getColumn("geometrytype", "dmannotation_geometrytype"))
-                    .addProjection(dmAnnotation.getColumn("geometrytype_codespace", "dmannotation_geometrytype_codespace"))
-                    .addProjection(dmAnnotation.getColumn("shapetype", "dmannotation_shapetype"))
-                    .addProjection(dmAnnotation.getColumn("shapetype_codespace", "dmannotation_shapetype_codespace"))
-                    .addProjection(dmGeometricAttribute.getColumn("geometrytype", "dmgeometricattribute_geometrytype"))
-                    .addProjection(dmGeometricAttribute.getColumn("geometrytype_codespace", "dmgeometricattribute_geometrytype_codespace"))
-                    .addProjection(dmGeometricAttribute.getColumn("shapetype", "dmgeometricattribute_shapetype"))
-                    .addProjection(dmGeometricAttribute.getColumn("shapetype_codespace", "dmgeometricattribute_shapetype_codespace"))
-                    .addProjection(helper.getGeometryColumn(dmAnnotation.getColumn("lod0anchorpoint_other_geom")))
-                    .addProjection(helper.getGeometryColumn(dmGeometricAttribute.getColumn("lod0geometry_other_geom")))
-                    .addJoin(JoinFactory.left(dmAnnotation, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addJoin(JoinFactory.left(dmGeometricAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
-                    .addSelection(ComparisonFactory.equalTo(table.getColumn(parentColumn), new PlaceHolder<>()))
-                    .addOrderBy(new OrderByToken(table.getColumn("id")));
-            psByParent.put(parentColumn, connection.prepareStatement(parentSelect.toString()));
-        }
+        Select select = new Select().addProjection(table.getColumns("id", "objectclass_id", "dmcode", "dmcode_codespace", "meshcode", "meshcode_codespace",
+                        "dmelement_id"))
+                .addProjection(dmAnnotation.getColumns("label", "isvertical", "size_", "orientation", "linewidth", "spacing", "lod0anchorpoint_brep_id"))
+                .addProjection(dmGeometricAttribute.getColumns("maplevel", "maplevel_codespace", "visibility", "is3d", "isinstallation", "isedited",
+                        "issupplementarysymbol", "angle", "elevation", "elevation_uom", "lod0geometry_brep_id"))
+                .addProjection(dmAnnotation.getColumn("geometrytype", "dmannotation_geometrytype"))
+                .addProjection(dmAnnotation.getColumn("geometrytype_codespace", "dmannotation_geometrytype_codespace"))
+                .addProjection(dmAnnotation.getColumn("shapetype", "dmannotation_shapetype"))
+                .addProjection(dmAnnotation.getColumn("shapetype_codespace", "dmannotation_shapetype_codespace"))
+                .addProjection(dmGeometricAttribute.getColumn("geometrytype", "dmgeometricattribute_geometrytype"))
+                .addProjection(dmGeometricAttribute.getColumn("geometrytype_codespace", "dmgeometricattribute_geometrytype_codespace"))
+                .addProjection(dmGeometricAttribute.getColumn("shapetype", "dmgeometricattribute_shapetype"))
+                .addProjection(dmGeometricAttribute.getColumn("shapetype_codespace", "dmgeometricattribute_shapetype_codespace"))
+                .addProjection(helper.getGeometryColumn(dmAnnotation.getColumn("lod0anchorpoint_other_geom")))
+                .addProjection(helper.getGeometryColumn(dmGeometricAttribute.getColumn("lod0geometry_other_geom")))
+                .addJoin(JoinFactory.left(dmAnnotation, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addJoin(JoinFactory.left(dmGeometricAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
+                .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
+        ps = connection.prepareStatement(select.toString());
 
         dmElementExporter = manager.getExporter(DmElementExporter.class);
         surfaceGeometryExporter = helper.getSurfaceGeometryExporter();
         gmlConverter = helper.getGMLConverter();
     }
 
-    public List<DmAttribute> doExport(long parentId, String parentColumn) throws CityGMLExportException, SQLException {
-        PreparedStatement ps = psByParent.get(parentColumn);
-        ps.setLong(1, parentId);
+    public DmAttribute doExport(long objectId) throws CityGMLExportException, SQLException {
+        ps.setLong(1, objectId);
 
-        List<DmAttribute> result = new ArrayList<>();
         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                DmAttribute dmAttribute = doExport(rs.getLong("id"), rs);
-                if (dmAttribute != null)
-                    result.add(dmAttribute);
-            }
+            return rs.next() ? doExport(objectId, rs) : null;
         }
-
-        return result;
     }
 
     private DmAttribute doExport(long objectId, ResultSet rs) throws CityGMLExportException, SQLException {
@@ -276,7 +258,6 @@ public class DmAttributeExporter implements UrbanObjectModuleExporter {
 
     @Override
     public void close() throws CityGMLExportException, SQLException {
-        for (PreparedStatement ps : psByParent.values())
-            ps.close();
+        ps.close();
     }
 }

@@ -36,6 +36,7 @@ import org.citydb.core.operation.exporter.CityGMLExportException;
 import org.citydb.core.query.filter.projection.ProjectionFilter;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
@@ -65,6 +66,9 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
     private final TrafficObjectUsecaseAttributeExporter trafficObjectUsecaseAttributeExporter;
+    private final PreparedStatement psTranDmAttribute;
+    private final PreparedStatement psTranFacilityAttribute;
+    private final PreparedStatement psTranKeyValuePairAttribute;
 
     public TransportationComplexPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.TRANSPORTATION_COMPLEX);
@@ -78,6 +82,21 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
+        Table tranDmAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSPORT_TO_DMATTRIBU)));
+        Select tranDmAttributeSelect = new Select().addProjection(tranDmAttributes.getColumn("dmattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tranDmAttributes.getColumn("transportation_complex_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tranDmAttributes.getColumn("dmattribute_id")));
+        psTranDmAttribute = connection.prepareStatement(tranDmAttributeSelect.toString());
+        Table tranFacilityAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSPORT_TO_FACILITYA)));
+        Select tranFacilityAttributeSelect = new Select().addProjection(tranFacilityAttributes.getColumn("facilityattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tranFacilityAttributes.getColumn("transportation_complex_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tranFacilityAttributes.getColumn("facilityattribute_id")));
+        psTranFacilityAttribute = connection.prepareStatement(tranFacilityAttributeSelect.toString());
+        Table tranKeyValuePairAttributes = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.TRANSPORT_TO_KEYVALUEP)));
+        Select tranKeyValuePairAttributeSelect = new Select().addProjection(tranKeyValuePairAttributes.getColumn("keyvaluepairattribute_id"))
+                .addSelection(ComparisonFactory.equalTo(tranKeyValuePairAttributes.getColumn("transportation_complex_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(tranKeyValuePairAttributes.getColumn("keyvaluepairattribute_id")));
+        psTranKeyValuePairAttribute = connection.prepareStatement(tranKeyValuePairAttributeSelect.toString());
         railwayRouteAttributeExporter = manager.getExporter(RailwayRouteAttributeExporter.class);
         roadTypeExporter = manager.getExporter(RoadTypeExporter.class);
         roadStructureAttributeExporter = manager.getExporter(RoadStructureAttributeExporter.class);
@@ -162,16 +181,28 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 }
 
                 if (projectionFilter.containsProperty("tranDmAttribute", module)) {
-                    for (DmAttribute tranDmAttribute : dmAttributeExporter.doExport(parentId, "transpor_complex_trandmat_id")) {
-                        TranDmAttributePropertyElement property = new TranDmAttributePropertyElement(new DmAttributeProperty(tranDmAttribute));
-                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    psTranDmAttribute.setLong(1, parentId);
+                    try (ResultSet tranDmAttributeRs = psTranDmAttribute.executeQuery()) {
+                        while (tranDmAttributeRs.next()) {
+                            DmAttribute tranDmAttribute = dmAttributeExporter.doExport(tranDmAttributeRs.getLong("dmattribute_id"));
+                            if (tranDmAttribute != null) {
+                                TranDmAttributePropertyElement property = new TranDmAttributePropertyElement(new DmAttributeProperty(tranDmAttribute));
+                                parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                            }
+                        }
                     }
                 }
 
                 if (projectionFilter.containsProperty("tranFacilityAttribute", module)) {
-                    for (FacilityAttribute tranFacilityAttribute : facilityAttributeExporter.doExport(parentId, "transpor_complex_tranfaci_id")) {
-                        TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
-                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    psTranFacilityAttribute.setLong(1, parentId);
+                    try (ResultSet tranFacilityAttributeRs = psTranFacilityAttribute.executeQuery()) {
+                        while (tranFacilityAttributeRs.next()) {
+                            FacilityAttribute tranFacilityAttribute = facilityAttributeExporter.doExport(tranFacilityAttributeRs.getLong("facilityattribute_id"));
+                            if (tranFacilityAttribute != null) {
+                                TranFacilityAttributePropertyElement property = new TranFacilityAttributePropertyElement(new FacilityAttributeProperty(tranFacilityAttribute));
+                                parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                            }
+                        }
                     }
                 }
 
@@ -194,9 +225,15 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
                 }
 
                 if (projectionFilter.containsProperty("tranKeyValuePairAttribute", module)) {
-                    for (KeyValuePairAttribute tranKeyValuePairAttribute : keyValuePairAttributeExporter.doExport(parentId, "transpor_complex_trankeyv_id")) {
-                        TranKeyValuePairAttributePropertyElement property = new TranKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(tranKeyValuePairAttribute));
-                        parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                    psTranKeyValuePairAttribute.setLong(1, parentId);
+                    try (ResultSet tranKeyValuePairAttributeRs = psTranKeyValuePairAttribute.executeQuery()) {
+                        while (tranKeyValuePairAttributeRs.next()) {
+                            KeyValuePairAttribute tranKeyValuePairAttribute = new KeyValuePairAttribute();
+                            keyValuePairAttributeExporter.doExport(tranKeyValuePairAttribute, tranKeyValuePairAttributeRs.getLong("keyvaluepairattribute_id"));
+
+                            TranKeyValuePairAttributePropertyElement property = new TranKeyValuePairAttributePropertyElement(new KeyValuePairAttributeProperty(tranKeyValuePairAttribute));
+                            parent.addGenericApplicationPropertyOfTransportationComplex(property);
+                        }
                     }
                 }
 
@@ -215,5 +252,8 @@ public class TransportationComplexPropertiesExporter implements UrbanObjectModul
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psTranDmAttribute.close();
+        psTranFacilityAttribute.close();
+        psTranKeyValuePairAttribute.close();
     }
 }

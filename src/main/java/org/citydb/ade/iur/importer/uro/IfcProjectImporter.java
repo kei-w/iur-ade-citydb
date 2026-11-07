@@ -43,6 +43,7 @@ public class IfcProjectImporter implements UrbanObjectModuleImporter {
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
     private final IfcGeometricRepresentationContextImporter ifcGeometricRepresentationContextImporter;
+    private final IfcProjectToIfcUnitImporter ifcProjectToIfcUnitImporter;
     private final IfcUnitImporter ifcUnitImporter;
 
     private int batchCounter;
@@ -57,6 +58,7 @@ public class IfcProjectImporter implements UrbanObjectModuleImporter {
                 "values (?, ?, ?, ?)");
 
         ifcGeometricRepresentationContextImporter = manager.getImporter(IfcGeometricRepresentationContextImporter.class);
+        ifcProjectToIfcUnitImporter = manager.getImporter(IfcProjectToIfcUnitImporter.class);
         ifcUnitImporter = manager.getImporter(IfcUnitImporter.class);
     }
 
@@ -81,8 +83,10 @@ public class IfcProjectImporter implements UrbanObjectModuleImporter {
             helper.executeBatch(schemaMapper.getTableName(ADETable.IFCPROJECT));
 
         for (IfcUnitProperty property : ifcProject.getUnitsInContext()) {
-            if (property.isSetObject())
-                ifcUnitImporter.doImport(property.getObject(), objectId);
+            if (property.isSetObject()) {
+                long unitsInContextId = ifcUnitImporter.doImport(property.getObject());
+                ifcProjectToIfcUnitImporter.doImport(unitsInContextId, objectId);
+            }
         }
     }
 

@@ -52,37 +52,36 @@ public class ParkHealthAssessmentImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PARKHEALTHASSESSMENT)) + " " +
-                "(id, parkfacility_parkhealthas_id, assessmentfiscalyear, deteriorationstatus, condition," +
-                "condition_codespace, urgency, urgency_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, assessmentfiscalyear, deteriorationstatus, condition, condition_codespace, urgency," +
+                "urgency_codespace) " +
+                "values (?, ?, ?, ?, ?, ?, ?)");
     }
 
-    public long doImport(ParkHealthAssessment parkHealthAssessment, long parentId) throws CityGMLImportException, SQLException {
+    public long doImport(ParkHealthAssessment parkHealthAssessment) throws CityGMLImportException, SQLException {
         long objectId = helper.getNextSequenceValue(schemaMapper.getSequenceName(ADESequence.PARKHEALTHASSESSME_SEQ));
         ps.setLong(1, objectId);
-        ps.setLong(2, parentId);
 
         if (parkHealthAssessment.getAssessmentFiscalYear() != null)
-            ps.setDate(3, Date.valueOf(LocalDate.of(parkHealthAssessment.getAssessmentFiscalYear().getValue(), 1, 1)));
+            ps.setDate(2, Date.valueOf(LocalDate.of(parkHealthAssessment.getAssessmentFiscalYear().getValue(), 1, 1)));
         else
-            ps.setNull(3, Types.DATE);
+            ps.setNull(2, Types.DATE);
 
-        ps.setString(4, parkHealthAssessment.getDeteriorationStatus());
+        ps.setString(3, parkHealthAssessment.getDeteriorationStatus());
 
         if (parkHealthAssessment.getCondition() != null && parkHealthAssessment.getCondition().isSetValue()) {
-            ps.setString(5, parkHealthAssessment.getCondition().getValue());
-            ps.setString(6, parkHealthAssessment.getCondition().getCodeSpace());
+            ps.setString(4, parkHealthAssessment.getCondition().getValue());
+            ps.setString(5, parkHealthAssessment.getCondition().getCodeSpace());
         } else {
+            ps.setNull(4, Types.VARCHAR);
             ps.setNull(5, Types.VARCHAR);
-            ps.setNull(6, Types.VARCHAR);
         }
 
         if (parkHealthAssessment.getUrgency() != null && parkHealthAssessment.getUrgency().isSetValue()) {
-            ps.setString(7, parkHealthAssessment.getUrgency().getValue());
-            ps.setString(8, parkHealthAssessment.getUrgency().getCodeSpace());
+            ps.setString(6, parkHealthAssessment.getUrgency().getValue());
+            ps.setString(7, parkHealthAssessment.getUrgency().getCodeSpace());
         } else {
+            ps.setNull(6, Types.VARCHAR);
             ps.setNull(7, Types.VARCHAR);
-            ps.setNull(8, Types.VARCHAR);
         }
 
         ps.addBatch();

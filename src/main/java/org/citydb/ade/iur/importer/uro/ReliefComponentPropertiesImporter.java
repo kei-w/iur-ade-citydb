@@ -46,6 +46,7 @@ public class ReliefComponentPropertiesImporter implements UrbanObjectModuleImpor
     private final PreparedStatement ps;
 
     private final DmAttributeImporter dmAttributeImporter;
+    private final ReliefComponentToDmAttributeImporter reliefComponentToDmAttributeImporter;
 
     private int batchCounter;
 
@@ -59,6 +60,7 @@ public class ReliefComponentPropertiesImporter implements UrbanObjectModuleImpor
                 "values (?)");
 
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
+        reliefComponentToDmAttributeImporter = manager.getImporter(ReliefComponentToDmAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, AbstractReliefComponent parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -70,8 +72,10 @@ public class ReliefComponentPropertiesImporter implements UrbanObjectModuleImpor
 
         if (properties.contains(DemDmAttributePropertyElement.class)) {
             for (DemDmAttributePropertyElement property : properties.getAll(DemDmAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    dmAttributeImporter.doImport(property.getValue().getObject(), parentId, "relief_component_demdmatt_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long demDmAttributeId = dmAttributeImporter.doImport(property.getValue().getObject());
+                    reliefComponentToDmAttributeImporter.doImport(demDmAttributeId, parentId);
+                }
             }
         }
     }

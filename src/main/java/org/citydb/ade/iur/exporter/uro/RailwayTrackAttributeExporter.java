@@ -40,6 +40,7 @@ import org.citydb.core.operation.exporter.util.GeometrySetter;
 import org.citydb.core.operation.exporter.util.SplitValue;
 import org.citydb.sqlbuilder.expression.PlaceHolder;
 import org.citydb.sqlbuilder.schema.Table;
+import org.citydb.sqlbuilder.select.OrderByToken;
 import org.citydb.sqlbuilder.select.Select;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citygml4j.ade.iur.model.uro.ControlPoint;
@@ -53,6 +54,7 @@ import java.sql.*;
 
 public class RailwayTrackAttributeExporter implements UrbanObjectModuleExporter {
     private final CityGMLExportHelper helper;
+    private final PreparedStatement psControlPoint;
     private final PreparedStatement ps;
     private final ControlPointExporter controlPointExporter;
     private final AttributeValueSplitter valueSplitter;
@@ -64,6 +66,11 @@ public class RailwayTrackAttributeExporter implements UrbanObjectModuleExporter 
         String tableName = manager.getSchemaMapper().getTableName(ADETable.RAILWAYTRACKATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Table controlPoints = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.RAILWAYTR_TO_CONTROLPO)));
+        Select controlPointSelect = new Select().addProjection(controlPoints.getColumn("controlpoint_id"))
+                .addSelection(ComparisonFactory.equalTo(controlPoints.getColumn("railwaytrackattribute_id"), new PlaceHolder<>()))
+                .addOrderBy(new OrderByToken(controlPoints.getColumn("controlpoint_id")));
+        psControlPoint = connection.prepareStatement(controlPointSelect.toString());
         Select select = new Select().addProjection(table.getColumns("routename", "directiontype", "directiontype_codespace", "tracktype", "tracktype_codespace",
                         "startpost", "endpost", "alignmenttype", "alignmenttype_codespace", "lod2network_brep_id",
                         "lod3network_brep_id"))
@@ -140,8 +147,14 @@ public class RailwayTrackAttributeExporter implements UrbanObjectModuleExporter 
                     }
                 }
 
-                for (ControlPoint controlPoint : controlPointExporter.doExport(objectId))
-                    railwayTrackAttribute.getControlPoint().add(new ControlPointProperty(controlPoint));
+                psControlPoint.setLong(1, objectId);
+                try (ResultSet controlPointRs = psControlPoint.executeQuery()) {
+                    while (controlPointRs.next()) {
+                        ControlPoint controlPoint = new ControlPoint();
+                        controlPointExporter.doExport(controlPoint, controlPointRs.getLong("controlpoint_id"));
+                        railwayTrackAttribute.getControlPoint().add(new ControlPointProperty(controlPoint));
+                    }
+                }
             }
         }
     }
@@ -149,5 +162,7 @@ public class RailwayTrackAttributeExporter implements UrbanObjectModuleExporter 
     @Override
     public void close() throws CityGMLExportException, SQLException {
         ps.close();
+        psControlPoint.close();
+
     }
 }

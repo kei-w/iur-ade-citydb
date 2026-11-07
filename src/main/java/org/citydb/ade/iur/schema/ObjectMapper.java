@@ -43,6 +43,7 @@ import org.citygml4j.ade.iur.model.uro.*;
 import org.citygml4j.ade.iur.model.urt.*;
 import org.citygml4j.model.gml.base.AbstractGML;
 import org.citygml4j.model.module.citygml.CityGMLVersion;
+import org.citygml4j.ade.iur.model.module.UrbanObjectModule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,15 +63,6 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "PublicTransitAccessibility":
                     objectClassIds.put(PublicTransitAccessibility.class, objectClassId);
                     break;
-                case "LandPrice":
-                    objectClassIds.put(LandPrice.class, objectClassId);
-                    break;
-                case "LandUseDiversion":
-                    if (type.getSchema().matchesNamespaceURI(StatisticalGridModule.v1_4.getNamespaceURI()))
-                        objectClassIds.put(LandUseDiversion.class, objectClassId);
-                    else if (type.getSchema().matchesNamespaceURI(UrbanFunctionModule.v1_4.getNamespaceURI()))
-                        objectClassIds.put(org.citygml4j.ade.iur.model.urf.LandUseDiversion.class, objectClassId);
-                    break;
                 case "Households":
                     objectClassIds.put(Households.class, objectClassId);
                     break;
@@ -79,54 +71,6 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "GenericGridCell":
                     objectClassIds.put(GenericGridCell.class, objectClassId);
-                    break;
-                case "Administration":
-                    objectClassIds.put(Administration.class, objectClassId);
-                    break;
-                case "LandUsePlan":
-                    objectClassIds.put(LandUsePlan.class, objectClassId);
-                    break;
-                case "UrbanPlan":
-                    objectClassIds.put(UrbanPlan.class, objectClassId);
-                    break;
-                case "Agreement":
-                    objectClassIds.put(Agreement.class, objectClassId);
-                    break;
-                case "Regulation":
-                    objectClassIds.put(Regulation.class, objectClassId);
-                    break;
-                case "AreaClassification":
-                    objectClassIds.put(AreaClassification.class, objectClassId);
-                    break;
-                case "DistrictsAndZones":
-                    objectClassIds.put(DistrictsAndZones.class, objectClassId);
-                    break;
-                case "DevelopmentProject":
-                    objectClassIds.put(DevelopmentProject.class, objectClassId);
-                    break;
-                case "CensusBlock":
-                    objectClassIds.put(CensusBlock.class, objectClassId);
-                    break;
-                case "DisasterDamage":
-                    objectClassIds.put(DisasterDamage.class, objectClassId);
-                    break;
-                case "Pollution":
-                    objectClassIds.put(Pollution.class, objectClassId);
-                    break;
-                case "DisasterPreventionBase":
-                    objectClassIds.put(DisasterPreventionBase.class, objectClassId);
-                    break;
-                case "Recreations":
-                    objectClassIds.put(Recreations.class, objectClassId);
-                    break;
-                case "HubCity":
-                    objectClassIds.put(HubCity.class, objectClassId);
-                    break;
-                case "Urbanization":
-                    objectClassIds.put(Urbanization.class, objectClassId);
-                    break;
-                case "PublicTransportationFacility":
-                    objectClassIds.put(PublicTransportationFacility.class, objectClassId);
                     break;
                 case "Route":
                     objectClassIds.put(Route.class, objectClassId);
@@ -167,23 +111,131 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "Attribution":
                     objectClassIds.put(Attribution.class, objectClassId);
                     break;
+                case "Administration":
+                    objectClassIds.put(Administration.class, objectClassId);
+                    break;
+                case "Agreement":
+                    objectClassIds.put(Agreement.class, objectClassId);
+                    break;
+                case "AircraftNoiseControlZone":
+                    objectClassIds.put(AircraftNoiseControlZone.class, objectClassId);
+                    break;
                 case "Appurtenance":
                     objectClassIds.put(Appurtenance.class, objectClassId);
+                    break;
+                case "AreaClassification":
+                    objectClassIds.put(AreaClassification.class, objectClassId);
                     break;
                 case "Cable":
                     objectClassIds.put(Cable.class, objectClassId);
                     break;
+                case "CensusBlock":
+                    objectClassIds.put(CensusBlock.class, objectClassId);
+                    break;
                 case "ClosureSurface":
                     objectClassIds.put(ClosureSurface.class, objectClassId);
+                    break;
+                case "CollectiveFacilitiesForReconstruction":
+                    objectClassIds.put(CollectiveFacilitiesForReconstruction.class, objectClassId);
+                    break;
+                case "CollectiveFacilitiesForReconstructionAndRevitalization":
+                    objectClassIds.put(CollectiveFacilitiesForReconstructionAndRevitalization.class, objectClassId);
+                    break;
+                case "CollectiveFacilitiesForTsunamiDisasterPrevention":
+                    objectClassIds.put(CollectiveFacilitiesForTsunamiDisasterPrevention.class, objectClassId);
+                    break;
+                case "CollectiveGovernmentAndPublicOfficeFacilities":
+                    objectClassIds.put(CollectiveGovernmentAndPublicOfficeFacilities.class, objectClassId);
+                    break;
+                case "CollectiveHousingFacilities":
+                    objectClassIds.put(CollectiveHousingFacilities.class, objectClassId);
+                    break;
+                case "CollectiveUrbanDisasterPreventionFacilities":
+                    objectClassIds.put(CollectiveUrbanDisasterPreventionFacilities.class, objectClassId);
+                    break;
+                case "ConservationZoneForClustersOfTraditionalStructures":
+                    objectClassIds.put(ConservationZoneForClustersOfTraditionalStructures.class, objectClassId);
                     break;
                 case "ConstructionInstallation":
                     objectClassIds.put(ConstructionInstallation.class, objectClassId);
                     break;
+                case "DID":
+                    objectClassIds.put(DID.class, objectClassId);
+                    break;
+                case "DevelopmentProject":
+                    objectClassIds.put(DevelopmentProject.class, objectClassId);
+                    break;
+                case "DisasterDamage":
+                    objectClassIds.put(DisasterDamage.class, objectClassId);
+                    break;
+                case "DisasterPreventionBase":
+                    objectClassIds.put(DisasterPreventionBase.class, objectClassId);
+                    break;
+                case "DisasterPreventionBlockImprovementProject":
+                    objectClassIds.put(DisasterPreventionBlockImprovementProject.class, objectClassId);
+                    break;
+                case "DisasterPreventionBlockImprovementZonePlan":
+                    objectClassIds.put(DisasterPreventionBlockImprovementZonePlan.class, objectClassId);
+                    break;
+                case "DistributionBusinessPark":
+                    objectClassIds.put(DistributionBusinessPark.class, objectClassId);
+                    break;
+                case "DistributionBusinessZone":
+                    objectClassIds.put(DistributionBusinessZone.class, objectClassId);
+                    break;
+                case "DistributionOfFloraAndFauna":
+                    objectClassIds.put(DistributionOfFloraAndFauna.class, objectClassId);
+                    break;
+                case "District":
+                    objectClassIds.put(District.class, objectClassId);
+                    break;
+                case "DistrictDevelopmentPlan":
+                    objectClassIds.put(DistrictDevelopmentPlan.class, objectClassId);
+                    break;
+                case "DistrictFacility":
+                    objectClassIds.put(DistrictFacility.class, objectClassId);
+                    break;
+                case "DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlan":
+                    objectClassIds.put(DistrictImprovementPlanForDisasterPreventionBlockImprovementZonePlan.class, objectClassId);
+                    break;
+                case "DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrict":
+                    objectClassIds.put(DistrictImprovementPlanForHistoricSceneryMaintenanceAndImprovementDistrict.class, objectClassId);
+                    break;
+                case "DistrictPlan":
+                    objectClassIds.put(DistrictPlan.class, objectClassId);
+                    break;
+                case "DistrictsAndZones":
+                    objectClassIds.put(DistrictsAndZones.class, objectClassId);
+                    break;
                 case "Duct":
                     objectClassIds.put(Duct.class, objectClassId);
                     break;
+                case "EducationalAndCulturalFacility":
+                    objectClassIds.put(EducationalAndCulturalFacility.class, objectClassId);
+                    break;
                 case "ElectricityCable":
                     objectClassIds.put(ElectricityCable.class, objectClassId);
+                    break;
+                case "ExceptionalFloorAreaRateDistrict":
+                    objectClassIds.put(ExceptionalFloorAreaRateDistrict.class, objectClassId);
+                    break;
+                case "FirePreventionDistrict":
+                    objectClassIds.put(FirePreventionDistrict.class, objectClassId);
+                    break;
+                case "FireProtectionFacility":
+                    objectClassIds.put(FireProtectionFacility.class, objectClassId);
+                    break;
+                case "FloodPreventionFacility":
+                    objectClassIds.put(FloodPreventionFacility.class, objectClassId);
+                    break;
+                case "GlobalHubCityDevelopmentProject":
+                    objectClassIds.put(GlobalHubCityDevelopmentProject.class, objectClassId);
+                    break;
+                case "GreenSpace":
+                    objectClassIds.put(GreenSpace.class, objectClassId);
+                    break;
+                case "GreenSpaceConservationDistrict":
+                    objectClassIds.put(GreenSpaceConservationDistrict.class, objectClassId);
                     break;
                 case "GroundSurface":
                     objectClassIds.put(GroundSurface.class, objectClassId);
@@ -191,11 +243,74 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "Handhole":
                     objectClassIds.put(Handhole.class, objectClassId);
                     break;
+                case "HeightControlDistrict":
+                    objectClassIds.put(HeightControlDistrict.class, objectClassId);
+                    break;
+                case "HighLevelUseDistrict":
+                    objectClassIds.put(HighLevelUseDistrict.class, objectClassId);
+                    break;
+                case "HighRiseResidentialAttractionDistrict":
+                    objectClassIds.put(HighRiseResidentialAttractionDistrict.class, objectClassId);
+                    break;
+                case "HistoricSceneryMaintenanceAndImprovementDistrictPlan":
+                    objectClassIds.put(HistoricSceneryMaintenanceAndImprovementDistrictPlan.class, objectClassId);
+                    break;
+                case "HousingControlArea":
+                    objectClassIds.put(HousingControlArea.class, objectClassId);
+                    break;
+                case "HubCity":
+                    objectClassIds.put(HubCity.class, objectClassId);
+                    break;
+                case "IndustrialParkDevelopmentProject":
+                    objectClassIds.put(IndustrialParkDevelopmentProject.class, objectClassId);
+                    break;
+                case "LandPrice":
+                    objectClassIds.put(org.citygml4j.ade.iur.model.urf.LandPrice.class, objectClassId);
+                    break;
+                case "LandReadjustmentProject":
+                    objectClassIds.put(LandReadjustmentProject.class, objectClassId);
+                    break;
+                case "LandReadjustmentPromotionArea":
+                    objectClassIds.put(LandReadjustmentPromotionArea.class, objectClassId);
+                    break;
+                case "LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopment":
+                    objectClassIds.put(LandReadjustmentPromotionAreasForCoreBusinessUrbanDevelopment.class, objectClassId);
+                    break;
+                case "LandUseDiversion":
+                    if (type.getSchema().matchesNamespaceURI(UrbanFunctionModule.v3_2.getNamespaceURI()))
+                        objectClassIds.put(org.citygml4j.ade.iur.model.urf.LandUseDiversion.class, objectClassId);
+                    else if (type.getSchema().matchesNamespaceURI(StatisticalGridModule.v1_4.getNamespaceURI()))
+                        objectClassIds.put(LandUseDiversion.class, objectClassId);
+                    break;
+                case "LandscapeZone":
+                    objectClassIds.put(LandscapeZone.class, objectClassId);
+                    break;
                 case "Manhole":
                     objectClassIds.put(Manhole.class, objectClassId);
                     break;
+                case "MarketsSlaughterhousesCrematoria":
+                    objectClassIds.put(MarketsSlaughterhousesCrematoria.class, objectClassId);
+                    break;
+                case "MedicalFacility":
+                    objectClassIds.put(MedicalFacility.class, objectClassId);
+                    break;
+                case "NaturalConditions":
+                    objectClassIds.put(NaturalConditions.class, objectClassId);
+                    break;
+                case "NewHousing":
+                    objectClassIds.put(NewHousing.class, objectClassId);
+                    break;
+                case "NewHousingAndUrbanDevelopmentProject":
+                    objectClassIds.put(NewHousingAndUrbanDevelopmentProject.class, objectClassId);
+                    break;
+                case "NewUrbanInfrastructureProject":
+                    objectClassIds.put(NewUrbanInfrastructureProject.class, objectClassId);
+                    break;
                 case "OilGasChemicalsPipe":
                     objectClassIds.put(OilGasChemicalsPipe.class, objectClassId);
+                    break;
+                case "OpenSpaceForPublicUse":
+                    objectClassIds.put(OpenSpaceForPublicUse.class, objectClassId);
                     break;
                 case "OtherConstruction":
                     objectClassIds.put(OtherConstruction.class, objectClassId);
@@ -206,20 +321,161 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "OuterFloorSurface":
                     objectClassIds.put(OuterFloorSurface.class, objectClassId);
                     break;
+                case "ParkingPlaceDevelopmentZone":
+                    objectClassIds.put(ParkingPlaceDevelopmentZone.class, objectClassId);
+                    break;
                 case "Pipe":
                     objectClassIds.put(Pipe.class, objectClassId);
                     break;
                 case "PointCloud":
                     objectClassIds.put(PointCloud.class, objectClassId);
                     break;
+                case "Pollution":
+                    objectClassIds.put(Pollution.class, objectClassId);
+                    break;
+                case "PortZone":
+                    objectClassIds.put(PortZone.class, objectClassId);
+                    break;
+                case "PrivateUrbanRenewalProjectPlan":
+                    objectClassIds.put(PrivateUrbanRenewalProjectPlan.class, objectClassId);
+                    break;
+                case "ProductiveGreenZone":
+                    objectClassIds.put(ProductiveGreenZone.class, objectClassId);
+                    break;
+                case "ProjectPromotionArea":
+                    objectClassIds.put(ProjectPromotionArea.class, objectClassId);
+                    break;
+                case "PromotionDistrict":
+                    objectClassIds.put(PromotionDistrict.class, objectClassId);
+                    break;
                 case "PublicLand":
                     objectClassIds.put(PublicLand.class, objectClassId);
+                    break;
+                case "PublicTransitFacility":
+                    objectClassIds.put(PublicTransitFacility.class, objectClassId);
+                    break;
+                case "QuasiUrbanPlanningArea":
+                    objectClassIds.put(QuasiUrbanPlanningArea.class, objectClassId);
+                    break;
+                case "Recreations":
+                    objectClassIds.put(Recreations.class, objectClassId);
+                    break;
+                case "Regulation":
+                    objectClassIds.put(Regulation.class, objectClassId);
+                    break;
+                case "ResidenceAttractionArea":
+                    objectClassIds.put(ResidenceAttractionArea.class, objectClassId);
+                    break;
+                case "ResidentialBlockConstructionProject":
+                    objectClassIds.put(ResidentialBlockConstructionProject.class, objectClassId);
+                    break;
+                case "ResidentialBlockConstructionPromotionArea":
+                    objectClassIds.put(ResidentialBlockConstructionPromotionArea.class, objectClassId);
+                    break;
+                case "ResidentialEnvironmentImprovementDistrict":
+                    objectClassIds.put(ResidentialEnvironmentImprovementDistrict.class, objectClassId);
+                    break;
+                case "RoadsideDistrictFacility":
+                    objectClassIds.put(RoadsideDistrictFacility.class, objectClassId);
+                    break;
+                case "RoadsideDistrictImprovementPlan":
+                    objectClassIds.put(RoadsideDistrictImprovementPlan.class, objectClassId);
+                    break;
+                case "RoadsideDistrictPlan":
+                    objectClassIds.put(RoadsideDistrictPlan.class, objectClassId);
                     break;
                 case "RoofSurface":
                     objectClassIds.put(RoofSurface.class, objectClassId);
                     break;
+                case "RuralDistrictFacility":
+                    objectClassIds.put(RuralDistrictFacility.class, objectClassId);
+                    break;
+                case "RuralDistrictImprovementPlan":
+                    objectClassIds.put(RuralDistrictImprovementPlan.class, objectClassId);
+                    break;
+                case "RuralDistrictPlan":
+                    objectClassIds.put(RuralDistrictPlan.class, objectClassId);
+                    break;
+                case "SandControlFacility":
+                    objectClassIds.put(SandControlFacility.class, objectClassId);
+                    break;
+                case "ScenicDistrict":
+                    objectClassIds.put(ScenicDistrict.class, objectClassId);
+                    break;
+                case "ScenicResource":
+                    objectClassIds.put(ScenicResource.class, objectClassId);
+                    break;
+                case "ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilities":
+                    objectClassIds.put(ScheduledAreaForCollectiveGovernmentAndPublicOfficeFacilities.class, objectClassId);
+                    break;
+                case "ScheduledAreaForCollectiveHousingFacilities":
+                    objectClassIds.put(ScheduledAreaForCollectiveHousingFacilities.class, objectClassId);
+                    break;
+                case "ScheduledAreaForDistributionBusinessPark":
+                    objectClassIds.put(ScheduledAreaForDistributionBusinessPark.class, objectClassId);
+                    break;
+                case "ScheduledAreaForIndustrialParkDevelopmentProjects":
+                    objectClassIds.put(ScheduledAreaForIndustrialParkDevelopmentProjects.class, objectClassId);
+                    break;
+                case "ScheduledAreaForNewHousingAndUrbanDevelopmentProjects":
+                    objectClassIds.put(ScheduledAreaForNewHousingAndUrbanDevelopmentProjects.class, objectClassId);
+                    break;
+                case "ScheduledAreaForNewUrbanInfrastructureProjects":
+                    objectClassIds.put(ScheduledAreaForNewUrbanInfrastructureProjects.class, objectClassId);
+                    break;
+                case "ScheduledAreaForUrbanDevelopmentProject":
+                    objectClassIds.put(ScheduledAreaForUrbanDevelopmentProject.class, objectClassId);
+                    break;
+                case "SedimentDisasterProneArea":
+                    objectClassIds.put(SedimentDisasterProneArea.class, objectClassId);
+                    break;
                 case "SewerPipe":
                     objectClassIds.put(SewerPipe.class, objectClassId);
+                    break;
+                case "SnowProtectionFacility":
+                    objectClassIds.put(SnowProtectionFacility.class, objectClassId);
+                    break;
+                case "SocialWelfareFacility":
+                    objectClassIds.put(SocialWelfareFacility.class, objectClassId);
+                    break;
+                case "SpecialGreenSpaceConservationDistrict":
+                    objectClassIds.put(SpecialGreenSpaceConservationDistrict.class, objectClassId);
+                    break;
+                case "SpecialUrbanRenaissanceDistrict":
+                    objectClassIds.put(SpecialUrbanRenaissanceDistrict.class, objectClassId);
+                    break;
+                case "SpecialUseAttractionDistrict":
+                    objectClassIds.put(SpecialUseAttractionDistrict.class, objectClassId);
+                    break;
+                case "SpecialUseDistrict":
+                    objectClassIds.put(SpecialUseDistrict.class, objectClassId);
+                    break;
+                case "SpecialUseRestrictionDistrict":
+                    objectClassIds.put(SpecialUseRestrictionDistrict.class, objectClassId);
+                    break;
+                case "SpecialZoneForPreservationOfHistoricalLandscape":
+                    objectClassIds.put(SpecialZoneForPreservationOfHistoricalLandscape.class, objectClassId);
+                    break;
+                case "SpecifiedBlock":
+                    objectClassIds.put(SpecifiedBlock.class, objectClassId);
+                    break;
+                case "SpecifiedBuildingZoneImprovementPlan":
+                    objectClassIds.put(SpecifiedBuildingZoneImprovementPlan.class, objectClassId);
+                    break;
+                case "SpecifiedDisasterPreventionBlockImprovementZone":
+                    objectClassIds.put(SpecifiedDisasterPreventionBlockImprovementZone.class, objectClassId);
+                    break;
+                case "SpecifiedUrgentUrbanRenewalArea":
+                    objectClassIds.put(SpecifiedUrgentUrbanRenewalArea.class, objectClassId);
+                    break;
+                case "SupplyFacility":
+                    objectClassIds.put(SupplyFacility.class, objectClassId);
+                    break;
+                case "Target":
+                    objectClassIds.put(Target.class, objectClassId);
+                    break;
+                case "TelecommunicationFacility":
+                    objectClassIds.put(TelecommunicationFacility.class, objectClassId);
                     break;
                 case "TelecommunicationsCable":
                     objectClassIds.put(TelecommunicationsCable.class, objectClassId);
@@ -227,8 +483,71 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "ThermalPipe":
                     objectClassIds.put(ThermalPipe.class, objectClassId);
                     break;
+                case "ThreeDimensionalExtent":
+                    objectClassIds.put(ThreeDimensionalExtent.class, objectClassId);
+                    break;
+                case "TideFacility":
+                    objectClassIds.put(TideFacility.class, objectClassId);
+                    break;
+                case "TrafficFacility":
+                    objectClassIds.put(TrafficFacility.class, objectClassId);
+                    break;
+                case "TreatmentFacility":
+                    objectClassIds.put(TreatmentFacility.class, objectClassId);
+                    break;
+                case "TreePlantingDistrict":
+                    objectClassIds.put(TreePlantingDistrict.class, objectClassId);
+                    break;
+                case "UnclassifiedBlankArea":
+                    objectClassIds.put(UnclassifiedBlankArea.class, objectClassId);
+                    break;
+                case "UnclassifiedUseDistrict":
+                    objectClassIds.put(UnclassifiedUseDistrict.class, objectClassId);
+                    break;
                 case "UndergroundBuilding":
                     objectClassIds.put(UndergroundBuilding.class, objectClassId);
+                    break;
+                case "UnusedLandUsePromotionArea":
+                    objectClassIds.put(UnusedLandUsePromotionArea.class, objectClassId);
+                    break;
+                case "UrbanDevelopmentProject":
+                    objectClassIds.put(UrbanDevelopmentProject.class, objectClassId);
+                    break;
+                case "UrbanDisasterRecoveryPromotionArea":
+                    objectClassIds.put(UrbanDisasterRecoveryPromotionArea.class, objectClassId);
+                    break;
+                case "UrbanFacility":
+                    objectClassIds.put(UrbanFacility.class, objectClassId);
+                    break;
+                case "UrbanFacilityStatus":
+                    objectClassIds.put(UrbanFacilityStatus.class, objectClassId);
+                    break;
+                case "UrbanFacilityStipulatedByCabinetOrder":
+                    objectClassIds.put(UrbanFacilityStipulatedByCabinetOrder.class, objectClassId);
+                    break;
+                case "UrbanFunctionAttractionArea":
+                    objectClassIds.put(UrbanFunctionAttractionArea.class, objectClassId);
+                    break;
+                case "UrbanPlanningArea":
+                    objectClassIds.put(UrbanPlanningArea.class, objectClassId);
+                    break;
+                case "UrbanRedevelopmentProject":
+                    objectClassIds.put(UrbanRedevelopmentProject.class, objectClassId);
+                    break;
+                case "UrbanRedevelopmentPromotionArea":
+                    objectClassIds.put(UrbanRedevelopmentPromotionArea.class, objectClassId);
+                    break;
+                case "UrbanRenewalProject":
+                    objectClassIds.put(UrbanRenewalProject.class, objectClassId);
+                    break;
+                case "Urbanization":
+                    objectClassIds.put(Urbanization.class, objectClassId);
+                    break;
+                case "UrgentUrbanRenewalArea":
+                    objectClassIds.put(UrgentUrbanRenewalArea.class, objectClassId);
+                    break;
+                case "UseDistrict":
+                    objectClassIds.put(UseDistrict.class, objectClassId);
                     break;
                 case "WallSurface":
                     objectClassIds.put(WallSurface.class, objectClassId);
@@ -237,7 +556,25 @@ public class ObjectMapper implements ADEObjectMapper {
                     objectClassIds.put(WaterPipe.class, objectClassId);
                     break;
                 case "Waterway":
-                    objectClassIds.put(Waterway.class, objectClassId);
+                    if (type.getSchema().matchesNamespaceURI(UrbanObjectModule.v3_2.getNamespaceURI()))
+                        objectClassIds.put(org.citygml4j.ade.iur.model.uro.Waterway.class, objectClassId);
+                    else if (type.getSchema().matchesNamespaceURI(UrbanFunctionModule.v3_2.getNamespaceURI()))
+                        objectClassIds.put(org.citygml4j.ade.iur.model.urf.Waterway.class, objectClassId);
+                    break;
+                case "WeatherObservation":
+                    objectClassIds.put(WeatherObservation.class, objectClassId);
+                    break;
+                case "WindProtectionFacility":
+                    objectClassIds.put(WindProtectionFacility.class, objectClassId);
+                    break;
+                case "ZonalDisasterPreventionFacility":
+                    objectClassIds.put(ZonalDisasterPreventionFacility.class, objectClassId);
+                    break;
+                case "Zone":
+                    objectClassIds.put(Zone.class, objectClassId);
+                    break;
+                case "ZoneForPreservationOfHistoricalLandscape":
+                    objectClassIds.put(ZoneForPreservationOfHistoricalLandscape.class, objectClassId);
                     break;
             }
         }
@@ -689,6 +1026,78 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "WaterwayDetailAttribute":
                     typeClassIds.put(WaterwayDetailAttribute.class, typeClassId);
+                    break;
+                case "Boundary":
+                    typeClassIds.put(Boundary.class, typeClassId);
+                    break;
+                case "UrbanParkAttribute":
+                    typeClassIds.put(UrbanParkAttribute.class, typeClassId);
+                    break;
+                case "BreakdownOfNominalArea":
+                    typeClassIds.put(BreakdownOfNominalArea.class, typeClassId);
+                    break;
+                case "PopulationType":
+                    typeClassIds.put(PopulationType.class, typeClassId);
+                    break;
+                case "PopulationByAgeAndSexType":
+                    typeClassIds.put(PopulationByAgeAndSexType.class, typeClassId);
+                    break;
+                case "DaytimePopulationType":
+                    typeClassIds.put(DaytimePopulationType.class, typeClassId);
+                    break;
+                case "EconomicActivityType":
+                    typeClassIds.put(EconomicActivityType.class, typeClassId);
+                    break;
+                case "EconomicActivitySumType":
+                    typeClassIds.put(EconomicActivitySumType.class, typeClassId);
+                    break;
+                case "ResidentialDevelopmentType":
+                    typeClassIds.put(ResidentialDevelopmentType.class, typeClassId);
+                    break;
+                case "UrbanDevelopmentProjectType":
+                    typeClassIds.put(UrbanDevelopmentProjectType.class, typeClassId);
+                    break;
+                case "AgriculturalDevelopmentProjectType":
+                    typeClassIds.put(AgriculturalDevelopmentProjectType.class, typeClassId);
+                    break;
+                case "ValueByCodes":
+                    typeClassIds.put(ValueByCodes.class, typeClassId);
+                    break;
+                case "FarmlandConversionType":
+                    typeClassIds.put(FarmlandConversionType.class, typeClassId);
+                    break;
+                case "ForestConversionType":
+                    typeClassIds.put(ForestConversionType.class, typeClassId);
+                    break;
+                case "ParkAttribute":
+                    typeClassIds.put(ParkAttribute.class, typeClassId);
+                    break;
+                case "ObservationPoint":
+                    typeClassIds.put(ObservationPoint.class, typeClassId);
+                    break;
+                case "WaterWorksAttribute":
+                    typeClassIds.put(WaterWorksAttribute.class, typeClassId);
+                    break;
+                case "UrbanRoadAttribute":
+                    typeClassIds.put(UrbanRoadAttribute.class, typeClassId);
+                    break;
+                case "StructureDetails":
+                    typeClassIds.put(StructureDetails.class, typeClassId);
+                    break;
+                case "UrbanRapidTransitRailroadAttribute":
+                    typeClassIds.put(UrbanRapidTransitRailroadAttribute.class, typeClassId);
+                    break;
+                case "ParkingPlaceAttribute":
+                    typeClassIds.put(ParkingPlaceAttribute.class, typeClassId);
+                    break;
+                case "VehicleTerminalAttribute":
+                    typeClassIds.put(VehicleTerminalAttribute.class, typeClassId);
+                    break;
+                case "SewerSystemAttribute":
+                    typeClassIds.put(SewerSystemAttribute.class, typeClassId);
+                    break;
+                case "WeatherObservationType":
+                    typeClassIds.put(WeatherObservationType.class, typeClassId);
                     break;
             }
         }

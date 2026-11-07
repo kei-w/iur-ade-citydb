@@ -47,6 +47,7 @@ public class ReliefFeaturePropertiesImporter implements UrbanObjectModuleImporte
 
     private final DataQualityAttributeImporter dataQualityAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
+    private final ReliefFeatureToKeyValuePairAttributeImporter reliefFeatureToKeyValuePairAttributeImporter;
 
     private int batchCounter;
 
@@ -61,6 +62,7 @@ public class ReliefFeaturePropertiesImporter implements UrbanObjectModuleImporte
 
         dataQualityAttributeImporter = manager.getImporter(DataQualityAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
+        reliefFeatureToKeyValuePairAttributeImporter = manager.getImporter(ReliefFeatureToKeyValuePairAttributeImporter.class);
     }
 
     public void doImport(ADEPropertyCollection properties, ReliefFeature parent, long parentId, FeatureType parentType) throws CityGMLImportException, SQLException {
@@ -86,8 +88,10 @@ public class ReliefFeaturePropertiesImporter implements UrbanObjectModuleImporte
 
         if (properties.contains(DemKeyValuePairAttributePropertyElement.class)) {
             for (DemKeyValuePairAttributePropertyElement property : properties.getAll(DemKeyValuePairAttributePropertyElement.class)) {
-                if (property.isSetValue() && property.getValue().isSetObject())
-                    keyValuePairAttributeImporter.doImport(property.getValue().getObject(), parentId, "relief_feature_demkeyvalu_id");
+                if (property.isSetValue() && property.getValue().isSetObject()) {
+                    long demKeyValuePairAttributeId = keyValuePairAttributeImporter.doImport(property.getValue().getObject());
+                    reliefFeatureToKeyValuePairAttributeImporter.doImport(demKeyValuePairAttributeId, parentId);
+                }
             }
         }
     }
