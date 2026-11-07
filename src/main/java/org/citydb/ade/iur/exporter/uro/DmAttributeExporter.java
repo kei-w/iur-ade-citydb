@@ -76,7 +76,7 @@ public class DmAttributeExporter implements UrbanObjectModuleExporter {
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Table dmAnnotation = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DMANNOTATION)));
         Table dmGeometricAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.DMGEOMETRICATTRIBUTE)));
-        for (String parentColumn : Arrays.asList("building_bldgdmattribute_id", "bridge_briddmattribute_id", "relief_component_demdmatt_id", "city_furniture_frndmattri_id", "land_use_lusedmattribute_id", "transpor_complex_trandmat_id", "tunnel_tundmattribute_id", "cityobject_vegdmattribute_id", "waterbody_wtrdmattribute_id")) {
+        for (String parentColumn : Arrays.asList("construction_consdmattrib_id", "building_bldgdmattribute_id", "bridge_briddmattribute_id", "relief_component_demdmatt_id", "city_furniture_frndmattri_id", "land_use_lusedmattribute_id", "transpor_complex_trandmat_id", "tunnel_tundmattribute_id", "cityobject_vegdmattribute_id", "waterbody_wtrdmattribute_id")) {
             Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "dmcode", "dmcode_codespace", "meshcode", "meshcode_codespace",
                             "dmelement_id"))
                     .addProjection(dmAnnotation.getColumns("label", "isvertical", "size_", "orientation", "linewidth", "spacing", "lod0anchorpoint_brep_id"))

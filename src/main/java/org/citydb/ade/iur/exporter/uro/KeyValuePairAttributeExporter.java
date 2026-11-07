@@ -55,7 +55,7 @@ public class KeyValuePairAttributeExporter implements UrbanObjectModuleExporter 
         String tableName = manager.getSchemaMapper().getTableName(ADETable.KEYVALUEPAIRATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        for (String parentColumn : Arrays.asList("building_bldgkeyvaluepair_id", "bridge_bridkeyvaluepairat_id", "relief_feature_demkeyvalu_id", "city_furniture_frnkeyvalu_id", "land_use_lusekeyvaluepair_id", "transpor_complex_trankeyv_id", "tunnel_tunkeyvaluepairatt_id", "cityobject_vegkeyvaluepai_id", "waterbody_wtrkeyvaluepair_id")) {
+        for (String parentColumn : Arrays.asList("construction_conskeyvalue_id", "building_bldgkeyvaluepair_id", "bridge_bridkeyvaluepairat_id", "relief_feature_demkeyvalu_id", "city_furniture_frnkeyvalu_id", "land_use_lusekeyvaluepair_id", "transpor_complex_trankeyv_id", "tunnel_tunkeyvaluepairatt_id", "cityobject_vegkeyvaluepai_id", "waterbody_wtrkeyvaluepair_id")) {
             Select parentSelect = new Select().addProjection(table.getColumns("key", "key_codespace", "codevalue", "codevalue_codespace"))
                     .addSelection(ComparisonFactory.equalTo(table.getColumn(parentColumn), new PlaceHolder<>()))
                     .addOrderBy(new OrderByToken(table.getColumn("id")));

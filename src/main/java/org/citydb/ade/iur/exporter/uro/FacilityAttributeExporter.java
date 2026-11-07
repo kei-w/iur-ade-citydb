@@ -122,7 +122,7 @@ public class FacilityAttributeExporter implements UrbanObjectModuleExporter {
         Table portWasteTreatmentFacility = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PORTWASTETREATMENTFACI)));
         Table portWelfareFacility = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.PORTWELFAREFACILITY)));
         Table shipServiceFacility = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.SHIPSERVICEFACILITY)));
-        for (String parentColumn : Arrays.asList("building_bldgfacilityattr_id", "bridge_bridfacilityattrib_id", "city_furniture_frnfacilit_id", "land_use_lusefacilityattr_id", "transpor_complex_tranfaci_id", "tunnel_tunfacilityattribu_id", "cityobject_vegfacilityatt_id", "waterbody_wtrfacilityattr_id")) {
+        for (String parentColumn : Arrays.asList("construction_consfacility_id", "building_bldgfacilityattr_id", "bridge_bridfacilityattrib_id", "city_furniture_frnfacilit_id", "land_use_lusefacilityattr_id", "transpor_complex_tranfaci_id", "tunnel_tunfacilityattribu_id", "cityobject_vegfacilityatt_id", "waterbody_wtrfacilityattr_id")) {
             Select parentSelect = new Select().addProjection(table.getColumns("id", "objectclass_id", "facilityid"))
                     .addProjection(fishingPortCapacity.getColumns("capacity", "weightcapacity", "weightcapacity_uom", "hullform", "shipnumber", "waterdepth_2m",
                             "waterdepth_2m_uom", "waterdepth2_3m", "waterdepth2_3m_uom", "waterdepth3_6m",

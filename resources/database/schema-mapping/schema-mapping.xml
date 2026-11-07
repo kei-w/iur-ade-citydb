@@ -3336,7 +3336,7 @@
                 <attribute column="sleevetype" type="string" path="." schema="ur_1"/>
             </complexAttribute>
         </featureType>
-        <featureType id="ur_1_OtherConstructionType" table="ur_construction" objectClassId="60154" path="OtherConstruction" schema="ur_1">
+        <featureType id="ur_1_OtherConstructionType" table="ur_construction" objectClassId="60154" topLevel="true" path="OtherConstruction" schema="ur_1">
             <extension base="ur_1_AbstractConstructionType"/>
             <complexAttribute maxOccurs="1" path="class" schema="ur_1">
                 <attribute column="class_codespace" type="string" path="@codespace" schema="gml"/>
@@ -3415,7 +3415,7 @@
         <featureType id="ur_1_ThermalPipeType" table="ur_pipe" objectClassId="60183" topLevel="true" path="ThermalPipe" schema="ur_1">
             <extension base="ur_1_PipeType"/>
         </featureType>
-        <featureType id="ur_1_UndergroundBuildingType" table="ur_undergroundbuilding" objectClassId="60185" path="UndergroundBuilding" schema="ur_1">
+        <featureType id="ur_1_UndergroundBuildingType" table="ur_undergroundbuilding" objectClassId="60185" topLevel="true" path="UndergroundBuilding" schema="ur_1">
             <extension base="AbstractBuildingType">
                 <join table="building" fromColumn="id" toColumn="id" toRole="parent"/>
             </extension>
