@@ -59,8 +59,8 @@ public class LargeCustomerFacilityAttributeImporter implements UrbanObjectModule
                 "class_codespace, districtsandzonestype, districtsandzonest_codespace, inauguraldate, keytenants," +
                 "landusetype, landusetype_codespace, name, note, owner, reference, surveyyear, totalfloorarea," +
                 "totalfloorarea_uom, totalstorefloorarea, totalstorefloorarea_uom, urbanplantype," +
-                "urbanplantype_codespace) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "urbanplantype_codespace, yearclosed, yearopened) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         valueJoiner = helper.getAttributeValueJoiner();
@@ -156,6 +156,16 @@ public class LargeCustomerFacilityAttributeImporter implements UrbanObjectModule
             ps.setNull(23, Types.VARCHAR);
             ps.setNull(24, Types.VARCHAR);
         }
+
+        if (largeCustomerFacilityAttribute.getYearClosed() != null)
+            ps.setDate(25, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearClosed().getValue(), 1, 1)));
+        else
+            ps.setNull(25, Types.DATE);
+
+        if (largeCustomerFacilityAttribute.getYearOpened() != null)
+            ps.setDate(26, Date.valueOf(LocalDate.of(largeCustomerFacilityAttribute.getYearOpened().getValue(), 1, 1)));
+        else
+            ps.setNull(26, Types.DATE);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

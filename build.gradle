@@ -30,9 +30,9 @@ repositories {
 
 dependencies {
     implementation 'org.citydb:impexp-client-gui:5.5.0'
-    implementation 'org.citygml4j.ade:iur-ade-citygml4j:2.0.0'
+    implementation 'org.citygml4j.ade:iur-ade-citygml4j:3.0.0'
 
-    citygml4j('org.citygml4j.ade:iur-ade-citygml4j:2.0.0') {
+    citygml4j('org.citygml4j.ade:iur-ade-citygml4j:3.0.0') {
         transitive = false
     }
 }

@@ -57,7 +57,7 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
                         "class_codespace", "districtsandzonestype", "districtsandzonest_codespace", "inauguraldate",
                         "keytenants", "landusetype", "landusetype_codespace", "name", "note", "owner", "reference",
                         "surveyyear", "totalfloorarea", "totalfloorarea_uom", "totalstorefloorarea",
-                        "totalstorefloorarea_uom", "urbanplantype", "urbanplantype_codespace"))
+                        "totalstorefloorarea_uom", "urbanplantype", "urbanplantype_codespace", "yearclosed", "yearopened"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -142,6 +142,14 @@ public class LargeCustomerFacilityAttributeExporter implements UrbanObjectModule
                     code.setCodeSpace(rs.getString("urbanplantype_codespace"));
                     largeCustomerFacilityAttribute.setUrbanPlanType(code);
                 }
+
+                Date yearClosed = rs.getDate("yearclosed");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setYearClosed(Year.of(yearClosed.toLocalDate().getYear()));
+
+                Date yearOpened = rs.getDate("yearopened");
+                if (!rs.wasNull())
+                    largeCustomerFacilityAttribute.setYearOpened(Year.of(yearOpened.toLocalDate().getYear()));
             }
         }
     }

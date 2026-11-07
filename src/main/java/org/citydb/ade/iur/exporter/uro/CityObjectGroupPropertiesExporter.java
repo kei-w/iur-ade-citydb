@@ -53,7 +53,7 @@ public class CityObjectGroupPropertiesExporter implements UrbanObjectModuleExpor
 
     public CityObjectGroupPropertiesExporter(Connection connection, CityGMLExportHelper helper, ExportManager manager) throws CityGMLExportException, SQLException {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.CITYOBJECTGROUP_1);
-        module = UrbanObjectModule.v2_0.getNamespaceURI();
+        module = UrbanObjectModule.v3_0.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
         Select select = new Select().addProjection(table.getColumns("fiscalyearofpublication", "language", "language_codespace"))
