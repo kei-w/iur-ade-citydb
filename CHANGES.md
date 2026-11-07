@@ -1,6 +1,23 @@
 Change Log
 ==========
 
+### 3.0.0 - 2026-11-07
+
+#### Breaking changes
+* Updated the Urban Object module (`uro`) to version 2.0 of the i-UR ADE. The database schema for `uro` was
+  regenerated with the ADE Manager Plugin and is not compatible with the 1.4 schema. The `urf`, `urg` and `urt`
+  parts of the schema (table names, schema ids) are unchanged.
+* Import/export of the i-UR 2.0 building attributes (`BuildingIDAttribute`, `BuildingDetailAttribute`,
+  `LargeCustomerFacilityAttribute`, `BuildingDisasterRiskAttribute` subtypes, `KeyValuePairAttribute`,
+  `BuildingDataQualityAttribute`).
+* Removed the 1.4 `uro` handling of LandUse and TransportationComplex properties. The 2.0 attributes of LandUse,
+  Road, TrafficArea, CityFurniture, Vegetation and WaterBody are stored in the schema but not yet imported/exported.
+* Updated iur-ade-citygml4j to 2.0.0. The module is currently consumed from `mavenLocal()`
+  (`gradlew publishToMavenLocal` in the iur-ade-citygml4j fork).
+
+#### Fixes
+* The `urf` and `urg` CityObjectGroup property exporters used the `uro` namespace for projection filtering.
+
 ### 2.1.0 - 2024-09-19
 
 #### Changes

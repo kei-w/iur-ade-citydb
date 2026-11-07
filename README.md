@@ -14,10 +14,16 @@ The "i-UR" is an information infrastructure for urban revitalization and plannin
 Existing bugs will be fixed, but large new features will likely not be added. Support through contributions or funding
 is welcome.
 
-This extension adds support for managing i-UR ADE **version 1.4** data inside the 3DCityDB and enables the
+This extension adds support for managing i-UR ADE data inside the 3DCityDB and enables the
 [Importer/Exporter tool](https://github.com/3dcitydb/importer-exporter) to load and export i-UR ADE enriched datasets.
 
 * **i-UR specification and material: https://www.chisou.go.jp/tiiki/toshisaisei/itoshisaisei/iur**
+
+:warning: This fork targets the **PLATEAU** flavour of the i-UR ADE: the Urban Object module (`uro`) follows
+*i-UR ADE version 2.0* (`https://www.geospatial.jp/iur/uro/2.0`) and currently covers the building attributes.
+The `urf`, `urg` and `urt` modules still follow version 1.4. See `CHANGES.md` for details. Building this fork
+requires the matching `iur-ade-citygml4j` fork to be published to the local Maven repository first
+(`gradlew publishToMavenLocal`).
 * **Where to file issues: https://github.com/3dcitydb/iur-ade-citydb/issues**
 
 ## How to use this extension
