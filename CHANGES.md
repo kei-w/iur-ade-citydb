@@ -52,6 +52,10 @@ Change Log
   `urt:target` are join tables exported as xlinks.
 * `xs:time` values are stored in timestamp columns on the epoch day.
 
+#### Changes (schema revisions, 2026-11-08)
+* `urf` 2.0 as published on geospatial.jp: the text of `urf:SpecialUseAttractionDistrict/maximumBuildingHeight`
+  (`gml:StringOrRefType`) is stored like the other string-or-reference values; a reference (`xlink:href`) is not.
+
 #### Known limitations
 * `uro:ControlPoint/uro:parameter` is not supported: the 2.0 XSD declares it with the type of `uro:ControlPoint` itself.
 * `urg:StatisticalGrid/urg:value` (`xs:anyType`) is not supported.

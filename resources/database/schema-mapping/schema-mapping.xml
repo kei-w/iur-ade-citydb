@@ -558,8 +558,8 @@
             </complexProperty>
         </complexType>
         <complexType id="ur_2_StructureDetailsType" table="ur_structuredetails" objectClassId="60092" path="StructureDetails" schema="ur_2">
-            <attribute column="startlocation" type="string" maxOccurs="1" path="startLocation" schema="ur_2"/>
-            <attribute column="endlocation" type="string" maxOccurs="1" path="endLocation" schema="ur_2"/>
+            <attribute column="startlocation" type="string" minOccurs="1" maxOccurs="1" path="startLocation" schema="ur_2"/>
+            <attribute column="endlocation" type="string" minOccurs="1" maxOccurs="1" path="endLocation" schema="ur_2"/>
             <attribute column="vialocations" type="string" maxOccurs="1" path="viaLocations" schema="ur_2"/>
             <complexAttribute maxOccurs="1" path="length" schema="ur_2">
                 <attribute column="length_uom" type="string" path="@uom" schema="gml"/>
@@ -603,8 +603,8 @@
             </complexProperty>
         </complexType>
         <complexType id="ur_2_ParkingPlaceAttributeType" table="ur_parkingplaceattribute" objectClassId="60094" path="ParkingPlaceAttribute" schema="ur_2">
-            <attribute column="storeysaboveground" type="integer" maxOccurs="1" path="storeysAboveGround" schema="ur_2"/>
-            <attribute column="storeysbelowground" type="integer" maxOccurs="1" path="storeysBelowGround" schema="ur_2"/>
+            <attribute column="storeysaboveground" type="integer" minOccurs="1" maxOccurs="1" path="storeysAboveGround" schema="ur_2"/>
+            <attribute column="storeysbelowground" type="integer" minOccurs="1" maxOccurs="1" path="storeysBelowGround" schema="ur_2"/>
         </complexType>
         <complexType id="ur_2_VehicleTerminalAttributeType" table="ur_vehicleterminalattribu" objectClassId="60095" path="VehicleTerminalAttribute" schema="ur_2">
             <complexAttribute minOccurs="1" maxOccurs="1" path="terminalType" schema="ur_2">

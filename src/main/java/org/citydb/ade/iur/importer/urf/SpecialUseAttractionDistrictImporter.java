@@ -88,7 +88,10 @@ public class SpecialUseAttractionDistrictImporter implements UrbanFunctionModule
             ps.setNull(6, Types.VARCHAR);
         }
 
-        ps.setString(7, specialUseAttractionDistrict.getMaximumBuildingHeight());
+        if (specialUseAttractionDistrict.getMaximumBuildingHeight() != null && specialUseAttractionDistrict.getMaximumBuildingHeight().isSetValue())
+            ps.setString(7, specialUseAttractionDistrict.getMaximumBuildingHeight().getValue());
+        else
+            ps.setNull(7, Types.VARCHAR);
 
         if (specialUseAttractionDistrict.getOtherRestrictions() != null && specialUseAttractionDistrict.getOtherRestrictions().isSetValue())
             ps.setString(8, specialUseAttractionDistrict.getOtherRestrictions().getValue());

@@ -119,7 +119,9 @@ public class SpecialUseAttractionDistrictExporter implements UrbanFunctionModule
             specialUseAttractionDistrict.setMinimumBuildingArea(measure);
         }
 
-        specialUseAttractionDistrict.setMaximumBuildingHeight(rs.getString(prefix + "maximumbuildingheight"));
+        String maximumBuildingHeight = rs.getString(prefix + "maximumbuildingheight");
+        if (!rs.wasNull())
+            specialUseAttractionDistrict.setMaximumBuildingHeight(new StringOrRef(maximumBuildingHeight));
 
         String otherRestrictions = rs.getString(prefix + "otherrestrictions");
         if (!rs.wasNull())
