@@ -53,8 +53,9 @@ public class PublicTransitFacilityImporter implements UrbanFunctionModuleImporte
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.PUBLICTRANSITFACILITY)) + " " +
-                "(id, id_, companyname, companytype, facilitytype, secionname, frequencyofservice, numberofcustomers) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, id_, companyname, companytype, companytype_codespace, facilitytype, facilitytype_codespace," +
+                "secionname, frequencyofservice, numberofcustomers) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         urbanFunctionImporter = manager.getImporter(UrbanFunctionImporter.class);
     }
@@ -68,21 +69,33 @@ public class PublicTransitFacilityImporter implements UrbanFunctionModuleImporte
 
         ps.setString(3, publicTransitFacility.getCompanyName());
 
-        ps.setString(4, publicTransitFacility.getCompanyType());
+        if (publicTransitFacility.getCompanyType() != null && publicTransitFacility.getCompanyType().isSetValue()) {
+            ps.setString(4, publicTransitFacility.getCompanyType().getValue());
+            ps.setString(5, publicTransitFacility.getCompanyType().getCodeSpace());
+        } else {
+            ps.setNull(4, Types.VARCHAR);
+            ps.setNull(5, Types.VARCHAR);
+        }
 
-        ps.setString(5, publicTransitFacility.getFacilityType());
+        if (publicTransitFacility.getFacilityType() != null && publicTransitFacility.getFacilityType().isSetValue()) {
+            ps.setString(6, publicTransitFacility.getFacilityType().getValue());
+            ps.setString(7, publicTransitFacility.getFacilityType().getCodeSpace());
+        } else {
+            ps.setNull(6, Types.VARCHAR);
+            ps.setNull(7, Types.VARCHAR);
+        }
 
-        ps.setString(6, publicTransitFacility.getSecionName());
+        ps.setString(8, publicTransitFacility.getSecionName());
 
         if (publicTransitFacility.getFrequencyOfService() != null)
-            ps.setInt(7, publicTransitFacility.getFrequencyOfService());
+            ps.setInt(9, publicTransitFacility.getFrequencyOfService());
         else
-            ps.setNull(7, Types.INTEGER);
+            ps.setNull(9, Types.INTEGER);
 
         if (publicTransitFacility.getNumberOfCustomers() != null)
-            ps.setInt(8, publicTransitFacility.getNumberOfCustomers());
+            ps.setInt(10, publicTransitFacility.getNumberOfCustomers());
         else
-            ps.setNull(8, Types.INTEGER);
+            ps.setNull(10, Types.INTEGER);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

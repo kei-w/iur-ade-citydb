@@ -41,6 +41,7 @@ import org.citydb.sqlbuilder.select.join.JoinFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonFactory;
 import org.citydb.sqlbuilder.select.operator.comparison.ComparisonName;
 import org.citygml4j.ade.iur.model.urf.PublicTransitFacility;
+import org.citygml4j.model.gml.basicTypes.Code;
 
 import java.sql.*;
 
@@ -77,7 +78,9 @@ public class PublicTransitFacilityExporter implements UrbanFunctionModuleExporte
         select.addProjection(table.getColumn("id_", prefix + "id_"),
                 table.getColumn("companyname", prefix + "companyname"),
                 table.getColumn("companytype", prefix + "companytype"),
+                table.getColumn("companytype_codespace", prefix + "companytype_codespace"),
                 table.getColumn("facilitytype", prefix + "facilitytype"),
+                table.getColumn("facilitytype_codespace", prefix + "facilitytype_codespace"),
                 table.getColumn("secionname", prefix + "secionname"),
                 table.getColumn("frequencyofservice", prefix + "frequencyofservice"),
                 table.getColumn("numberofcustomers", prefix + "numberofcustomers"));
@@ -90,9 +93,19 @@ public class PublicTransitFacilityExporter implements UrbanFunctionModuleExporte
 
         publicTransitFacility.setCompanyName(rs.getString(prefix + "companyname"));
 
-        publicTransitFacility.setCompanyType(rs.getString(prefix + "companytype"));
+        String companyType = rs.getString(prefix + "companytype");
+        if (!rs.wasNull()) {
+            Code code = new Code(companyType);
+            code.setCodeSpace(rs.getString(prefix + "companytype_codespace"));
+            publicTransitFacility.setCompanyType(code);
+        }
 
-        publicTransitFacility.setFacilityType(rs.getString(prefix + "facilitytype"));
+        String facilityType = rs.getString(prefix + "facilitytype");
+        if (!rs.wasNull()) {
+            Code code = new Code(facilityType);
+            code.setCodeSpace(rs.getString(prefix + "facilitytype_codespace"));
+            publicTransitFacility.setFacilityType(code);
+        }
 
         publicTransitFacility.setSecionName(rs.getString(prefix + "secionname"));
 

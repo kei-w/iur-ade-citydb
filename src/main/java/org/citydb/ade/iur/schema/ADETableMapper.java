@@ -2477,7 +2477,9 @@ public class ADETableMapper {
                 add("ID");
                 add("COMPANYNAME");
                 add("COMPANYTYPE");
+                add("COMPANYTYPE_CODESPACE");
                 add("FACILITYTYPE");
+                add("FACILITYTYPE_CODESPACE");
                 add("FREQUENCYOFSERVICE");
                 add("ID_");
                 add("NUMBEROFCUSTOMERS");

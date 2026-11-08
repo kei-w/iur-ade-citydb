@@ -59,6 +59,10 @@ Change Log
   `urt:target` are join tables exported as xlinks.
 * `xs:time` values are stored in timestamp columns on the epoch day.
 
+#### Changes (schema revisions, 2026-11-08)
+* `urf` 3.1.1: the code spaces of `urf:PublicTransitFacility/companyType` and `facilityType` are stored (new
+  `_codespace` columns).
+
 #### Known limitations
 * `gml:pos` values (`uro:Elevation/elevationValue`, `uro:OffsetDepth/pos`) keep their coordinates only; `srsName` and
   `srsDimension` are not stored.

@@ -3959,8 +3959,14 @@
             </extension>
             <attribute column="id_" type="string" minOccurs="1" maxOccurs="1" path="id" schema="ur_2"/>
             <attribute column="companyname" type="string" maxOccurs="1" path="companyName" schema="ur_2"/>
-            <attribute column="companytype" type="string" maxOccurs="1" path="companyType" schema="ur_2"/>
-            <attribute column="facilitytype" type="string" maxOccurs="1" path="facilityType" schema="ur_2"/>
+            <complexAttribute maxOccurs="1" path="companyType" schema="ur_2">
+                <attribute column="companytype_codespace" type="string" path="@codespace" schema="gml"/>
+                <attribute column="companytype" type="string" path="." schema="ur_2"/>
+            </complexAttribute>
+            <complexAttribute maxOccurs="1" path="facilityType" schema="ur_2">
+                <attribute column="facilitytype_codespace" type="string" path="@codespace" schema="gml"/>
+                <attribute column="facilitytype" type="string" path="." schema="ur_2"/>
+            </complexAttribute>
             <attribute column="secionname" type="string" maxOccurs="1" path="secionName" schema="ur_2"/>
             <attribute column="frequencyofservice" type="integer" maxOccurs="1" path="frequencyOfService" schema="ur_2"/>
             <attribute column="numberofcustomers" type="integer" maxOccurs="1" path="numberOfCustomers" schema="ur_2"/>
