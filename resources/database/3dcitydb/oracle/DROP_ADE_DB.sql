@@ -104,6 +104,9 @@ ALTER TABLE ur_building
 ALTER TABLE ur_building
     DROP CONSTRAINT ur_building_buildingdat_fk;
 
+ALTER TABLE ur_building
+    DROP CONSTRAINT ur_building_bldgrealest_fk;
+
 -- -------------------------------------------------------------------- 
 -- ur_building_furniture 
 -- -------------------------------------------------------------------- 
@@ -1015,6 +1018,12 @@ ALTER TABLE ur_railwaytrackattribute
 
 ALTER TABLE ur_railwaytrackattribute
     DROP CONSTRAINT ur_railway_lod3net_brep_fk;
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_realestateidattribute
+    DROP CONSTRAINT ur_realestateidattribut_fk;
 
 -- -------------------------------------------------------------------- 
 -- ur_relief_co_to_dmattribu 
@@ -3316,6 +3325,11 @@ DROP TABLE ur_railwaytr_to_controlpo;
 -- ur_railwaytrackattribute 
 -- -------------------------------------------------------------------- 
 DROP TABLE ur_railwaytrackattribute;
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+DROP TABLE ur_realestateidattribute;
 
 -- -------------------------------------------------------------------- 
 -- ur_relief_co_to_dmattribu 

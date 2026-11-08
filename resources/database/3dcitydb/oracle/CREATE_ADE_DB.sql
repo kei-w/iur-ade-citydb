@@ -282,6 +282,7 @@ CREATE TABLE ur_building
     id NUMBER(38) NOT NULL,
     bldgfacilityidattribute_id NUMBER(38),
     bldgfacilitytypeattribute_id NUMBER(38),
+    bldgrealestateidattribute_id NUMBER(38),
     buildingdataqualityattrib_id NUMBER(38),
     buildingdetailattribute_id NUMBER(38),
     buildingidattribute_id NUMBER(38),
@@ -2419,6 +2420,21 @@ CREATE TABLE ur_railwaytrackattribute
     startpost VARCHAR2(1000),
     tracktype VARCHAR2(1000),
     tracktype_codespace VARCHAR2(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_realestateidattribute
+(
+    id NUMBER(38) NOT NULL,
+    matchingscore INTEGER,
+    numberofbuildingunitownershi INTEGER,
+    numberofrealestateidofland INTEGER,
+    realestateidofbuilding VARCHAR2(1000),
+    realestateidofbuildingunitow VARCHAR2(1000),
+    realestateidofland VARCHAR2(1000),
     PRIMARY KEY (id)
 );
 
@@ -6309,6 +6325,10 @@ ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdat_fk FOREIGN KEY (b
 REFERENCES ur_buildingdataqualityatt (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgrealest_fk FOREIGN KEY (bldgrealestateidattribute_id)
+REFERENCES ur_realestateidattribute (id)
+ON DELETE SET NULL;
+
 -- -------------------------------------------------------------------- 
 -- ur_building_furniture 
 -- -------------------------------------------------------------------- 
@@ -7185,6 +7205,13 @@ REFERENCES surface_geometry (id);
 
 ALTER TABLE ur_railwaytrackattribute ADD CONSTRAINT ur_railway_lod3net_brep_fk FOREIGN KEY (lod3network_brep_id)
 REFERENCES surface_geometry (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_realestateidattribute ADD CONSTRAINT ur_realestateidattribut_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id)
+ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
 -- ur_relief_component 
@@ -9392,6 +9419,8 @@ CREATE INDEX ur_building_ifcbuildin_fkx ON ur_building (ifcbuildingattribute_id)
 CREATE INDEX ur_building_indoorbuil_fkx ON ur_building (indoorbuildingattribute_id);
 
 CREATE INDEX ur_building_largecusto_fkx ON ur_building (largecustomerfacilityattr_id);
+
+CREATE INDEX ur_building_bldgreales_fkx ON ur_building (bldgrealestateidattribute_id);
 
 -- -------------------------------------------------------------------- 
 -- ur_building_furniture 

@@ -1066,6 +1066,7 @@ CREATE TABLE ur_building
     id BIGINT NOT NULL,
     bldgfacilityidattribute_id BIGINT,
     bldgfacilitytypeattribute_id BIGINT,
+    bldgrealestateidattribute_id BIGINT,
     buildingdataqualityattrib_id BIGINT,
     buildingdetailattribute_id BIGINT,
     buildingidattribute_id BIGINT,
@@ -3203,6 +3204,21 @@ CREATE TABLE ur_railwaytrackattribute
     startpost VARCHAR(1000),
     tracktype VARCHAR(1000),
     tracktype_codespace VARCHAR(1000),
+    PRIMARY KEY (id)
+);
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+CREATE TABLE ur_realestateidattribute
+(
+    id BIGINT NOT NULL,
+    matchingscore INTEGER,
+    numberofbuildingunitownershi INTEGER,
+    numberofrealestateidofland INTEGER,
+    realestateidofbuilding VARCHAR(1000),
+    realestateidofbuildingunitow VARCHAR(1000),
+    realestateidofland VARCHAR(1000),
     PRIMARY KEY (id)
 );
 
@@ -7093,6 +7109,10 @@ ALTER TABLE ur_building ADD CONSTRAINT ur_building_buildingdat_fk FOREIGN KEY (b
 REFERENCES ur_buildingdataqualityatt (id)
 ON DELETE SET NULL;
 
+ALTER TABLE ur_building ADD CONSTRAINT ur_building_bldgrealest_fk FOREIGN KEY (bldgrealestateidattribute_id)
+REFERENCES ur_realestateidattribute (id)
+ON DELETE SET NULL;
+
 -- -------------------------------------------------------------------- 
 -- ur_building_furniture 
 -- -------------------------------------------------------------------- 
@@ -7969,6 +7989,13 @@ REFERENCES surface_geometry (id);
 
 ALTER TABLE ur_railwaytrackattribute ADD CONSTRAINT ur_railway_lod3net_brep_fk FOREIGN KEY (lod3network_brep_id)
 REFERENCES surface_geometry (id);
+
+-- -------------------------------------------------------------------- 
+-- ur_realestateidattribute 
+-- -------------------------------------------------------------------- 
+ALTER TABLE ur_realestateidattribute ADD CONSTRAINT ur_realestateidattribut_fk FOREIGN KEY (id)
+REFERENCES ur_buildingattribute (id)
+ON DELETE CASCADE;
 
 -- -------------------------------------------------------------------- 
 -- ur_relief_component 
@@ -10236,6 +10263,12 @@ CREATE INDEX ur_building_largecusto_fkx ON ur_building
     USING btree
     (
       largecustomerfacilityattr_id ASC NULLS LAST
+    )   WITH (FILLFACTOR = 90);
+
+CREATE INDEX ur_building_bldgreales_fkx ON ur_building
+    USING btree
+    (
+      bldgrealestateidattribute_id ASC NULLS LAST
     )   WITH (FILLFACTOR = 90);
 
 -- -------------------------------------------------------------------- 

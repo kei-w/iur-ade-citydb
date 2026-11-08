@@ -682,6 +682,17 @@
             <attribute column="note" type="string" maxOccurs="1" path="note" schema="ur_1"/>
             <attribute column="surveyyear" type="date" minOccurs="1" maxOccurs="1" path="surveyYear" schema="ur_1"/>
         </complexType>
+        <complexType id="ur_1_RealEstateIDAttributeType" table="ur_realestateidattribute" objectClassId="60414" path="RealEstateIDAttribute" schema="ur_1">
+            <extension base="ur_1_BuildingAttributeType">
+                <join table="ur_buildingattribute" fromColumn="id" toColumn="id" toRole="parent"/>
+            </extension>
+            <attribute column="realestateidofbuilding" type="string" minOccurs="1" maxOccurs="1" path="realEstateIDOfBuilding" schema="ur_1"/>
+            <attribute column="numberofbuildingunitownershi" type="integer" maxOccurs="1" path="numberOfBuildingUnitOwnership" schema="ur_1"/>
+            <attribute column="realestateidofbuildingunitow" type="string" path="realEstateIDOfBuildingUnitOwnership" schema="ur_1"/>
+            <attribute column="numberofrealestateidofland" type="integer" maxOccurs="1" path="numberOfRealEstateIDOfLand" schema="ur_1"/>
+            <attribute column="realestateidofland" type="string" path="realEstateIDOfLand" schema="ur_1"/>
+            <attribute column="matchingscore" type="integer" minOccurs="1" maxOccurs="1" path="matchingScore" schema="ur_1"/>
+        </complexType>
         <complexType abstract="true" id="ur_1_BuildingDisasterRiskAttributeType" table="ur_buildingdisasterriskat" objectClassId="60042" path="BuildingDisasterRiskAttribute" schema="ur_1">
             <extension base="ur_1_BuildingAttributeType">
                 <join table="ur_buildingattribute" fromColumn="id" toColumn="id" toRole="parent"/>
@@ -5790,6 +5801,9 @@
             </complexProperty>
             <complexProperty refType="ur_1_BuildingDataQualityAttributeType" maxOccurs="1" path="buildingDataQualityAttribute" schema="ur_1">
                 <join table="ur_buildingdataqualityatt" fromColumn="buildingdataqualityattrib_id" toColumn="id" toRole="parent"/>
+            </complexProperty>
+            <complexProperty refType="ur_1_RealEstateIDAttributeType" maxOccurs="1" path="bldgRealEstateIDAttribute" schema="ur_1">
+                <join table="ur_realestateidattribute" fromColumn="bldgrealestateidattribute_id" toColumn="id" toRole="parent"/>
             </complexProperty>
         </propertyInjection>
         <propertyInjection table="ur_land_use" defaultBase="LandUseType">
