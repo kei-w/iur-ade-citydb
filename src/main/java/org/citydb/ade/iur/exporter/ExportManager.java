@@ -839,6 +839,8 @@ public class ExportManager implements ADEExportManager {
                     exporter = new TunnelStructureAttributeExporter(connection, helper, this);
                 else if (type == TunnelFunctionalAttributeExporter.class)
                     exporter = new TunnelFunctionalAttributeExporter(connection, helper, this);
+                else if (type == BuildingAttributeExporter.class)
+                    exporter = new BuildingAttributeExporter(connection, helper, this);
                 else if (type == RailwayRouteAttributeExporter.class)
                     exporter = new RailwayRouteAttributeExporter(connection, helper, this);
                 else if (type == RailwayTrackAttributeExporter.class)
@@ -871,8 +873,6 @@ public class ExportManager implements ADEExportManager {
                     exporter = new LandUseDataQualityAttributeExporter(connection, helper, this);
                 else if (type == RoadTypeExporter.class)
                     exporter = new RoadTypeExporter(connection, helper, this);
-                else if (type == BuildingAttributeExporter.class)
-                    exporter = new BuildingAttributeExporter(connection, helper, this);
                 else if (type == KeyValuePairAttributeExporter.class)
                     exporter = new KeyValuePairAttributeExporter(connection, helper, this);
                 else if (type == LandUseDetailAttributeExporter.class)

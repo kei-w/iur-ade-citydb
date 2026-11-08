@@ -51,9 +51,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
     private final BuildingToFacilityAttributeImporter buildingToFacilityAttributeImporter;
     private final DmAttributeImporter dmAttributeImporter;
     private final BuildingToDmAttributeImporter buildingToDmAttributeImporter;
+    private final BuildingAttributeImporter buildingAttributeImporter;
     private final IfcAttributeImporter ifcAttributeImporter;
     private final IndoorAttributeImporter indoorAttributeImporter;
-    private final BuildingAttributeImporter buildingAttributeImporter;
     private final BuildingToBuildingDisasterRiskAttributeImporter buildingToBuildingDisasterRiskAttributeImporter;
     private final KeyValuePairAttributeImporter keyValuePairAttributeImporter;
     private final BuildingToKeyValuePairAttributeImporter buildingToKeyValuePairAttributeImporter;
@@ -66,10 +66,10 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
 
         ps = connection.prepareStatement("insert into " +
                 helper.getTableNameWithSchema(schemaMapper.getTableName(ADETable.BUILDING)) + " " +
-                "(id, bldgfacilityidattribute_id, bldgfacilitytypeattribute_id, ifcbuildingattribute_id," +
-                "indoorbuildingattribute_id, buildingidattribute_id, buildingdetailattribute_id," +
-                "largecustomerfacilityattr_id, buildingdataqualityattrib_id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(id, bldgfacilityidattribute_id, bldgfacilitytypeattribute_id, bldgrealestateidattribute_id," +
+                "ifcbuildingattribute_id, indoorbuildingattribute_id, buildingidattribute_id," +
+                "buildingdetailattribute_id, largecustomerfacilityattr_id, buildingdataqualityattrib_id) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         facilityIdAttributeImporter = manager.getImporter(FacilityIdAttributeImporter.class);
         facilityTypeAttributeImporter = manager.getImporter(FacilityTypeAttributeImporter.class);
@@ -77,9 +77,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         buildingToFacilityAttributeImporter = manager.getImporter(BuildingToFacilityAttributeImporter.class);
         dmAttributeImporter = manager.getImporter(DmAttributeImporter.class);
         buildingToDmAttributeImporter = manager.getImporter(BuildingToDmAttributeImporter.class);
+        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         ifcAttributeImporter = manager.getImporter(IfcAttributeImporter.class);
         indoorAttributeImporter = manager.getImporter(IndoorAttributeImporter.class);
-        buildingAttributeImporter = manager.getImporter(BuildingAttributeImporter.class);
         buildingToBuildingDisasterRiskAttributeImporter = manager.getImporter(BuildingToBuildingDisasterRiskAttributeImporter.class);
         keyValuePairAttributeImporter = manager.getImporter(KeyValuePairAttributeImporter.class);
         buildingToKeyValuePairAttributeImporter = manager.getImporter(BuildingToKeyValuePairAttributeImporter.class);
@@ -116,6 +116,20 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         else
             ps.setNull(3, Types.NULL);
 
+        long bldgRealEstateIDAttributeId = 0;
+        if (properties.contains(BldgRealEstateIDAttributePropertyElement.class)) {
+            BldgRealEstateIDAttributePropertyElement property = properties.getFirst(BldgRealEstateIDAttributePropertyElement.class);
+            if (property.isSetValue() && property.getValue().isSetObject()) {
+                bldgRealEstateIDAttributeId = buildingAttributeImporter.doImport(property.getValue().getObject());
+                property.setValue(null);
+            }
+        }
+
+        if (bldgRealEstateIDAttributeId != 0)
+            ps.setLong(4, bldgRealEstateIDAttributeId);
+        else
+            ps.setNull(4, Types.NULL);
+
         long ifcBuildingAttributeId = 0;
         if (properties.contains(IfcBuildingAttributePropertyElement.class)) {
             IfcBuildingAttributePropertyElement property = properties.getFirst(IfcBuildingAttributePropertyElement.class);
@@ -126,9 +140,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (ifcBuildingAttributeId != 0)
-            ps.setLong(4, ifcBuildingAttributeId);
+            ps.setLong(5, ifcBuildingAttributeId);
         else
-            ps.setNull(4, Types.NULL);
+            ps.setNull(5, Types.NULL);
 
         long indoorBuildingAttributeId = 0;
         if (properties.contains(IndoorBuildingAttributePropertyElement.class)) {
@@ -140,9 +154,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (indoorBuildingAttributeId != 0)
-            ps.setLong(5, indoorBuildingAttributeId);
+            ps.setLong(6, indoorBuildingAttributeId);
         else
-            ps.setNull(5, Types.NULL);
+            ps.setNull(6, Types.NULL);
 
         long buildingIDAttributeId = 0;
         if (properties.contains(BuildingIDAttributePropertyElement.class)) {
@@ -154,9 +168,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (buildingIDAttributeId != 0)
-            ps.setLong(6, buildingIDAttributeId);
+            ps.setLong(7, buildingIDAttributeId);
         else
-            ps.setNull(6, Types.NULL);
+            ps.setNull(7, Types.NULL);
 
         long buildingDetailAttributeId = 0;
         if (properties.contains(BuildingDetailAttributePropertyElement.class)) {
@@ -168,9 +182,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (buildingDetailAttributeId != 0)
-            ps.setLong(7, buildingDetailAttributeId);
+            ps.setLong(8, buildingDetailAttributeId);
         else
-            ps.setNull(7, Types.NULL);
+            ps.setNull(8, Types.NULL);
 
         long largeCustomerFacilityAttributeId = 0;
         if (properties.contains(LargeCustomerFacilityAttributePropertyElement.class)) {
@@ -182,9 +196,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (largeCustomerFacilityAttributeId != 0)
-            ps.setLong(8, largeCustomerFacilityAttributeId);
+            ps.setLong(9, largeCustomerFacilityAttributeId);
         else
-            ps.setNull(8, Types.NULL);
+            ps.setNull(9, Types.NULL);
 
         long buildingDataQualityAttributeId = 0;
         if (properties.contains(BuildingDataQualityAttributePropertyElement.class)) {
@@ -196,9 +210,9 @@ public class BuildingPropertiesImporter implements UrbanObjectModuleImporter {
         }
 
         if (buildingDataQualityAttributeId != 0)
-            ps.setLong(9, buildingDataQualityAttributeId);
+            ps.setLong(10, buildingDataQualityAttributeId);
         else
-            ps.setNull(9, Types.NULL);
+            ps.setNull(10, Types.NULL);
 
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())

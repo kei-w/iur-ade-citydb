@@ -41,6 +41,7 @@ import org.citygml4j.ade.iur.model.uro.BuildingDetailAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingDisasterRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingIDAttribute;
 import org.citygml4j.ade.iur.model.uro.LargeCustomerFacilityAttribute;
+import org.citygml4j.ade.iur.model.uro.RealEstateIDAttribute;
 
 import java.sql.*;
 
@@ -49,6 +50,7 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
     private final ObjectMapper objectMapper;
     private final SchemaMapper schemaMapper;
     private final PreparedStatement ps;
+    private final RealEstateIDAttributeImporter realEstateIDAttributeImporter;
     private final BuildingIDAttributeImporter buildingIDAttributeImporter;
     private final BuildingDetailAttributeImporter buildingDetailAttributeImporter;
     private final LargeCustomerFacilityAttributeImporter largeCustomerFacilityAttributeImporter;
@@ -67,6 +69,7 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
                 "(id, objectclass_id) " +
                 "values (?, ?)");
 
+        realEstateIDAttributeImporter = manager.getImporter(RealEstateIDAttributeImporter.class);
         buildingIDAttributeImporter = manager.getImporter(BuildingIDAttributeImporter.class);
         buildingDetailAttributeImporter = manager.getImporter(BuildingDetailAttributeImporter.class);
         largeCustomerFacilityAttributeImporter = manager.getImporter(LargeCustomerFacilityAttributeImporter.class);
@@ -82,6 +85,9 @@ public class BuildingAttributeImporter implements UrbanObjectModuleImporter {
         ps.addBatch();
         if (++batchCounter == helper.getDatabaseAdapter().getMaxBatchSize())
             helper.executeBatch(schemaMapper.getTableName(ADETable.BUILDINGATTRIBUTE));
+
+        if (buildingAttribute instanceof RealEstateIDAttribute)
+            realEstateIDAttributeImporter.doImport((RealEstateIDAttribute) buildingAttribute, objectId);
 
         if (buildingAttribute instanceof BuildingIDAttribute)
             buildingIDAttributeImporter.doImport((BuildingIDAttribute) buildingAttribute, objectId);

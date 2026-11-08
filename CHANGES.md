@@ -51,6 +51,11 @@ Change Log
   `urt:target` are join tables exported as xlinks.
 * `xs:time` values are stored in timestamp columns on the epoch day.
 
+#### Changes (schema revisions, 2026-11-08)
+* `uro` 3.0.4: the table `ur_realestateidattribute` (a subtype of `ur_buildingattribute`) and the column
+  `ur_building.bldgrealestateidattribute_id` are added in the form the ADE Manager produces for the same type in
+  3.1; the importers and exporters are regenerated.
+
 #### Known limitations
 * `uro:ControlPoint/uro:parameter` is not supported: the 3.0 XSD declares it with the type of `uro:ControlPoint` itself.
 * `gml:pos` values (`uro:Elevation/elevationValue`, `uro:OffsetDepth/pos`) keep their coordinates only; `srsName` and

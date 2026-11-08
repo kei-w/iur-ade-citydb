@@ -209,6 +209,7 @@ public class ADETableMapper {
                 add("ID");
                 add("BLDGFACILITYIDATTRIBUTE_ID");
                 add("BLDGFACILITYTYPEATTRIBUTE_ID");
+                add("BLDGREALESTATEIDATTRIBUTE_ID");
                 add("BUILDINGDATAQUALITYATTRIB_ID");
                 add("BUILDINGDETAILATTRIBUTE_ID");
                 add("BUILDINGIDATTRIBUTE_ID");
@@ -2386,6 +2387,15 @@ public class ADETableMapper {
             put(schemaMapper.getTableName(ADETable.RAILWAYTR_TO_CONTROLPO).toUpperCase(), new LinkedHashSet<String>() {{
                 add("CONTROLPOINT_ID");
                 add("RAILWAYTRACKATTRIBUTE_ID");
+            }});
+            put(schemaMapper.getTableName(ADETable.REALESTATEIDATTRIBUTE).toUpperCase(), new LinkedHashSet<String>() {{
+                add("ID");
+                add("MATCHINGSCORE");
+                add("NUMBEROFBUILDINGUNITOWNERSHI");
+                add("NUMBEROFREALESTATEIDOFLAND");
+                add("REALESTATEIDOFBUILDING");
+                add("REALESTATEIDOFBUILDINGUNITOW");
+                add("REALESTATEIDOFLAND");
             }});
             put(schemaMapper.getTableName(ADETable.RECREATIONS).toUpperCase(), new LinkedHashSet<String>() {{
                 add("ID");

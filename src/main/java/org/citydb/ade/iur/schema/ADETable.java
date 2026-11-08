@@ -288,6 +288,7 @@ public enum ADETable {
     RAILWAYROUTEATTRIBUTE(RailwayRouteAttributeImporter.class),
     RAILWAYTRACKATTRIBUTE(RailwayTrackAttributeImporter.class),
     RAILWAYTR_TO_CONTROLPO(RailwayTrackAttributeToControlPointImporter.class),
+    REALESTATEIDATTRIBUTE(RealEstateIDAttributeImporter.class),
     RECREATIONS(RecreationsImporter.class),
     RELIEF_COMPONENT(ReliefComponentPropertiesImporter.class),
     RELIEF_CO_TO_DMATTRIBU(ReliefComponentToDmAttributeImporter.class),

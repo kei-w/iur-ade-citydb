@@ -50,6 +50,7 @@ import org.citygml4j.ade.iur.model.uro.BuildingIDAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingLandSlideRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.BuildingRiverFloodingRiskAttribute;
 import org.citygml4j.ade.iur.model.uro.LargeCustomerFacilityAttribute;
+import org.citygml4j.ade.iur.model.uro.RealEstateIDAttribute;
 import org.citygml4j.model.gml.basicTypes.Code;
 import org.citygml4j.model.gml.basicTypes.Measure;
 import org.citygml4j.model.gml.measures.Length;
@@ -70,6 +71,7 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
         String tableName = manager.getSchemaMapper().getTableName(ADETable.BUILDINGATTRIBUTE);
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
+        Table realEstateIDAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.REALESTATEIDATTRIBUTE)));
         Table buildingIDAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGIDATTRIBUTE)));
         Table buildingDetailAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGDETAILATTRIBUT)));
         Table largeCustomerFacilityAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.LARGECUSTOMERFACILITYA)));
@@ -78,6 +80,8 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
         Table buildingRiverFloodingRiskAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGRIVERFLOODINGR)));
         Table buildingDataQualityAttribute = new Table(helper.getTableNameWithSchema(manager.getSchemaMapper().getTableName(ADETable.BUILDINGDATAQUALITYATT)));
         Select select = new Select().addProjection(table.getColumns("id", "objectclass_id"))
+                .addProjection(realEstateIDAttribute.getColumns("realestateidofbuilding", "numberofbuildingunitownershi", "realestateidofbuildingunitow",
+                        "numberofrealestateidofland", "realestateidofland", "matchingscore"))
                 .addProjection(buildingIDAttribute.getColumns("buildingid", "branchid", "partid", "prefecture", "prefecture_codespace", "city", "city_codespace"))
                 .addProjection(buildingDetailAttribute.getColumns("serialnumberofbuildingcertif", "sitearea", "sitearea_uom", "buildingfootprintarea",
                         "buildingfootprintarea_uom", "buildingroofedgearea", "buildingroofedgearea_uom", "developmentarea",
@@ -128,6 +132,7 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
                 .addProjection(largeCustomerFacilityAttribute.getColumn("reference", "largecustomerfacilityattribute_reference"))
                 .addProjection(largeCustomerFacilityAttribute.getColumn("note", "largecustomerfacilityattribute_note"))
                 .addProjection(largeCustomerFacilityAttribute.getColumn("surveyyear", "largecustomerfacilityattribute_surveyyear"))
+                .addJoin(JoinFactory.left(realEstateIDAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.left(buildingIDAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.left(buildingDetailAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
                 .addJoin(JoinFactory.left(largeCustomerFacilityAttribute, "id", ComparisonName.EQUAL_TO, table.getColumn("id")))
@@ -158,6 +163,30 @@ public class BuildingAttributeExporter implements UrbanObjectModuleExporter {
         if (buildingAttribute == null) {
             helper.logOrThrowErrorMessage("Failed to instantiate building attribute (id: " + objectId + ").");
             return null;
+        }
+
+        if (buildingAttribute instanceof RealEstateIDAttribute) {
+            RealEstateIDAttribute realEstateIDAttribute = (RealEstateIDAttribute) buildingAttribute;
+
+            realEstateIDAttribute.setRealEstateIDOfBuilding(rs.getString("realestateidofbuilding"));
+
+            int numberOfBuildingUnitOwnership = rs.getInt("numberofbuildingunitownershi");
+            if (!rs.wasNull())
+                realEstateIDAttribute.setNumberOfBuildingUnitOwnership(numberOfBuildingUnitOwnership);
+
+            for (SplitValue splitValue : valueSplitter.split(rs.getString("realestateidofbuildingunitow")))
+                realEstateIDAttribute.getRealEstateIDOfBuildingUnitOwnership().add(splitValue.result(0));
+
+            int numberOfRealEstateIDOfLand = rs.getInt("numberofrealestateidofland");
+            if (!rs.wasNull())
+                realEstateIDAttribute.setNumberOfRealEstateIDOfLand(numberOfRealEstateIDOfLand);
+
+            for (SplitValue splitValue : valueSplitter.split(rs.getString("realestateidofland")))
+                realEstateIDAttribute.getRealEstateIDOfLand().add(splitValue.result(0));
+
+            int matchingScore = rs.getInt("matchingscore");
+            if (!rs.wasNull())
+                realEstateIDAttribute.setMatchingScore(matchingScore);
         }
 
         if (buildingAttribute instanceof BuildingIDAttribute) {

@@ -53,9 +53,9 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
     private final FacilityTypeAttributeExporter facilityTypeAttributeExporter;
     private final FacilityAttributeExporter facilityAttributeExporter;
     private final DmAttributeExporter dmAttributeExporter;
+    private final BuildingAttributeExporter buildingAttributeExporter;
     private final IfcAttributeExporter ifcAttributeExporter;
     private final IndoorAttributeExporter indoorAttributeExporter;
-    private final BuildingAttributeExporter buildingAttributeExporter;
     private final KeyValuePairAttributeExporter keyValuePairAttributeExporter;
     private final PreparedStatement psBldgFacilityAttribute;
     private final PreparedStatement psBldgDmAttribute;
@@ -67,9 +67,9 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         module = UrbanObjectModule.v3_0.getNamespaceURI();
 
         Table table = new Table(helper.getTableNameWithSchema(tableName));
-        Select select = new Select().addProjection(table.getColumns("bldgfacilityidattribute_id", "bldgfacilitytypeattribute_id", "ifcbuildingattribute_id",
-                        "indoorbuildingattribute_id", "buildingidattribute_id", "buildingdetailattribute_id",
-                        "largecustomerfacilityattr_id", "buildingdataqualityattrib_id"))
+        Select select = new Select().addProjection(table.getColumns("bldgfacilityidattribute_id", "bldgfacilitytypeattribute_id", "bldgrealestateidattribute_id",
+                        "ifcbuildingattribute_id", "indoorbuildingattribute_id", "buildingidattribute_id",
+                        "buildingdetailattribute_id", "largecustomerfacilityattr_id", "buildingdataqualityattrib_id"))
                 .addSelection(ComparisonFactory.equalTo(table.getColumn("id"), new PlaceHolder<>()));
         ps = connection.prepareStatement(select.toString());
 
@@ -97,9 +97,9 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
         facilityTypeAttributeExporter = manager.getExporter(FacilityTypeAttributeExporter.class);
         facilityAttributeExporter = manager.getExporter(FacilityAttributeExporter.class);
         dmAttributeExporter = manager.getExporter(DmAttributeExporter.class);
+        buildingAttributeExporter = manager.getExporter(BuildingAttributeExporter.class);
         ifcAttributeExporter = manager.getExporter(IfcAttributeExporter.class);
         indoorAttributeExporter = manager.getExporter(IndoorAttributeExporter.class);
-        buildingAttributeExporter = manager.getExporter(BuildingAttributeExporter.class);
         keyValuePairAttributeExporter = manager.getExporter(KeyValuePairAttributeExporter.class);
     }
 
@@ -149,6 +149,15 @@ public class BuildingPropertiesExporter implements UrbanObjectModuleExporter {
                                 parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                             }
                         }
+                    }
+                }
+
+                long bldgRealEstateIDAttributeId = rs.getLong("bldgrealestateidattribute_id");
+                if (bldgRealEstateIDAttributeId != 0 && projectionFilter.containsProperty("bldgRealEstateIDAttribute", module)) {
+                    BuildingAttribute bldgRealEstateIDAttribute = buildingAttributeExporter.doExport(bldgRealEstateIDAttributeId);
+                    if (bldgRealEstateIDAttribute instanceof RealEstateIDAttribute) {
+                        BldgRealEstateIDAttributePropertyElement property = new BldgRealEstateIDAttributePropertyElement(new RealEstateIDAttributeProperty((RealEstateIDAttribute) bldgRealEstateIDAttribute));
+                        parent.addGenericApplicationPropertyOfAbstractBuilding(property);
                     }
                 }
 

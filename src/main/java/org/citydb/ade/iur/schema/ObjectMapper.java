@@ -714,6 +714,12 @@ public class ObjectMapper implements ADEObjectMapper {
                 case "TunnelFunctionalAttribute":
                     typeClassIds.put(TunnelFunctionalAttribute.class, typeClassId);
                     break;
+                case "BuildingAttribute":
+                    typeClassIds.put(BuildingAttribute.class, typeClassId);
+                    break;
+                case "RealEstateIDAttribute":
+                    typeClassIds.put(RealEstateIDAttribute.class, typeClassId);
+                    break;
                 case "RailwayRouteAttribute":
                     typeClassIds.put(RailwayRouteAttribute.class, typeClassId);
                     break;
@@ -893,9 +899,6 @@ public class ObjectMapper implements ADEObjectMapper {
                     break;
                 case "RoadType":
                     typeClassIds.put(RoadType.class, typeClassId);
-                    break;
-                case "BuildingAttribute":
-                    typeClassIds.put(BuildingAttribute.class, typeClassId);
                     break;
                 case "BuildingIDAttribute":
                     typeClassIds.put(BuildingIDAttribute.class, typeClassId);

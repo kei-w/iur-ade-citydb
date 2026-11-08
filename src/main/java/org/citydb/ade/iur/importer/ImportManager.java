@@ -958,6 +958,10 @@ public class ImportManager implements ADEImportManager {
                     importer = new TunnelStructureAttributeImporter(connection, helper, this);
                 else if (type == TunnelFunctionalAttributeImporter.class)
                     importer = new TunnelFunctionalAttributeImporter(connection, helper, this);
+                else if (type == BuildingAttributeImporter.class)
+                    importer = new BuildingAttributeImporter(connection, helper, this);
+                else if (type == RealEstateIDAttributeImporter.class)
+                    importer = new RealEstateIDAttributeImporter(connection, helper, this);
                 else if (type == RailwayRouteAttributeImporter.class)
                     importer = new RailwayRouteAttributeImporter(connection, helper, this);
                 else if (type == RailwayTrackAttributeImporter.class)
@@ -1058,8 +1062,6 @@ public class ImportManager implements ADEImportManager {
                     importer = new LandUseDataQualityAttributeImporter(connection, helper, this);
                 else if (type == RoadTypeImporter.class)
                     importer = new RoadTypeImporter(connection, helper, this);
-                else if (type == BuildingAttributeImporter.class)
-                    importer = new BuildingAttributeImporter(connection, helper, this);
                 else if (type == BuildingIDAttributeImporter.class)
                     importer = new BuildingIDAttributeImporter(connection, helper, this);
                 else if (type == BuildingDetailAttributeImporter.class)
